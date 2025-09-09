@@ -51,3 +51,14 @@ Route::middleware(['auth'])->group(function () {
 
 
 
+
+// untuk pencarian user di jadwal
+// Tambahkan route ini di routes/web.php
+Route::get('/search-users', [JadwalController::class, 'searchUsers'])->name('search.users');
+
+// Atau kalau mau lebih spesifik dengan middleware
+// Route::get('/search-users', [JadwalController::class, 'searchUsers'])
+//      ->name('search.users')
+//      ->middleware('auth'); // sesuaikan middleware yang dipakai
+// routes/web.php (temporary untuk debug)
+Route::get('/check-db', [JadwalController::class, 'checkDatabaseStructure']);

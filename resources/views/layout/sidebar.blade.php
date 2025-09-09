@@ -44,8 +44,8 @@
              <span>Management Kaldik</span>
          </a>
      </li>
-     <li>
-         <a href="#" class="nav-link">
+     <li class="{{ Route::is('jadwal.*') ? 'active' : '' }}">
+         <a href="{{ route('jadwal.index') }}" class="nav-link">
              <i class="fa-solid fa-calendar-day"></i>
              <span>Management Jadwal</span>
          </a>
