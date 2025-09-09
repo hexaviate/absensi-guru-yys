@@ -12,7 +12,7 @@
 
         <div class="section-body">
             <div class="shadow pb-2">
-                {{-- <a href="{{ route('jadwal.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Instansi</a> --}}
+                <a href="{{ route('jadwal.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Instansi</a>
             </div>
 
             <div class="row">
@@ -37,25 +37,19 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {{-- @forelse ($instansi as $item)
+                                        @forelse ($jadwal as $item)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $item->nama_instansi }}</td>
-                                                <td>{{ $item->kepala_instansi }}</td>
-                                                <td>{{ $item->alamat_instansi }}</td>
-                                                <td>{{ $item->telp_instansi }}</td>
-                                                <td>
-                                                    @foreach ($item->user as $user)
-                                                        {{ $user->name }}
-                                                        @if (!$loop->last)
-                                                            ,
-                                                        @endif
-                                                    @endforeach
-                                                </td>
+                                                <td>{{ $item->tapel->kode }}</td>
+                                                <td>{{ $item->instansi->nama_instansi }}</td>
+                                                <td>{{ $item->user->name }}</td>
+                                                <td>{{ $item->hari }}</td>
+                                                <td>{{ $item->datang }}</td>
+                                                <td>{{ $item->pulang }}</td>
                                                 <td class="d-flex">
-                                                    <a href="{{ route('instansi.edit', $item->id) }}"
+                                                    <a href="{{ route('jadwal.edit', $item->id) }}"
                                                         class="btn btn-warning mx-2">Edit</a>
-                                                    <form action="{{ route('instansi.destroy', $item->id) }}" method="POST"
+                                                    <form action="{{ route('jadwal.destroy', $item->id) }}" method="POST"
                                                         onsubmit="return confirm('Yakin ingin menghapus?')">
                                                         @csrf
                                                         @method('delete')
@@ -67,7 +61,7 @@
                                             <tr>
                                                 <td colspan="7" class="text-center">Data Instansi Kosong</td>
                                             </tr>
-                                        @endforelse --}}
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
