@@ -8,7 +8,8 @@
 <ul class="navbar-nav navbar-right">
     <li class="dropdown"><a href="#" data-toggle="dropdown"
             class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-            <img alt="image" src="{{asset('asset/dist/assets/img/avatar/avatar-2.png')}}" class="rounded-circle mr-1">
+            <img alt="image" src="{{ asset('asset/dist/assets/img/avatar/avatar-2.png') }}"
+                class="rounded-circle mr-1">
             <div class="d-sm-none d-lg-inline-block">Hi, Ujang Maman</div>
         </a>
         <div class="dropdown-menu dropdown-menu-right">
@@ -17,9 +18,16 @@
                 <i class="far fa-user"></i> Profile
             </a>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item has-icon text-danger">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
+            <form action="{{ Route('logout') }}" method="POST">
+                @csrf
+                <button type="submit">
+                    <a class="dropdown-item has-icon text-danger">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </button>
+            </form>
+
         </div>
+
     </li>
 </ul>

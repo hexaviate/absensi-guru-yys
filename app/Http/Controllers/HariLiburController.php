@@ -16,8 +16,18 @@ class HariLiburController extends Controller
      */
     public function index()
     {
-        $hariLibur = HariLibur::where('instansi_id', 3); //nanti diubah agar instansi disamakan dengan instansi nya operator
-        return view('instansi.main', compact('hariLibur'));
+        $user = auth()->user();
+
+        $tapel = Tapel::all();
+        if ($user->hasAnyPermission(['view all hari_libur', 'manage hari_libur'])) {
+            $instansi = $user->instansi; //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
+            return view('hariLibur.index', compact('user', 'tapel', 'instansi'));
+        } else {
+            return view('login')->with('error', 'Anda tidak punya Permission');
+        }
+
+        // $hariLibur = HariLibur::where('instansi_id', $user->id); //nanti diubah agar instansi disamakan dengan instansi nya operator
+        // return view('hariLibur.index', compact('hariLibur', 'user'));
     }
 
     /**
@@ -25,8 +35,13 @@ class HariLiburController extends Controller
      */
     public function create()
     {
+        $user = auth()->user();
+        if (!$user->can('manage hari_libur')) {
+            return redirect()->intended('dashboard');
+        }
+
         $tapel = Tapel::all();
-        $instansi = Instansi::where('id', 3); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
+        $instansi = Instansi::where('id', $user->id); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
         return view('', compact('tapel', 'instansi'));
 
     }

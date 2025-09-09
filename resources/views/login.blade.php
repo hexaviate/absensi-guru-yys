@@ -57,19 +57,20 @@
                                     </div>
 
                                     <div class="form-group">
-  <label for="password">Password</label>
-  <div class="input-group">
-    <input type="password" class="form-control" id="password" name="password" required>
-    <div class="input-group-append">
-      <span class="input-group-text" style="cursor: pointer;">
-        <i class="fa fa-eye toggle-password"></i>
-      </span>
-    </div>
-  </div>
-  <div class="invalid-feedback">
-    Tolong isi Password Anda
-  </div>
-</div>
+                                        <label for="password">Password</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="password" name="password"
+                                                required>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" style="cursor: pointer;">
+                                                    <i class="fa fa-eye toggle-password"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="invalid-feedback">
+                                            Tolong isi Password Anda
+                                        </div>
+                                    </div>
 
 
 
