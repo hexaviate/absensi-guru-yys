@@ -50,8 +50,8 @@
              <span>Management Jadwal</span>
          </a>
      </li>
-     <li>
-         <a href="#" class="nav-link">
+     <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
+         <a href="{{ route('hariLibur.index') }}" class="nav-link">
              <i class="fa-solid fa-umbrella-beach">
              </i><span>Management Hari Libur</span>
          </a>

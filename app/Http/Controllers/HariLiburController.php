@@ -16,8 +16,9 @@ class HariLiburController extends Controller
      */
     public function index()
     {
-        $hariLibur = HariLibur::where('instansi_id', 3); //nanti diubah agar instansi disamakan dengan instansi nya operator
-        return view('instansi.main', compact('hariLibur'));
+        $tapel = Tapel::all();
+        $hariLibur = HariLibur::where('instansi_id', 3)->get(); //nanti diubah agar instansi disamakan dengan instansi nya operator
+        return view('hariLibur.main', compact('hariLibur','tapel'));
     }
 
     /**
@@ -26,8 +27,8 @@ class HariLiburController extends Controller
     public function create()
     {
         $tapel = Tapel::all();
-        $instansi = Instansi::where('id', 3); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
-        return view('', compact('tapel', 'instansi'));
+        $instansi = Instansi::where('id', 3)->get(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
+        return view('hariLibur.tambah', compact('tapel', 'instansi'));
 
     }
 
@@ -80,9 +81,10 @@ class HariLiburController extends Controller
      */
     public function edit(string $id)
     {
+        $hariLibur = HariLibur::findOrFail($id);
         $tapel = Tapel::all();
-        $instansi = Instansi::where('id', 3); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
-        return view('', compact('tapel', 'instansi'));
+        $instansi = Instansi::where('id', 3)->get(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
+        return view('hariLibur.edit', compact('tapel', 'instansi','hariLibur'));
     }
 
     /**
