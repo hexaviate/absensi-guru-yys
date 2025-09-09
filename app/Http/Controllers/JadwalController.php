@@ -131,7 +131,7 @@ class JadwalController extends Controller
             return redirect()->back()->with('error', 'User ini sudah punya jadwal di instansi ini pada hari yang sama');
         }
 
-        Jadwal::create([
+        $jadwal->update([
             'tapel_id' => $request->tapel_id,
             'instansi_id' => $request->instansi_id,
             'user_id' => $request->user_id,
