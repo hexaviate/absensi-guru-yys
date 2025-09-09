@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    {{-- Perlu ditambahkan !penting! --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- Perlu ditambahkan !penting! --}}
     <title>Presensi - Selfie, Lokasi, Perangkat</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -107,9 +110,12 @@
 
         //? kemungkinan untuk mengambil model library (belum pasti)
         async function loadModels() {
-            await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-            await faceapi.nets.faceRecognitionNet.loadFromUri('/models'); // Tambahkan ini
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+                faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+                faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+            ]);
+            console.log("✅ Semua model berhasil dimuat");
         }
 
         //* mulai presensi
@@ -194,8 +200,9 @@
             video.style.display = 'none';
 
             // Face matching dengan foto asli pegawai
+            const fotoForPresensi = @json($fotoPresensi);
             const imgPegawai = await faceapi.fetchImage(
-                'foto_asli/pegawai1.jpg'); //! bisa diganti tergantung foto yang dimiliki user
+                'foto/' + fotoForPresensi); //! bisa diganti tergantung foto yang dimiliki user
             const deteksiPegawai = await faceapi
                 .detectSingleFace(imgPegawai, new faceapi.TinyFaceDetectorOptions())
                 .withFaceLandmarks()
@@ -222,9 +229,9 @@
 
             //pengecekan wajah apakah wajah cocok dengan pengguna
             const jarak = faceapi.euclideanDistance(deteksiPegawai.descriptor, deteksiSelfie.descriptor);
-            const threshold = 0.6;
+            const threshold = 0.4;
             const similarity = Math.max(0, (1 - jarak)) * 100;
-
+            const akurasi = similarity.toFixed(2);
             const matchingInfo = document.getElementById('matching-info');
             matchingInfo.innerText = `Tingkat kemiripan wajah: ${similarity.toFixed(2)}%`;
             matchingInfo.style.display = 'block';
@@ -257,24 +264,130 @@
                         }
 
                         // Validasi lokasi radius
-                        const radius = 100;
-                        const pusatLat = -6.592996353118405;
-                        const pusatLon = 111.06748580403307;
-                        const R = 6371e3;
-                        const dLat = (latitude - pusatLat) * Math.PI / 180;
-                        const dLon = (longitude - pusatLon) * Math.PI / 180;
-                        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                            Math.cos(pusatLat * Math.PI / 180) * Math.cos(latitude * Math.PI / 180) *
-                            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                        const jarak = R * c;
-                        if (jarak > radius) {
-                            status.innerText = "❌ Lokasi di luar radius presensi.";
-                            return;
+                        // const radius = 100;
+                        // const pusatLat = -6.592996353118405;
+                        // const pusatLon = 111.06748580403307;
+                        // const R = 6371e3;
+                        // const dLat = (latitude - pusatLat) * Math.PI / 180;
+                        // const dLon = (longitude - pusatLon) * Math.PI / 180;
+                        // const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        //     Math.cos(pusatLat * Math.PI / 180) * Math.cos(latitude * Math.PI / 180) *
+                        //     Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                        // const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                        // const jarak = R * c;
+                        // if (jarak > radius) {
+                        //     status.innerText = "❌ Lokasi di luar radius presensi.";
+                        //     return;
+                        // }
+
+                        // status.innerText = "✅ Presensi sukses: wajah cocok dan lokasi valid.";
+                        // status.style.display = 'block';
+
+                        ///////////////////////////////////////////////////////////////////////////////////////
+                        //! ini AI
+                        const lokasis = @json($lokasi);
+
+                        // function hitungJarak(lat1, lon1, lat2, lon2) {
+                        //     const R = 6371e3; // jari-jari bumi
+                        //     const dLat = (lat2 - lat1) * Math.PI / 180;
+                        //     const dLon = (lon2 - lon1) * Math.PI / 180;
+
+                        //     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        //         Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                        //         Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+                        //     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                        //     return R * c; // meter
+                        // }
+
+                        // function cekLokasi(latitude, longitude) {
+                        //     for (let lokasi of lokasis) {
+                        //         const jarak = hitungJarak(lokasi.latitude, lokasi.longitude, latitude,
+                        //             longitude);
+                        //         if (jarak <= instansi.radius) {
+                        //             return true; // valid, berada dalam salah satu instansi
+                        //         }
+                        //     }
+                        //     return false; // tidak ada yang cocok
+                        // }
+
+                        // if (cekLokasi(latitude, longitude)) {
+                        //     status.innerText = "✅ Presensi sukses: lokasi valid.";
+                        // } else {
+                        //     status.innerText = "❌ Lokasi di luar radius semua instansi.";
+                        // }
+                        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                        function hitungJarak(lat1, lon1) {
+                            const radius = 100;
+                            const R = 6371e3;
+                            const dLat = (latitude - lat1) * Math.PI / 180;
+                            const dLon = (longitude - lon1) * Math.PI / 180;
+                            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                Math.cos(lat1 * Math.PI / 180) * Math.cos(latitude * Math.PI / 180) *
+                                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                            console.log(R * c);
+
+                            return R * c;
                         }
 
-                        status.innerText = "✅ Presensi sukses: wajah cocok dan lokasi valid.";
-                        status.style.display = 'block';
+                        function cekLokasi(latitude, longitude) {
+                            for (let lokasi of lokasis) {
+                                const jarak = hitungJarak(lokasi.latitude, lokasi.longitude);
+                                if (jarak <= 100) {
+                                    const namaInstansi = lokasi.nama_instansi
+                                    // status.innerText = "❌ Lokasi di luar radius presensi.";
+                                    console.log('didalam');
+                                    return {
+                                        valid: true,
+                                        instansi: lokasi.nama_instansi,
+                                        id: lokasi.instansi_id
+                                    };
+                                    // return true, namaInstansi; // valid, berada dalam salah satu instansi
+                                }
+                            }
+                            console.log('diluar');
+                            return {
+                                valid: false,
+                                instansi: null
+                            };
+                        }
+
+                        const hasil = cekLokasi(latitude, longitude);
+                        const instansi = hasil.id;
+                        console.log(instansi);
+
+
+                        fetch("{{ route('prosesPresensi') }}", {
+                                method: "POST",
+                                headers: {
+                                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
+                                        .getAttribute('content'),
+                                    "X-Requested-With": "XMLHttpRequest",
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    instansi_id: instansi,
+                                    akurasi: akurasi,
+                                    userAgent: navigator.userAgent,
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                console.log("Response Laravel:", data);
+                            });
+
+                        if (hasil.valid) {
+                            status.innerText = `✅ Presensi sukses: lokasi valid.
+                                                    Instansi: ${hasil.instansi}`;
+                            status.style.display = 'block';
+
+                        } else {
+                            status.innerText = "❌ Lokasi di luar radius semua instansi.";
+                            status.style.display = 'block';
+
+                        }
 
                         // Kamera dan lokasi sudah dinonaktifkan setelah presensi sukses
                         if (video.srcObject) {
@@ -303,6 +416,8 @@
             document.getElementById('perangkat').innerText = perangkatInfo;
 
             status.style.display = 'block';
+
+
         }
     </script>
 </body>

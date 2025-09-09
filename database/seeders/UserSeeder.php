@@ -18,11 +18,11 @@ class UserSeeder extends Seeder
             'telp' => '081',
             'username' => 'admin1',
             'password' => '123',
-            'foto_presensi' => 'pegawai.jpeg',
-            'foto' => 'pegawai.jpeg',
+            'foto_presensi' => 'pegawai.jpg',
+            'foto' => 'pegawai.jpg',
         ]);
         $admin->assignRole('admin_yayasan');
-        $admin->instansi()->attach([1, 2]);
+        $admin->instansi()->attach([1, 2, 3]);
 
 
         $operator = User::create([
@@ -30,20 +30,23 @@ class UserSeeder extends Seeder
             "telp" => '082',
             'username' => 'operator',
             'password' => '123',
-            'foto_presensi' => 'foto.jpg',
+            'foto_presensi' => 'operator.jpg',
             'foto' => 'operator.jpg'
         ]);
         $operator->assignRole('operator_instansi');
+        $operator->instansi()->attach([1, 2, 3]);
+
 
         $pendidik = User::create([
             "name" => 'Bu Pendidik',
             "telp" => '083',
             "username" => 'pendidik',
             'password' => '123',
-            'foto_presensi' => 'foto.jpg',
+            'foto_presensi' => 'pendidik.jpg',
             "foto" => 'pendidik.jpg'
         ]);
         $pendidik->assignRole('tenaga_pendidik');
+        $pendidik->instansi()->attach([1, 2, 3]);
 
         $pendidikan = User::create([
             "name" => 'Bu Pendidikan',

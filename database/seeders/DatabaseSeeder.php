@@ -20,7 +20,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             InstansiSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            TapelSeeder::class,
+            JadwalSeeder::class
         ]);
 
         // $admin = User::factory()->make([

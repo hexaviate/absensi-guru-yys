@@ -25,4 +25,17 @@
 <!-- Font Awesome -->
 <script src="https://kit.fontawesome.com/40f5c7c2d3.js" crossorigin="anonymous"></script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const alert = document.getElementById("alertMessage");
+        if (alert) {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 3000);
+        }
+    });
+</script>
+
+
 @stack('script')
