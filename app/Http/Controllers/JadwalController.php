@@ -16,6 +16,11 @@ class JadwalController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+        if (!$user->hasAnyPermission(['view all instansi', 'manage jadwal'])) {
+            return redirect()->intended('dashboard');
+        }
+
         $jadwal = Jadwal::all();
         return view('jadwal.main', compact('jadwal'));
     }
@@ -25,6 +30,11 @@ class JadwalController extends Controller
      */
     public function create()
     {
+        $user = auth()->user();
+        if (!$user->can('manage jadwal')) {
+            return redirect()->intended('dashboard');
+        }
+
         $tapel = Tapel::all();
         $user = User::all();
         $instansi = Instansi::all();
@@ -89,6 +99,11 @@ class JadwalController extends Controller
      */
     public function edit(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage jadwal')) {
+            return redirect()->intended('dashboard');
+        }
+
         $tapel = Tapel::all();
         $user = User::all();
         $instansi = Instansi::all();
@@ -148,6 +163,11 @@ class JadwalController extends Controller
      */
     public function destroy(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage jadwal')) {
+            return redirect()->intended('dashboard');
+        }
+
         $target = Jadwal::find($id);
         $target->delete();
         return redirect()->route('jadwal.index');

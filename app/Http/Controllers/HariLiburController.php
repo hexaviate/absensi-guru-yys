@@ -18,12 +18,13 @@ class HariLiburController extends Controller
     {
         $user = auth()->user();
 
-        $tapel = Tapel::all();
         if ($user->hasAnyPermission(['view all hari_libur', 'manage hari_libur'])) {
+            $tapel = Tapel::all();
+            $hariLibur = HariLibur::all();
             $instansi = $user->instansi; //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
-            return view('hariLibur.index', compact('user', 'tapel', 'instansi'));
+            return view('hariLibur.main', compact('user', 'tapel', 'instansi', 'hariLibur'));
         } else {
-            return view('login')->with('error', 'Anda tidak punya Permission');
+            return redirect()->route('login')->with('error', 'Anda tidak punya Permission');
         }
 
         // $hariLibur = HariLibur::where('instansi_id', $user->id); //nanti diubah agar instansi disamakan dengan instansi nya operator
@@ -42,7 +43,7 @@ class HariLiburController extends Controller
 
         $tapel = Tapel::all();
         $instansi = Instansi::where('id', $user->id); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
-        return view('', compact('tapel', 'instansi'));
+        return view('hariLibur.tambah', compact('tapel', 'instansi'));
 
     }
 
@@ -95,6 +96,11 @@ class HariLiburController extends Controller
      */
     public function edit(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage hari_libur')) {
+            return redirect()->intended('dashboard');
+        }
+
         $hariLibur = HariLibur::findOrFail($id);
         $tapel = Tapel::all();
         $instansi = Instansi::where('id', 3)->get(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
@@ -142,6 +148,11 @@ class HariLiburController extends Controller
      */
     public function destroy(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage hari_libur')) {
+            return redirect()->intended('dashboard');
+        }
+
         $target = HariLibur::find($id);
         $target->delete();
         return redirect()->route('hariLibur.index');

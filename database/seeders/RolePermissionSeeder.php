@@ -38,6 +38,7 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name' => 'view self profile']);
         Permission::create(['name' => 'view self riwayat absen']);
         Permission::create(['name' => 'view self jadwal']);
+        Permission::create(['name' => 'presensi']);
 
 
         //lain lain

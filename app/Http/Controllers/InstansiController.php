@@ -15,6 +15,11 @@ class InstansiController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+        if (!$user->hasAnyPermission(['view all instansi', 'manage instansi'])) {
+            return redirect()->intended('dashboard');
+        }
+
         $instansi = Instansi::all();
         return view('instansi.main', compact('instansi'));
     }
@@ -24,6 +29,11 @@ class InstansiController extends Controller
      */
     public function create()
     {
+        $user = auth()->user();
+        if (!$user->can('manage instansi')) {
+            return redirect()->intended('dashboard');
+        }
+
         $user = User::role('operator_instansi')->get();
         return view('instansi.tambah', compact('user'));
     }
@@ -43,7 +53,7 @@ class InstansiController extends Controller
             "user_id.*" => "exists:users,id"
         ]);
 
-        if($validate->fails()){
+        if ($validate->fails()) {
             return redirect()->route('instansi.create')->withErrors($validate)->withInput();
         }
 
@@ -74,6 +84,11 @@ class InstansiController extends Controller
      */
     public function edit(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage instansi')) {
+            return redirect()->intended('dashboard');
+        }
+
         $instansi = Instansi::find($id);
         $user = User::role('operator_instansi')->get();
         return view('instansi.edit', compact('user', 'instansi'));
@@ -95,7 +110,7 @@ class InstansiController extends Controller
             "user_id.*" => "exists:users,id"
         ]);
 
-        if($validate->fails()){
+        if ($validate->fails()) {
             return redirect()->route('instansi.edit', $id)->withErrors($validate)->withInput();
         }
 
@@ -116,6 +131,11 @@ class InstansiController extends Controller
      */
     public function destroy(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage instansi')) {
+            return redirect()->intended('dashboard');
+        }
+
         $target = Instansi::find($id);
         $target->delete();
         return redirect()->route('instansi.index');
