@@ -24,6 +24,7 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name' => 'manage tapel']);
         Permission::create(['name' => 'manage hari_libur']);
         Permission::create(['name' => 'manage jadwal']);
+        Permission::create(['name' => 'manage role']);
 
         //hanya view saja. apabila sudah mempunyai permission manage maka tidak usah diberi permission view
         Permission::create(['name' => 'view all users']);
@@ -38,7 +39,7 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name' => 'view self profile']);
         Permission::create(['name' => 'view self riwayat absen']);
         Permission::create(['name' => 'view self jadwal']);
-        Permission::create(['name' => 'presensi']);
+        Permission::create(['name' => 'presensi ']);
 
 
         //lain lain

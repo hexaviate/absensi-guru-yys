@@ -15,7 +15,7 @@ class PresensiController extends Controller
     {
         // $instansi = auth()->user()->instansi()->get(['latitude', 'longitude']);
         // return view('tesPresensi.index', compact('instansi'));
-        $user = User::find(3);
+        $user = auth()->user();
         $fotoPresensi = $user->foto_presensi;
         $lokasi = $user->instansi()->get(['latitude', 'longitude', 'nama_instansi', 'instansi_id']);
         return view('tesPresensi.index', compact('user', 'lokasi', 'fotoPresensi'));

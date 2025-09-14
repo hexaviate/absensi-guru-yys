@@ -19,6 +19,10 @@ class UsersController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+        if (!$user->hasAnyPermission(['view all users', 'manage users'])) {
+            return redirect()->intended('dashboard');
+        }
         $user = User::all();
         $role = Role::all();
         $instansi = Instansi::all();
@@ -30,6 +34,10 @@ class UsersController extends Controller
      */
     public function create()
     {
+        $user = auth()->user();
+        if (!$user->can('manage users')) {
+            return redirect()->intended('dashboard');
+        }
         $role = Role::all();
         $user = User::all();
         $instansi = Instansi::all();
@@ -80,7 +88,8 @@ class UsersController extends Controller
             "username" => $request->username,
             "password" => $request->password,
             "foto_presensi" => $imagePresensi,
-            "foto_profil" => $imageName,'foto'
+            "foto_profil" => $imageName,
+            'foto'
         ]);
 
         $user->instansi()->attach($request->instansi_id);
@@ -104,6 +113,10 @@ class UsersController extends Controller
      */
     public function edit(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage users')) {
+            return redirect()->intended('dashboard');
+        }
         $user = User::find($id);
         $instansi = Instansi::all();
         $role = Role::all();
@@ -169,6 +182,10 @@ class UsersController extends Controller
      */
     public function destroy(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage users')) {
+            return redirect()->intended('dashboard');
+        }
         $target = User::find($id);
         $target->delete();
         return redirect()->route('user.index');

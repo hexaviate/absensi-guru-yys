@@ -16,6 +16,10 @@ class RoleController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+        if (!$user->can('manage role')) {
+            return redirect()->intended('dashboard');
+        }
         $role = Role::all();
         return view('role.main', compact('role'));
     }
@@ -25,6 +29,10 @@ class RoleController extends Controller
      */
     public function create()
     {
+        $user = auth()->user();
+        if (!$user->can('manage role')) {
+            return redirect()->intended('dashboard');
+        }
         $permission = Permission::all();
         return view('role.tambah', compact('permission'));
     }
@@ -69,7 +77,10 @@ class RoleController extends Controller
         // $role = Role::find($id);
         // $permission = Permission::all();
         // return view('role.edit', compact('role', 'permission'));
-
+        $user = auth()->user();
+        if (!$user->can('manage role')) {
+            return redirect()->intended('dashboard');
+        }
         $role = Role::find($id);
         $permission = Permission::all();
         $rolePermissions = $role->permissions->pluck('id')->toArray(); // ambil id permission dari role
@@ -98,7 +109,7 @@ class RoleController extends Controller
         ]);
 
 
-        $permissions = \Spatie\Permission\Models\Permission::whereIn('id', $request->permissions)->get();
+        $permissions = Permission::whereIn('id', $request->permissions)->get();
         $target->syncPermissions($permissions);
 
         return redirect()->route('role.index');

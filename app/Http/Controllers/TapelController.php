@@ -14,6 +14,11 @@ class TapelController extends Controller
      */
     public function index()
     {
+
+        $user = auth()->user();
+        if (!$user->hasAnyPermission(['view all tapel', 'manage tapel'])) {
+            return redirect()->intended('dashboard');
+        }
         $tapel = Tapel::all();
 
         //! diganti sesuai viewnya. (view ini hanya untuk kebutuhan testing tampil data)
@@ -26,6 +31,10 @@ class TapelController extends Controller
      */
     public function create()
     {
+        $user = auth()->user();
+        if (!$user->can('manage tapel')) {
+            return redirect()->intended('dashboard');
+        }
         //! diganti sesuai viewnya. (view ini hanya untuk kebutuhan testing tambah)
         //! jika sudah diganti maka hapus comment ini
         return view('tapel.tambah');
@@ -40,7 +49,7 @@ class TapelController extends Controller
             "kode" => "required"
         ]);
 
-        if($validate->fails()){
+        if ($validate->fails()) {
             return redirect()->route('tapel.create')->withErrors($validate)->withInput();
         }
 
@@ -64,6 +73,11 @@ class TapelController extends Controller
      */
     public function edit(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage tapel')) {
+            return redirect()->intended('dashboard');
+        }
+
         $tapel = Tapel::find($id);
 
         //! diganti sesuai viewnya. (view ini hanya untuk kebutuhan testing edit data)
@@ -82,7 +96,7 @@ class TapelController extends Controller
             "kode" => 'required'
         ]);
 
-        if($validate->fails()){
+        if ($validate->fails()) {
             return redirect()->route('instansi.create', $id)->withErrors($validate)->withInput();
         }
 
@@ -98,6 +112,11 @@ class TapelController extends Controller
      */
     public function destroy(string $id)
     {
+        $user = auth()->user();
+        if (!$user->can('manage tapel')) {
+            return redirect()->intended('dashboard');
+        }
+
         $target = Tapel::find($id);
         $target->delete();
         return redirect()->route('tapel.index');
