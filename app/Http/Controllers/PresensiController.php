@@ -13,6 +13,7 @@ class PresensiController extends Controller
 {
     public function viewPresensi()
     {
+        // dd(Carbon::now()->isoFormat('dddd'));
         // $instansi = auth()->user()->instansi()->get(['latitude', 'longitude']);
         // return view('tesPresensi.index', compact('instansi'));
         $user = auth()->user();
@@ -28,8 +29,12 @@ class PresensiController extends Controller
         $user = User::find(3)->id; //diubah ketika final, nanti diisi user id
         $now = Carbon::now();
 
+        //*Mengambil Hari Saat ini
+        $hariIni = Carbon::now()->isoFormat('dddd');
+
         //* mengambil jadwal user dan guru
-        $jadwal = Jadwal::where('user_id', $user)->where('instansi_id', $request->instansi_id)->first();
+        $jadwal = Jadwal::where('user_id', $user)->where('instansi_id', $request->instansi_id)->where('hari', $hariIni)->first();
+
 
         if (!$jadwal) {
             return response()->json(['status' => '❌ Jadwal tidak ditemukan'], 404);

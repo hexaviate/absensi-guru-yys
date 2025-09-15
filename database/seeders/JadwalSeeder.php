@@ -27,7 +27,7 @@ class JadwalSeeder extends Seeder
             "tapel_id" => 1,
             "instansi_id" => 1,
             "user_id" => 3,
-            "hari" => Carbon::parse('19 August 2025')->toDateString(),
+            "hari" => Carbon::parse('19 August 2025')->isoFormat('dddd'),
             "datang" => Carbon::createFromTime('11', '20', '00'),
             "pulang" => Carbon::createFromTime('11', '30', '00'),
         ]);
