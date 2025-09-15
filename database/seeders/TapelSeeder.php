@@ -14,7 +14,8 @@ class TapelSeeder extends Seeder
     public function run(): void
     {
         Tapel::create([
-            "kode" => "2025/2026"
+            "kode" => "2025/2026",
+            "status" => "aktif"
         ]);
     }
 }
