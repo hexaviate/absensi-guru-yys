@@ -38,8 +38,8 @@ class RolePermissionSeeder extends Seeder
         //permission view tapi hanya yang dimiliki oleh user. contoh: user 1 hanya bisa melihat jadwalnya dia sendiri dan tidak bisa melihat jadwal user lain
         Permission::create(['name' => 'view self profile']);
         Permission::create(['name' => 'view self riwayat absen']);
+        Permission::create(['name' => 'melakukan presensi ']);
         Permission::create(['name' => 'view self jadwal']);
-        Permission::create(['name' => 'presensi ']);
 
 
         //lain lain
@@ -54,7 +54,7 @@ class RolePermissionSeeder extends Seeder
         $kependidikan = Role::create(['name' => 'tenaga_kependidikan']);
 
         $admin->syncPermissions($permission);
-        $operator->givePermissionTo(['rekap presensi', 'manage presensi', 'manage jadwal', 'manage hari_libur', 'view all users', 'presensi', '']);
+        $operator->givePermissionTo(['rekap presensi', 'manage presensi', 'manage jadwal', 'manage hari_libur', 'view all users']);
         $pendidik->givePermissionTo(['view self jadwal', 'view self riwayat absen']);
         $kependidikan->givePermissionTo(['view self riwayat absen']);
 
