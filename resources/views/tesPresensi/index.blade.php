@@ -202,7 +202,7 @@
             // Face matching dengan foto asli pegawai
             const fotoForPresensi = @json($fotoPresensi);
             const imgPegawai = await faceapi.fetchImage(
-                'foto/' + fotoForPresensi); //! bisa diganti tergantung foto yang dimiliki user
+                'foto_presensi/' + fotoForPresensi); //! bisa diganti tergantung foto yang dimiliki user
             const deteksiPegawai = await faceapi
                 .detectSingleFace(imgPegawai, new faceapi.TinyFaceDetectorOptions())
                 .withFaceLandmarks()

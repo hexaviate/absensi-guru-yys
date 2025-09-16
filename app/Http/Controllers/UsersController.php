@@ -66,9 +66,9 @@ class UsersController extends Controller
 
         // * Upload untuk Foto Presensi
 
-        $imagePresensi = time() . '.' . $request->foto_presensi->extension();
+        $imageNamePresensi = time() . '.' . $request->foto_presensi->extension();
 
-        $request->foto_presensi->move(public_path('foto_presensi/'), $imagePresensi);
+        // $request->foto_presensi->move(public_path('foto_presensi/'), $imagePresensi);
 
         // * Upload untuk Foto Profil
         $imageName = time() . '.' . $request->foto_profil->extension();
@@ -79,17 +79,20 @@ class UsersController extends Controller
         $manager = ImageManager::withDriver(new Driver());
 
         //read image
-        $image = $manager->read($request->file('foto_profil'));
-        $image->encode(new AutoEncoder(quality: 50))->save(public_path('foto/' . $imageName));
+        $imageProfil = $manager->read($request->file('foto_profil'));
+        $imageProfil->encode(new AutoEncoder(50))->save(public_path('foto/' . $imageName));
+
+        //read image
+        $imagePresensi = $manager->read($request->file('foto_presensi'));
+        $imagePresensi->encode(new AutoEncoder(50))->save(public_path('foto_presensi/' . $imageNamePresensi));
 
         $user = User::create([
             "name" => $request->name,
             "telp" => $request->telp,
             "username" => $request->username,
             "password" => $request->password,
-            "foto_presensi" => $imagePresensi,
-            "foto_profil" => $imageName,
-            'foto'
+            "foto_presensi" => $imageNamePresensi,
+            "foto" => $imageName,
         ]);
 
         $user->instansi()->attach($request->instansi_id);
