@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Jadwal;
 use App\Models\Presensi;
 use App\Models\Tapel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\AutoEncoder;
@@ -55,7 +56,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function viewJadwalSaya()
+    public function viewJadwalMingguIni()
     {
         $user = auth()->user();
         if (!$user->can('view self jadwal')) {
@@ -79,5 +80,22 @@ class ProfileController extends Controller
         $presensi = Presensi::where('user_id', $user->id)->get();
 
         return view('riwayatAbsen', compact('presensi'));// view nanti diganti
+    }
+
+    public function viewJadwalHariIni()
+    {
+        $user = auth()->user();
+        if (!$user->can('view self jadwal')) {
+            return redirect()->intended('dashboard');
+        }
+
+        $tapelAktif = Tapel::where('status', "aktif")->first();
+        $hariIni = Carbon::now()->isoFormat('dddd');
+
+
+        $jadwal = Jadwal::where('user_id', $user->id)->where('hari', $hariIni)->where('tapel_id', $tapelAktif->id)->first();
+
+        return view('jadwalHariIni', compact('jadwal'));// view nanti diganti
+
     }
 }

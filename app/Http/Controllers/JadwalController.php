@@ -59,8 +59,10 @@ class JadwalController extends Controller
             return redirect()->route('jadwal.create')->withErrors($validate)->withInput();
         }
 
+        $tapelAktif = Tapel::where('status', "aktif")->first();
+
         //melihat apakah ada jadwal dari instansi yang sama di hari tersebut
-        $adaJadwal = Jadwal::where('user_id', $request->user_id)->where('instansi_id', $request->instansi_id)->where('hari', $request->hari)->first();
+        $adaJadwal = Jadwal::where('user_id', $request->user_id)->where('instansi_id', $request->instansi_id)->where('hari', $request->hari)->where('tapel_id', $tapelAktif->id)->first();
         $terdaftar = User::find($request->user_id)->instansi()->where('instansi_id', $request->instansi_id)->first(); //melihat apakah user terdaftar pada instansi
 
         if ($terdaftar) {

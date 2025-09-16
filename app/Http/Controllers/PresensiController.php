@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Jadwal;
 use App\Models\Presensi;
+use App\Models\Tapel;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,14 +27,16 @@ class PresensiController extends Controller
     public function prosesPresensi(Request $request)
     {
 
-        $user = User::find(3)->id; //diubah ketika final, nanti diisi user id
+        $user = auth()->user(); //diubah ketika final, nanti diisi user id
         $now = Carbon::now();
 
         //*Mengambil Hari Saat ini
         $hariIni = Carbon::now()->isoFormat('dddd');
 
+        $tapelAktif = Tapel::where('status', "aktif")->first();
+
         //* mengambil jadwal user dan guru
-        $jadwal = Jadwal::where('user_id', $user)->where('instansi_id', $request->instansi_id)->where('hari', $hariIni)->first();
+        $jadwal = Jadwal::where('user_id', $user->id)->where('instansi_id', $request->instansi_id)->where('hari', $hariIni)->where('tapel_id', $tapelAktif->id)->first();
 
 
         if (!$jadwal) {
@@ -56,7 +59,7 @@ class PresensiController extends Controller
             if ($now->lessThan($jamPulang) && $now->greaterThan(Carbon::createFromTime('23', '00', '00'))) {
                 Presensi::create([
                     'instansi_id' => $request->instansi_id,
-                    "user_id" => 3, //diubah ketika testing final, nanti diisi user id
+                    "user_id" => $user->id, //diubah ketika testing final, nanti diisi user id
                     "datang" => Carbon::now(),
                     "status" => 'hadir',
                     'tanggal' => Carbon::now()->toDateString(),
