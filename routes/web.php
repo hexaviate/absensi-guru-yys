@@ -3,8 +3,10 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HariLiburController;
 use App\Http\Controllers\InstansiController;
+use App\Http\Controllers\IzinController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\PresensiController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TapelController;
 use App\Http\Controllers\UsersController;
@@ -44,6 +46,37 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('tapel', TapelController::class);
     Route::resource('hariLibur', HariLiburController::class);
     Route::resource('jadwal', JadwalController::class);
+
+
+    Route::controller(ProfileController::class)->group(function () {
+        Route::get('viewEditProfile', 'viewEditProfile');
+        Route::post('editProfile', 'editProfile');
+        Route::get('viewJadwalMingguIni', 'viewJadwalMingguIni');
+        Route::get('viewRiwayatAbsensi', 'viewRiwayatAbsensi');
+        Route::get('viewJadwalHariIni', 'viewJadwalHariIni');
+    });
+
+    Route::controller(IzinController::class)->group(function () {
+        //*---------------------------------------------------------{User}-----------------------------------------------------------------------//
+
+        Route::get('izinIndexUser', 'izinIndexUser');
+        Route::get('viewIzinCreate', 'viewIzinCreate');
+        Route::post('izinCreate', 'izinCreate');
+        Route::get('viewIzinEdit', 'viewIzinEdit');
+        Route::post('izinEdit', 'izinEdit');
+        //*---------------------------------------------------------{User}-----------------------------------------------------------------------//
+        //?---------------------------------------------------------{Operator/Admin}-----------------------------------------------------------------------//
+
+        Route::get('izinIndexOperator', 'izinIndexOperator');
+        Route::get('viewIzinVerify', 'viewIzinVerify');
+        Route::post('izinVerify', 'izinVerify');
+
+
+
+        //?---------------------------------------------------------{Operator/Admin}-----------------------------------------------------------------------//
+
+
+    });
 });
 
 
