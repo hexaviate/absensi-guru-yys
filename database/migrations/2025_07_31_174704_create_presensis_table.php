@@ -14,10 +14,10 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('instansi_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('izin_id')->nullable()->constrained()->onDelete('cascade');
             $table->time('datang')->nullable();
             $table->time('pulang')->nullable();
             $table->enum('status', ['hadir', 'izin']);
-            $table->string('bukti_izin')->nullable();
             $table->date('tanggal');
             $table->string('akurasi')->nullable();
             $table->string('userAgent')->nullable();

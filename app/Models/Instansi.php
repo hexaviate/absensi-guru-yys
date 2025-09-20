@@ -53,5 +53,13 @@ class Instansi extends Model
         return $this->hasMany(HariLibur::class);
     }
 
-
+    /**
+     * Get all of the izin for the Instansi
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function izin(): HasMany
+    {
+        return $this->hasMany(Izin::class);
+    }
 }

@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('telp');
             $table->string('username');
             $table->string('password');
+            $table->string('jarak_tempuh')->nullable();
             $table->string('foto_presensi');
             $table->string('foto');
             $table->rememberToken();

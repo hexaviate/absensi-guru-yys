@@ -78,4 +78,14 @@ class User extends Authenticatable
         return $this->hasMany(Jadwal::class);
     }
 
+    /**
+     * Get all of the user for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function izin(): HasMany
+    {
+        return $this->hasMany(Izin::class);
+    }
+
 }
