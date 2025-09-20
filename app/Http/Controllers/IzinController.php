@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Izin;
+use App\Models\Presensi;
+use Carbon\Carbon;
 use File;
 use Illuminate\Http\Request;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -86,6 +88,23 @@ class IzinController extends Controller
 
     public function viewIzinEdit(string $id)
     {
+        $user = auth()->user();
+        if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
+            return redirect()->intended('dashboard');
+        }
+
+        $izin = Izin::find($id);
+        $instansi = $user->instansi();
+
+        if ($izin->status != 'belum_diverifikasi') {
+            return redirect()->intended('dashboard')->with('error', 'izin ini telah diverifikasi');
+        }
+
+        if ($izin->user_id != $user->id) {
+            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+        }
+
+        return view('izinEdit', compact('izin', 'instansi'));
 
     }
 
@@ -151,5 +170,76 @@ class IzinController extends Controller
 
 
     //*---------------------------------------------------------{User}-----------------------------------------------------------------------//
+
+    //?---------------------------------------------------------{Operator/Admin}-----------------------------------------------------------------------//
+
+
+    public function izinIndexOperator()
+    {
+        $user = auth()->user();
+        if (!$user->hasAnyPermission(['manage izin'])) {
+            return redirect()->intended('dashboard');
+        }
+
+        $instansi_id = $user->instansi()->id;
+        $izin = Izin::where('instansi_id', $instansi_id)->first();
+        return view('izinIndexOperator', compact('izin'));
+    }
+
+    public function viewIzinVerify(string $id)
+    {
+        $user = auth()->user();
+        if (!$user->hasAnyPermission(['manage izin'])) {
+            return redirect()->intended('dashboard');
+        }
+
+        $izin = Izin::find($id);
+        if ($izin->user_id == $user->id) {
+            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+        }
+
+        return view('izinVerification', compact('izin'));
+    }
+
+    public function izinVerify(Request $request, string $id)
+    {
+        $user = auth()->user();
+        if (!$user->hasAnyPermission(['manage izin'])) {
+            return redirect()->intended('dashboard');
+        }
+
+        $izin = Izin::find($id);
+        if ($izin->user_id == $user->id) {
+            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+        }
+
+        $validate = Validator::make($request->all(), [
+            "status" => "required"
+        ]);
+
+        if ($validate->fails()) {
+            return redirect()->route('', $id)->withErrors($validate)->withInput();
+        }
+
+        $izin->update([
+            'status' => $request->status
+        ]);
+
+        if ($izin->status == 'diterima') {
+            Presensi::create([
+                "instansi_id" => $izin->instansi_id,
+                "user_id" => $izin->user_id,
+                "izin_id" => $izin->id,
+                "status" => 'izin',
+                "tanggal" => Carbon::now()->toDateString(),
+            ]);
+        }
+
+        return redirect()->route('izinIndexOperator')->with('success', 'anda berhasil memverifikasi izin ini');
+
+    }
+
+    //?---------------------------------------------------------{Operator/Admin}-----------------------------------------------------------------------//
+
 
 }

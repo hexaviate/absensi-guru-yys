@@ -39,7 +39,7 @@ class PresensiController extends Controller
         $jadwal = Jadwal::where('user_id', $user->id)->where('instansi_id', $request->instansi_id)->where('hari', $hariIni)->where('tapel_id', $tapelAktif->id)->first();
 
         // Cek apakah user sudah pernah presensi hari ini untuk instansi ini, dengan menggunakan created_at
-        $presensiHariIni = Presensi::where('user_id', $user)
+        $presensiHariIni = Presensi::where('user_id', $user->id)
             ->where('instansi_id', $request->instansi_id)
             ->whereDate('created_at', $now->toDateString())
             ->first();
