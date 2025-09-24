@@ -59,17 +59,17 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(IzinController::class)->group(function () {
         //*---------------------------------------------------------{User}-----------------------------------------------------------------------//
 
-        Route::get('izinIndexUser', 'izinIndexUser');
-        Route::get('viewIzinCreate', 'viewIzinCreate');
-        Route::post('izinCreate', 'izinCreate');
-        Route::get('viewIzinEdit', 'viewIzinEdit');
-        Route::post('izinEdit', 'izinEdit');
+        Route::get('izinIndexUser', 'izinIndexUser')->name("izinIndexUser");
+        Route::get('viewIzinCreate', 'viewIzinCreate')->name("viewIzinCreate");
+        Route::post('izinCreate', 'izinCreate')->name("izinCreate");
+        Route::get('viewIzinEdit/{id}', 'viewIzinEdit')->name("viewIzinEdit");
+        Route::put('izinEdit/{id}', 'izinEdit')->name("izinEdit");
         //*---------------------------------------------------------{User}-----------------------------------------------------------------------//
         //?---------------------------------------------------------{Operator/Admin}-----------------------------------------------------------------------//
 
-        Route::get('izinIndexOperator', 'izinIndexOperator');
-        Route::get('viewIzinVerify', 'viewIzinVerify');
-        Route::post('izinVerify', 'izinVerify');
+        Route::get('izinIndexOperator', 'izinIndexOperator')->name("izinIndexOperator");
+        Route::get('viewIzinVerify', 'viewIzinVerify')->name("viewIzinVerify");
+        Route::post('izinVerify', 'izinVerify')->name("izinVerify");
 
 
 

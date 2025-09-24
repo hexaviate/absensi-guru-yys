@@ -23,7 +23,7 @@
 <script src="{{asset('asset/dist/assets/js/custom.js')}}"></script>
 
 <!-- Font Awesome -->
-<script src="https://kit.fontawesome.com/40f5c7c2d3.js" crossorigin="anonymous"></script>
+{{-- <script src="https://kit.fontawesome.com/40f5c7c2d3.js" crossorigin="anonymous"></script> --}}
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
