@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\JadwalResource;
 use App\Models\Jadwal;
 use App\Models\Presensi;
 use App\Models\Tapel;
 use App\Models\User;
 use Carbon\Carbon;
+use Http;
 use Illuminate\Http\Request;
 use function Symfony\Component\Clock\now;
 
@@ -44,6 +46,10 @@ class PresensiController extends Controller
             ->whereDate('created_at', $now->toDateString())
             ->first();
 
+        $token = '74SPnec8JM2KKXmKDNSz';
+
+
+        //? tidak ada jadwal
         if (!$jadwal) {
             if (!$presensiHariIni) {
                 if ($now->greaterThan(Carbon::createFromTime('06', '00', '00')) && $now->lessThan(Carbon::createFromTime('12', '00', '00'))) {
@@ -57,8 +63,32 @@ class PresensiController extends Controller
                         'userAgent' => $request->userAgent()
                     ]);
 
+                    //*Send Message
+                    Http::withOptions(['verify' => false]) // << DISABLE SSL VERIFY
+                        ->withHeaders(['Authorization' => $token])
+                        ->asForm()->post('https://api.fonnte.com/send', [
+                                'target' => '083186180137',
+                                'message' => "anda telah absen pada $now dan anda tidak punya jadwal hari ini",
+                            ]);
+
                     return response()->json([
-                        "status" => 'anda berhasil absensi' //status diganti ke return view blade
+                        "status" => 'anda berhasil absensi tidak ada jadwal hari ini' //status diganti ke return view blade
+                    ]);
+                } elseif ($now->greaterThan(Carbon::createFromTime('12', '00', '00')) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) {
+                    Presensi::create([
+                        'instansi_id' => $request->instansi_id,
+                        "user_id" => $user->id, //diubah ketika testing final, nanti diisi user id
+                        "pulang" => Carbon::now(),
+                        "status" => 'hadir',
+                        'tanggal' => Carbon::now()->toDateString(),
+                        'akurasi' => $request->akurasi,
+                        'userAgent' => $request->userAgent()
+                    ]);
+
+
+
+                    return response()->json([
+                        "status" => 'anda berhasil absensi pulang dan tidak ada jadwal hari ni' //status diganti ke return view blade
                     ]);
                 } else {
                     return response()->json([
@@ -83,7 +113,7 @@ class PresensiController extends Controller
                     ]);
                 } else {
                     return response()->json([
-                        'status' => 'anda'
+                        'status' => 'anda tidak ada absen dan diluar jadwal pulang ataupun datamg'
                     ]);
                 }
             }
@@ -107,9 +137,33 @@ class PresensiController extends Controller
                     'userAgent' => $request->userAgent()
                 ]);
 
+                //*Send Message
+                $token = '74SPnec8JM2KKXmKDNSz';
+                Http::withOptions(['verify' => false]) // << DISABLE SSL VERIFY
+                    ->withHeaders(['Authorization' => $token])
+                    ->asForm()->post('https://api.fonnte.com/send', [
+                            'target' => '083186180137',
+                            'message' => "Anda berhasil Absen pada hari ini",
+                        ]);
+
                 return response()->json([
                     "status" => 'anda berhasil absensi' //status diganti ke return view blade
                 ]);
+            } elseif ($now->greaterThan($jamPulang) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) {
+                Presensi::create([
+                    'instansi_id' => $request->instansi_id,
+                    "user_id" => $user->id, //diubah ketika testing final, nanti diisi user id
+                    "pulang" => Carbon::now(),
+                    "status" => 'hadir',
+                    'tanggal' => Carbon::now()->toDateString(),
+                    'akurasi' => $request->akurasi,
+                    'userAgent' => $request->userAgent()
+                ]);
+
+                return response()->json([
+                    "status" => 'anda berhasil absensi pulang' //status diganti ke return view blade
+                ]);
+
             } else {
                 return response()->json([
                     "status" => 'absen belum dibuka'

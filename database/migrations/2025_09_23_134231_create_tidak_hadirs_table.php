@@ -10,16 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('hari_liburs', function (Blueprint $table) {
+        Schema::create('tidak_hadirs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tapel_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('instansi_id')->constrained()->cascadeOnDelete();
-            $table->string('keterangan');
             $table->date('tanggal');
-            $table->time('waktu');
             $table->timestamps();
-            $table->softDeletes();
-
         });
     }
 
@@ -28,6 +24,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('hari_liburs');
+        Schema::dropIfExists('tidak_hadirs');
     }
 };
