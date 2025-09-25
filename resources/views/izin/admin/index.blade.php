@@ -130,7 +130,7 @@
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title">
                                 <i class="fas fa-image mr-2"></i>
-                                Bukti Izin - {{ $item->user->name }}
+                                Bukti Izin - {{ $item->user->name ff}}
                             </h5>
                             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
