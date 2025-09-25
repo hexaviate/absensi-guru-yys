@@ -10,14 +10,14 @@
             </div>
         </div>
         @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <div class="section-body">
             <div class="row">
@@ -88,7 +88,8 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="align-middle text-center">Anda Belum Memiliki Izin</td>
+                                                <td colspan="7" class="align-middle text-center">Anda Belum Memiliki Izin
+                                                </td>
                                             </tr>
                                         @endforelse
                                     </tbody>

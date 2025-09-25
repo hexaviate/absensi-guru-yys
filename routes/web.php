@@ -69,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('izinIndexOperator', 'izinIndexOperator')->name("izinIndexOperator");
         Route::get('viewIzinVerify', 'viewIzinVerify')->name("viewIzinVerify");
-        Route::post('izinVerify', 'izinVerify')->name("izinVerify");
+        Route::put('izinVerify/{id}', 'izinVerify')->name("izinVerify");
 
 
 
