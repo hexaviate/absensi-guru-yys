@@ -241,6 +241,13 @@ class IzinController extends Controller
             'status' => $request->status
         ]);
 
+        if ($izin->status == 'ditolak') {
+            $izin->update([
+                "keterangan_ditolak" => $request->keterangan_ditolak
+            ]);
+        }
+
+
         if ($izin->status == 'diterima') {
             Presensi::create([
                 "instansi_id" => $izin->instansi_id,
