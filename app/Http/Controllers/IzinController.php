@@ -168,6 +168,27 @@ class IzinController extends Controller
 
     }
 
+    public function izinDelete(string $id)
+    {
+        $user = auth()->user();
+        $izin = Izin::find($id);
+
+        if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
+            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+        }
+
+        if ($izin->user_id != $user->id) {
+            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+        }
+
+        if ($izin->status != 'belum_diverifikasi') {
+            return redirect()->intended('dashboard')->with('error', 'izin ini telah diverifikasi');
+        }
+
+        $izin->delete();
+        return redirect()->back()->with('success', 'Anda berhasil menghapus izin ini');
+    }
+
 
     //*---------------------------------------------------------{User}-----------------------------------------------------------------------//
 
