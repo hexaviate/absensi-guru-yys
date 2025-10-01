@@ -63,13 +63,13 @@ class PresensiController extends Controller
                         'userAgent' => $request->userAgent()
                     ]);
 
-                    //*Send Message
-                    Http::withOptions(['verify' => false]) // << DISABLE SSL VERIFY
-                        ->withHeaders(['Authorization' => $token])
-                        ->asForm()->post('https://api.fonnte.com/send', [
-                                'target' => '083186180137',
-                                'message' => "anda telah absen pada $now dan anda tidak punya jadwal hari ini",
-                            ]);
+                    // //*Send Message
+                    // Http::withOptions(['verify' => false]) // << DISABLE SSL VERIFY
+                    //     ->withHeaders(['Authorization' => $token])
+                    //     ->asForm()->post('https://api.fonnte.com/send', [
+                    //             'target' => '083186180137',
+                    //             'message' => "anda telah absen pada $now dan anda tidak punya jadwal hari ini",
+                    //         ]);
 
                     return response()->json([
                         "status" => 'anda berhasil absensi tidak ada jadwal hari ini' //status diganti ke return view blade
@@ -137,14 +137,14 @@ class PresensiController extends Controller
                     'userAgent' => $request->userAgent()
                 ]);
 
-                //*Send Message
-                $token = '74SPnec8JM2KKXmKDNSz';
-                Http::withOptions(['verify' => false]) // << DISABLE SSL VERIFY
-                    ->withHeaders(['Authorization' => $token])
-                    ->asForm()->post('https://api.fonnte.com/send', [
-                            'target' => '083186180137',
-                            'message' => "Anda berhasil Absen pada hari ini",
-                        ]);
+                // //*Send Message
+                // $token = '74SPnec8JM2KKXmKDNSz';
+                // Http::withOptions(['verify' => false]) // << DISABLE SSL VERIFY
+                //     ->withHeaders(['Authorization' => $token])
+                //     ->asForm()->post('https://api.fonnte.com/send', [
+                //             'target' => '083186180137',
+                //             'message' => "Anda berhasil Absen pada hari ini",
+                //         ]);
 
                 return response()->json([
                     "status" => 'anda berhasil absensi' //status diganti ke return view blade
