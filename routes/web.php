@@ -64,6 +64,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('izinCreate', 'izinCreate');
         Route::get('viewIzinEdit', 'viewIzinEdit');
         Route::post('izinEdit', 'izinEdit');
+        Route::post('izinDelete', 'izinDelete');
         //*---------------------------------------------------------{User}-----------------------------------------------------------------------//
         //?---------------------------------------------------------{Operator/Admin}-----------------------------------------------------------------------//
 
