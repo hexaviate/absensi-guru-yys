@@ -130,7 +130,7 @@
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title">
                                 <i class="fas fa-image mr-2"></i>
-                                Bukti Izin - {{ $item->user->name ff}}
+                                Bukti Izin - {{ $item->user->name}}
                             </h5>
                             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -210,9 +210,9 @@
                                             </label>
                                         </div>
                                         <div class="custom-control custom-radio">
-                                            <input type="radio" id="ditolak-{{ $item->id }}" name="status" value="ditolak"
+                                            <input type="radio" id="tidak_diterima-{{ $item->id }}" name="status" value="tidak_diterima"
                                                 class="custom-control-input status-radio" required>
-                                            <label class="custom-control-label text-danger" for="ditolak-{{ $item->id }}">
+                                            <label class="custom-control-label text-danger" for="tidak_diterima-{{ $item->id }}">
                                                 <i class="fas fa-times mr-1"></i> Ditolak
                                             </label>
                                         </div>
@@ -281,7 +281,7 @@
                 const itemId = $(this).attr('id').split('-')[1];
                 const keteranganDiv = $('#keterangan-ditolak-' + itemId);
 
-                if ($(this).val() === 'ditolak' && $(this).is(':checked')) {
+                if ($(this).val() === 'tidak_diterima' && $(this).is(':checked')) {
                     keteranganDiv.slideDown();
                 } else {
                     keteranganDiv.slideUp();
@@ -426,4 +426,28 @@
             min-height: 200px;
         }
     </style>
+@endpush
+
+@push('message')
+    {{-- di layout blade, misalnya di bagian bawah sebelum </body> --}}
+{{-- <script src="{{ asset('assets/modules/izitoast/js/iziToast.min.js') }}"></script> --}}
+
+<script>
+    @if(session('success'))
+        iziToast.success({
+            title: 'Sukses',
+            message: "{{ session('success') }}",
+            position: 'topRight'
+        });
+    @endif
+
+    @if(session('error'))
+        iziToast.error({
+            title: 'Error',
+            message: "{{ session('error') }}",
+            position: 'topRight'
+        });
+    @endif
+</script>
+
 @endpush

@@ -241,8 +241,8 @@ class IzinController extends Controller
             'status' => $request->status
         ]);
 
-        if ($izin->status == 'ditolak') {
-            $izin->update([
+        if ($izin->status == 'tidak_diterima') {
+            $izin->update(attributes: [
                 "keterangan_ditolak" => $request->keterangan_ditolak
             ]);
         }

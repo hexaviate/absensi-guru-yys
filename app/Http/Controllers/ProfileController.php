@@ -67,7 +67,7 @@ class ProfileController extends Controller
 
         $jadwal = Jadwal::where('user_id', $user->id)->where('tapel_id', $tapelAktif->id)->get();
 
-        return view('jadwalSaya', compact('jadwal')); //view nanti diganti
+        return view('jadwalUser.index', compact('jadwal')); //view nanti diganti
     }
 
     public function viewRiwayatAbsensi()

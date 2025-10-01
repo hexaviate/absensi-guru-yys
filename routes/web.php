@@ -40,6 +40,10 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard.main');
     })->name('dashboard');
 
+    Route::get('/profile', function () {
+        return view('profile.index');
+    })->name('profile');
+
     Route::resource('user', UsersController::class);
     Route::resource('role', RoleController::class);
     Route::resource('instansi', InstansiController::class);
@@ -51,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(ProfileController::class)->group(function () {
         Route::get('viewEditProfile', 'viewEditProfile');
         Route::post('editProfile', 'editProfile');
-        Route::get('viewJadwalMingguIni', 'viewJadwalMingguIni');
+        Route::get('/jadwalUser', 'viewJadwalMingguIni');
         Route::get('viewRiwayatAbsensi', 'viewRiwayatAbsensi');
         Route::get('viewJadwalHariIni', 'viewJadwalHariIni');
     });
@@ -78,6 +82,8 @@ Route::middleware(['auth'])->group(function () {
 
     });
 });
+
+
 
 
 

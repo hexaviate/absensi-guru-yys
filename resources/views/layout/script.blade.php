@@ -22,11 +22,15 @@
 <script src="{{asset('asset/dist/assets/js/scripts.js')}}"></script>
 <script src="{{asset('asset/dist/assets/js/custom.js')}}"></script>
 
+  <script src="{{asset("asset/dist/assets/modules/izitoast/js/iziToast.min.js")}}"></script>
+
+  <script src="{{asset("asset/dist/assets/js/page/modules-ion-icons.js")}}"></script>
+
 <!-- Font Awesome -->
 {{-- <script src="https://kit.fontawesome.com/40f5c7c2d3.js" crossorigin="anonymous"></script> --}}
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("+", function() {
         const alert = document.getElementById("alertMessage");
         if (alert) {
             setTimeout(() => {

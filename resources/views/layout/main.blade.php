@@ -23,16 +23,19 @@
             <div class="main-content">
                 @yield('main')
             </div>
-
-            @yield('modal')
-
-            <footer class="main-footer">
-                @include('layout.footer')
-            </footer>
         </div>
-    </div>
 
-    @include('layout.script')
+        @yield('modal')
+
+
+        <footer class="main-footer">
+            @include('layout.footer')
+        </footer>
+    </div>
+</div>
+
+@include('layout.script')
+@include('layout.message')
 
 </body>
 
