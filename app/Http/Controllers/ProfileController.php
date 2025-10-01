@@ -14,6 +14,15 @@ use Validator;
 
 class ProfileController extends Controller
 {
+
+    public function viewProfile()
+    {
+        $user = auth()->user();
+        $instansiName = $user->instansi()->get();
+
+        return view('instansiIndex');
+    }
+
     public function viewEditProfile(string $id)
     {
         $user = auth()->user();
