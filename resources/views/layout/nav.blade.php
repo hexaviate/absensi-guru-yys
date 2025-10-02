@@ -8,13 +8,13 @@
 <ul class="navbar-nav navbar-right">
     <li class="dropdown"><a href="#" data-toggle="dropdown"
             class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-            <img alt="image" src="{{ asset('asset/dist/assets/img/avatar/avatar-2.png') }}"
+            <img src="{{ $user->foto ? asset('foto/' . $user->foto) : asset('foto/default.jpg') }}" alt="Foto Profil" style=" border: 2px solid rgba(255, 255, 255, 0.3);"
                 class="rounded-circle mr-1">
             <div class="d-sm-none d-lg-inline-block"></div>
         </a>
         <div class="dropdown-menu dropdown-menu-right">
             <div class="dropdown-title">Logged in 5 min ago</div>
-            <a href="{{route("profile")}}" class="dropdown-item has-icon">
+            <a href="{{ route('viewProfile') }}" class="dropdown-item has-icon">
                 <i class="far fa-user"></i> Profile
             </a>
             <div class="dropdown-divider"></div>

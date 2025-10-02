@@ -1,7 +1,7 @@
 @extends('layout.main')
 @section('main')
     <section class="section">
-        <div class="section-header" style="">
+        <div class="section-header">
             <h1>Tambah User</h1>
             <div class="section-header-breadcrumb">
                 <div class="breadcrumb-item active"><a href="#">User</a></div>
@@ -10,7 +10,7 @@
         </div>
 
         <div class="section-body">
-            <div class="card shadow-sm" style="">
+            <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Tambah User</h5>
                 </div>
@@ -28,12 +28,12 @@
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Nama</label>
                                 <input type="text" class="form-control" id="name" name="name"
-                                    placeholder="Masukkan nama">
+                                    placeholder="Masukkan nama" value="{{ old('name') }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="telp" class="form-label">No Telepon</label>
                                 <input type="text" class="form-control" id="telp" name="telp"
-                                    placeholder="08xxxxxxxxxx">
+                                    placeholder="08xxxxxxxxxx" value="{{ old('telp') }}">
                             </div>
                         </div>
 
@@ -42,7 +42,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" name="username" id="username"
-                                    placeholder="Masukkan username">
+                                    placeholder="Masukkan username" value="{{ old('username') }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="password" class="form-label">Password</label>
@@ -51,22 +51,22 @@
                             </div>
                         </div>
 
-                        <!-- uid & foto -->
+                        <!-- foto_presensi & jarak_tempuh -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="foto_presensi" class="form-label">Foto Presensi</label>
                                 <input type="file" class="form-control" id="foto_presensi" name="foto_presensi">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="foto_profil" class="form-label">Foto</label>
-                                <input type="file" class="form-control" id="foto_profil" name="foto_profil">
+                                <label for="jarak_tempuh" class="form-label">Jarak Tempuh (km)</label>
+                                <input type="number" class="form-control" id="jarak_tempuh" name="jarak_tempuh"
+                                    placeholder="Masukkan jarak tempuh" value="{{ old('jarak_tempuh') }}" step="0.01">
                             </div>
                         </div>
 
                         <!-- role & instansi -->
-                        <!-- role -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Role</label>
                                 <div class="selectgroup selectgroup-pills">
                                     @forelse ($role as $item)
@@ -81,11 +81,8 @@
                                     @endforelse
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- instansi -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Instansi</label>
                                 <div class="selectgroup selectgroup-pills">
                                     @forelse ($instansi as $item)
@@ -113,4 +110,3 @@
         </div>
     </section>
 @endsection
-

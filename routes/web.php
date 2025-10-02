@@ -32,17 +32,13 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
     Route::controller(PresensiController::class)->group(function () {
-        Route::get('presensi', 'viewPresensi');
+        Route::get('presensi', 'viewPresensi')->name('presensi');
         Route::post('prosesPresensi', 'prosesPresensi')->name('prosesPresensi');
     });
 
     Route::get('/dashboard', function () {
         return view('dashboard.main');
     })->name('dashboard');
-
-    Route::get('/profile', function () {
-        return view('profile.index');
-    })->name('profile');
 
     Route::resource('user', UsersController::class);
     Route::resource('role', RoleController::class);
@@ -54,8 +50,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::controller(ProfileController::class)->group(function () {
         Route::get('viewEditProfile', 'viewEditProfile');
+        Route::get('viewProfile', 'viewProfile')->name('viewProfile');
         Route::post('editProfile', 'editProfile');
-        Route::get('/jadwalUser', 'viewJadwalMingguIni');
+        Route::get('jadwalUser', 'viewJadwalMingguIni')->name('jadwalUser');
         Route::get('viewRiwayatAbsensi', 'viewRiwayatAbsensi');
         Route::get('viewJadwalHariIni', 'viewJadwalHariIni');
     });

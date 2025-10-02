@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+@php
+    $user = auth()->user();
+@endphp
 
 <head>
     @include('layout.head')
