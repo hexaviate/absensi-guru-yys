@@ -137,49 +137,82 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $target = User::find($id);
-        $validate = Validator::make($request->all(), [
+
+        if (!$target) {
+            return redirect()->route('user.index')->with('error', 'User tidak ditemukan');
+        }
+
+        // Setup validation rules
+        $rules = [
             "name" => "required|min:5",
             "telp" => "required|numeric",
-            "username" => "required",
-            "password" => "required",
-            "uid_rfid" => "required"
-        ]);
+            "password" => "nullable|min:6",
+            "foto_presensi" => "nullable|image|mimes:jpeg,png,jpg|max:2048",
+            "jarak_tempuh" => "nullable|numeric|min:0",
+            "role_id" => "required|array|min:1",
+            "instansi_id" => "required|array|min:1"
+        ];
+
+        // Validasi username hanya jika berubah
+        if ($request->username != $target->username) {
+            $rules['username'] = "required|unique:users,username";
+        } else {
+            $rules['username'] = "required";
+        }
+
+        // Validate request
+        $validate = Validator::make($request->all(), $rules);
 
         if ($validate->fails()) {
             return redirect()->back()->withErrors($validate)->withInput();
         }
 
-
-        $imageName = time() . '.' . $request->foto->extension();
-
-        // $request->image->move(public_path('images'), $imageName);
-
-        //img intervention
-        $manager = ImageManager::withDriver(new Driver());
-
-        //read image
-        $image = $manager->read($request->file('foto'));
-        $image->encode(new AutoEncoder(quality: 50))->save(public_path('foto/' . $imageName));
-
-        $target->update([
+        // Prepare data untuk update
+        $dataUpdate = [
             "name" => $request->name,
             "telp" => $request->telp,
             "username" => $request->username,
-            "password" => $request->password,
-            "uid_rfid" => $request->uid_rfid,
-            "foto" => $imageName
-        ]);
+            "jarak_tempuh" => $request->jarak_tempuh ?? 0,
+        ];
 
-        $target->roles()->sync($request->role_id);
-        $target->roles()->sync($request->instansi_id);
+        // Update password hanya jika diisi
+        if ($request->filled('password')) {
+            $dataUpdate['password'] = Hash::make($request->password);
+        }
 
-        return redirect()->route('user.index');
+        // Handle Foto Presensi
+        if ($request->hasFile('foto_presensi')) {
+            try {
+                if ($target->foto_presensi && file_exists(public_path('foto/' . $target->foto_presensi))) {
+                    unlink(public_path('foto/' . $target->foto_presensi));
+                }
 
+                $imageName = 'presensi_' . time() . '_' . uniqid() . '.' . $request->foto_presensi->extension();
+
+                $manager = ImageManager::withDriver(new Driver());
+                $image = $manager->read($request->file('foto_presensi'));
+                $image->encode(new AutoEncoder(quality: 50))->save(public_path('foto/' . $imageName));
+
+                $dataUpdate['foto_presensi'] = $imageName;
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Gagal mengupload foto: ' . $e->getMessage())->withInput();
+            }
+        }
+
+        try {
+            $target->update($dataUpdate);
+
+            $target->roles()->sync($request->role_id);
+            $target->instansi()->sync($request->instansi_id);
+
+            return redirect()->route('user.index')->with('success', 'User berhasil diupdate');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengupdate user: ' . $e->getMessage())->withInput();
+        }
     }
-
     /**
      * Remove the specified resource from storage.
      */

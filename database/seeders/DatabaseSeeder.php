@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
             InstansiSeeder::class,
             UserSeeder::class,
             TapelSeeder::class,
-            JadwalSeeder::class
+            JadwalSeeder::class,
+            IzinSeeder::class
         ]);
 
         // $admin = User::factory()->make([

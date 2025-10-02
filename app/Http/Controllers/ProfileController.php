@@ -20,7 +20,7 @@ class ProfileController extends Controller
         $user = auth()->user();
         $instansiName = $user->instansi()->get();
 
-        return view('instansiIndex');
+        return view('profile.index', compact('user','instansiName'));
     }
 
     public function viewEditProfile(string $id)
@@ -76,7 +76,7 @@ class ProfileController extends Controller
 
         $jadwal = Jadwal::where('user_id', $user->id)->where('tapel_id', $tapelAktif->id)->get();
 
-        return view('jadwalSaya', compact('jadwal')); //view nanti diganti
+        return view('jadwalUser.index', compact('jadwal')); //view nanti diganti
     }
 
     public function viewRiwayatAbsensi()

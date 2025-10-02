@@ -22,7 +22,7 @@ class IzinController extends Controller
         if ($user->hasAnyPermission(['view self izin', 'manage izin'])) {
             // $instansi = $user->instansi; //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
             $izin = Izin::where('user_id', $user->id)->get();
-            return view('izinUser', compact('izin'));
+            return view('izin.users.index', compact('izin'));
         } else {
             return redirect()->route('login')->with('error', 'Anda tidak punya Permission');
         }
@@ -35,13 +35,14 @@ class IzinController extends Controller
             return redirect()->intended('dashboard');
         }
 
-        $instansi = $user->instansi();
-        return view('createIzin', compact('instansi'));
+        $instansi = $user->instansi;
+        return view('izin.users.tambah', compact('instansi'));
 
     }
 
     public function izinCreate(Request $request)
     {
+
         $user = auth()->user();
         if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
             return redirect()->intended('dashboard');
@@ -49,41 +50,48 @@ class IzinController extends Controller
 
         $validate = Validator::make($request->all(), [
             'bukti_izin' => 'required',
-            'instanzi_id' => 'required|exists:instansis,id',
-            'tanggal' => 'required',
+            'instansi_id' => 'required|exists:instansis,id',
             'keterangan' => 'required',
         ]);
 
         if ($validate->fails()) {
-            return redirect()->route('')->withErrors($validate)->withInput();
+            return redirect()->route('viewIzinCreate')->withErrors($validate)->withInput();
         }
 
-        $instansiUser = $user->instansi();
+        foreach ($request->instansi_id as $instansi) {
 
-        if ($request->instansi_id != $instansiUser) {
-            return redirect()->back()->with('error', 'tidak  tidak terdaftar pada instansi ini');
+
+            $instansiUser = $user->instansi();
+
+            // if ($request->instansi_id != $instansiUser->id) {
+            //     // return redirect()->back()->with('error', 'tidak  tidak terdaftar pada instansi ini');
+            // }
+
+            // * Upload untuk Foto Profil
+            $buktiIzin = time() . $instansi . '.' . $request->bukti_izin->extension();
+
+
+            //img interevention
+            $manager = ImageManager::withDriver(new Driver());
+
+            //read image
+            $fotoIzin = $manager->read($request->file('bukti_izin'));
+            $fotoIzin->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $buktiIzin));
+
+            Izin::create([
+                'user_id' => $user->id,
+                'instansi_id' => $instansi,
+                'bukti_izin' => $buktiIzin,
+                'tanggal' => Carbon::now()->toDateString(),
+                'keterangan' => $request->keterangan,
+            ]);
         }
 
-        // * Upload untuk Foto Profil
-        $buktiIzin = time() . '.' . $request->bukti_izin->extension();
 
 
-        //img interevention
-        $manager = ImageManager::withDriver(new Driver());
+        // dd($created);
 
-        //read image
-        $fotoIzin = $manager->read($request->file('foto_profil'));
-        $fotoIzin->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $buktiIzin));
-
-        Izin::make([
-            'user_id' => $user->id,
-            'instansi_id' => $request->instansi_id,
-            'bukti_izin' => $buktiIzin,
-            'tanggal' => $request->tanggal,
-            'keterangan' => $request->keterangan,
-        ]);
-
-        return redirect()->back()->with('success', 'anda berhasil membuat izin');
+        return redirect()->route("izinIndexUser")->with('success', value: 'anda berhasil membuat izin');
     }
 
     public function viewIzinEdit(string $id)
@@ -94,7 +102,7 @@ class IzinController extends Controller
         }
 
         $izin = Izin::find($id);
-        $instansi = $user->instansi();
+        $instansi = $user->instansi;
 
         if ($izin->status != 'belum_diverifikasi') {
             return redirect()->intended('dashboard')->with('error', 'izin ini telah diverifikasi');
@@ -104,7 +112,7 @@ class IzinController extends Controller
             return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
         }
 
-        return view('izinEdit', compact('izin', 'instansi'));
+        return view('izin.users.edit', compact('izin', 'instansi'));
 
     }
 
@@ -136,36 +144,39 @@ class IzinController extends Controller
             return redirect()->route('', $id)->withErrors($validate)->withInput();
         }
 
+        if ($request->bukti_izin) {
+            // * Upload untuk Foto izin
+            $buktiIzin = time() . '.' . $request->file('bukti_izin')->extension();
 
-        // * Upload untuk Foto izin
-        $buktiIzin = time() . '.' . $request->bukti_izin->extension();
 
+            //*delete file yang sudah ada sebelumnya
+            $filePath = public_path('bukti_izin/' . $buktiIzin);
 
-        //*delete file yang sudah ada sebelumnya
-        $filePath = public_path('bukti_izin/' . $buktiIzin);
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+            }
 
-        if (File::exists($filePath)) {
-            File::delete($filePath);
+            //img interevention
+            $manager = ImageManager::withDriver(new Driver());
+
+            //read image
+            $fotoIzin = $manager->read($request->file('bukti_izin'));
+            $fotoIzin->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $buktiIzin));
+
+            $izin->update([
+                "bukti_izin" => $buktiIzin,
+            ]);
         }
 
 
-        //img interevention
-        $manager = ImageManager::withDriver(new Driver());
-
-        //read image
-        $fotoIzin = $manager->read($request->file('foto_profil'));
-        $fotoIzin->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $buktiIzin));
 
         $izin->update([
             "instansi_id" => $request->instansi_id,
-            "bukti_izin" => $buktiIzin,
             'tanggal' => $request->tanggal,
             "keterangan" => $request->keterangan
         ]);
 
         return redirect()->back()->with('success', 'anda berhasil mengedit izin anda');
-
-
     }
 
     public function izinDelete(string $id)
@@ -202,9 +213,14 @@ class IzinController extends Controller
             return redirect()->intended('dashboard');
         }
 
-        $instansi_id = $user->instansi()->id;
-        $izin = Izin::where('instansi_id', $instansi_id)->first();
-        return view('izinIndexOperator', compact('izin'));
+        // $instansi_id = $user->instansi()->id;
+        // $izin = Izin::where('instansi_id', $instansi_id)->first();
+
+        $instansi_ids = $user->instansi->pluck('id');
+
+        // ambil semua izin untuk semua instansi user
+        $izin = Izin::whereIn('instansi_id', $instansi_ids)->get();
+        return view('izin.admin.index', compact('izin'));
     }
 
     public function viewIzinVerify(string $id)
@@ -231,7 +247,7 @@ class IzinController extends Controller
 
         $izin = Izin::find($id);
         if ($izin->user_id == $user->id) {
-            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+            return redirect()->intended('izinIndexOperator')->with('error', 'anda tidak punya permission');
         }
 
         $validate = Validator::make($request->all(), [
@@ -239,15 +255,15 @@ class IzinController extends Controller
         ]);
 
         if ($validate->fails()) {
-            return redirect()->route('', $id)->withErrors($validate)->withInput();
+            return redirect()->route('izinIndexOperator', $id)->withErrors($validate)->withInput();
         }
 
         $izin->update([
             'status' => $request->status
         ]);
 
-        if ($izin->status == 'ditolak') {
-            $izin->update([
+        if ($izin->status == 'tidak_diterima') {
+            $izin->update(attributes: [
                 "keterangan_ditolak" => $request->keterangan_ditolak
             ]);
         }

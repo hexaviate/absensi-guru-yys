@@ -102,7 +102,7 @@
     <script src="{{ asset('asset/dist/assets/modules/nicescroll/jquery.nicescroll.min.js') }}"></script>
     <script src="{{ asset('asset/dist/assets/modules/moment.min.js') }}"></script>
     <script src="{{ asset('asset/dist/assets/js/stisla.js') }}"></script>
-    
+
     <!-- Template JS File -->
     <script src="{{ asset('asset/dist/assets/js/scripts.js') }}"></script>
     <script src="{{ asset('asset/dist/assets/js/custom.js') }}"></script>

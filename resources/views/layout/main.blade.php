@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+@php
+    $user = auth()->user();
+@endphp
 
 <head>
-    @include('layout.head') 
+    @include('layout.head')
 </head>
 
 <body>
@@ -12,6 +15,7 @@
             <nav class="navbar navbar-expand-lg main-navbar">
                 @include('layout.nav')
             </nav>
+
             <div class="main-sidebar sidebar-style-2">
                 <aside id="sidebar-wrapper">
                     @include('layout.sidebar')
@@ -22,13 +26,19 @@
             <div class="main-content">
                 @yield('main')
             </div>
-            <footer class="main-footer">
-                @include('layout.footer')
-            </footer>
         </div>
-    </div>
 
-    @include('layout.script')
+        @yield('modal')
+
+
+        <footer class="main-footer">
+            @include('layout.footer')
+        </footer>
+    </div>
+</div>
+
+@include('layout.script')
+@include('layout.message')
 
 </body>
 

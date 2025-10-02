@@ -2,85 +2,447 @@
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    {{-- Perlu ditambahkan !penting! --}}
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+    <title>Halaman Absensi</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    {{-- Perlu ditambahkan !penting! --}}
-    <title>Presensi - Selfie, Lokasi, Perangkat</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome 6.6.0 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+
     <style>
-        .btn-teal {
-            background-color: #009688;
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #6777EF 0%, #6777EF 100%) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-container {
+            margin-top: 100px;
+            padding: 20px;
+        }
+
+        .attendance-card {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100vw;
+            /* full layar */
+            height: 100vh;
+            /* full layar */
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background: #000;
+        }
+
+        /* elemen video & preview */
+        #video,
+        #preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* penuh tanpa space */
+            object-position: center;
+            display: none;
+            /* default hidden */
+        }
+
+        /* aktifkan elemen */
+        #video.active,
+        #preview.active {
+            display: block;
+        }
+
+        /* khusus mirror kamera */
+        #video {
+            transform: scaleX(-1);
+        }
+
+        .btn-custom {
+            border-radius: 15px;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #6777EF 0%, #6777EF 100%);
             color: white;
         }
 
-        .btn-teal:hover {
-            background-color: #00796b;
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
         }
 
-        .text-teal {
-            color: #00695c;
+        .btn-success-custom {
+            background: linear-gradient(135deg, #6777EF 0%, #6777EF 100%);
+            color: white;
         }
 
-        #preview,
-        #video {
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, #6777EF 0%, #6777EF 100%);
+            color: white;
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .user-info {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .status-badge {
+            background: linear-gradient(135deg, #6777EF 0%, #6777EF 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .modal-content {
+            border: none;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #6777EF 0%, #6777EF 100%);
+            color: white;
+            border: none;
+        }
+
+        .tutorial-step {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #6777EF;
+        }
+
+        .step-number {
+            background: #6777EF;
+            color: white;
             border-radius: 50%;
-            border: 4px solid #009688;
-            object-fit: cover;
-            background: #f0f0f0;
-            display: block;
-            margin: 0 auto 1rem auto;
-            width: 100%;
-            max-width: 200px;
-            aspect-ratio: 1/1;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
         }
 
-        #status-wajah.ready {
-            color: #009688;
+        .navbar-toggler {
+            border: none;
+            color: white;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        @media (max-width: 576px) {
+            .main-container {
+                margin-top: 80px;
+                padding: 15px;
+            }
+
+            .attendance-card {
+                padding: 20px;
+            }
+
+            #video,
+            #preview {
+                height: 280px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container py-4">
-        <div class="card shadow-sm rounded-4 p-4">
+    <!-- Header dengan gradien modern -->
+    <nav class="navbar navbar-expand-lg fixed-top shadow p-2">
+        <div class="container-fluid">
+            <div class="row w-100 text-center align-items-center">
 
-            <div class="text-center mb-3">
-                <img id="preview" alt="Hasil Selfie" class="rounded-circle border border-success shadow"
-                    style="width: 180px; height: 180px; object-fit: cover; margin-bottom: 1rem; display: none;" />
-                <video id="video" autoplay playsinline muted class="rounded-circle border border-info shadow"
-                    style="width: 180px; height: 180px; object-fit: cover; transform: scaleX(-1); background-color: #f8f9fa; display: none;">
-                </video>
-            </div>
+                <!-- kiri -->
+                <div class="col-4 text-start">
+                    {{-- <i class="fas fa-camera fa-lg text-white"></i> --}}
+                </div>
 
-            <div id="status-wajah" class="text-center text-danger fw-semibold mb-3 text-wrap"
-                style="font-size: 15px; display:none;">Mendeteksi wajah...</div>
-            <div id="matching-info" class="text-center text-muted small mb-3 text-wrap" style="display:none;"></div>
-            <canvas id="canvas" style="display:none;"></canvas>
+                <!-- tengah -->
+                <div class="col-4">
+                    <h5 class="text-white mb-0 fw-bold">Presensi Wajah</h5>
+                </div>
 
-            <button class="btn btn-teal w-100 fw-semibold mb-4" onclick="ambilPresensi()">Ambil Presensi</button>
-
-            <div class="alert alert-success text-center fw-semibold mb-4" role="alert" id="status"
-                style="display:none;">
-                ✅ Presensi sukses: <br> wajah cocok dan lokasi valid.
-            </div>
-            <div class="mb-3">
-                <div class="card p-3 text-center">
-                    <div class="fw-bold text-secondary mb-1">📍 Lokasi</div>
-                    <div id="lokasi" class="text-wrap small"></div>
+                <!-- kanan -->
+                <div class="col-4 text-end">
+                    <i class="fas fa-circle-info fa-lg text-white" style="cursor: pointer;" data-bs-toggle="modal"
+                        data-bs-target="#tutorialModal"></i>
                 </div>
             </div>
-            <div class="mb-3">
-                <div class="card p-3">
-                    <div class="fw-bold text-secondary mb-1">💻 Info Perangkat</div>
-                    <div id="perangkat" class="small text-wrap"></div>
+        </div>
+    </nav>
+
+    <!-- Konten Utama -->
+    <div class="main-container">
+        <div class="attendance-card">
+
+            <!-- Video Preview -->
+            <div class="video-container text-center position-relative"
+                style="width: 100%; height: 300px; overflow: hidden; border-radius: 12px;">
+
+                <!-- placeholder awal -->
+                <div id="placeholder"
+                    style="position: absolute; top:0; left:0; width:100%; height:100%;
+        background: #f5f5f5; display:flex; align-items:center; justify-content:center; z-index:1;">
+                    <i class="fas fa-user fa-6x text-secondary"></i>
+                </div>
+
+                <!-- video -->
+                <video id="video" autoplay playsinline muted
+                    style="width:100%; height:100%; object-fit:cover; transform:scaleX(-1);
+        display:none; position:relative; z-index:2;"></video>
+
+                <!-- hasil selfie -->
+                <img id="preview" alt="Hasil Selfie"
+                    style="width:100%; height:100%; object-fit:cover; transform:scaleX(-1);
+        display:none; position:relative; z-index:3;" />
+            </div>
+
+
+
+            <!-- Status Deteksi Wajah -->
+            <div id="status-wajah" class="text-center text-danger fw-semibold mb-3 text-wrap"
+                style="font-size: 15px; display:none;">
+                Mendeteksi wajah...
+            </div>
+
+            <!-- Info Matching Wajah -->
+            <div id="matching-info" class="text-center text-muted small mb-3 text-wrap" style="display:none;"></div>
+
+            <!-- Status Utama - ELEMENT YANG HILANG -->
+            {{-- <div class="alert alert-success text-center fw-semibold mb-4" role="alert" id="status"
+                style="display:none;">
+                Status presensi akan muncul di sini
+            </div> --}}
+
+            <!-- Tombol Kontrol -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-4">
+                    <button class="btn btn-custom btn-primary-custom w-100" id="switchCamera">
+                        <i class="fas fa-sync-alt me-2"></i>Ganti Kamera
+                    </button>
+                </div>
+                <div class="col-12 col-md-4">
+                    <button class="btn btn-custom btn-success-custom w-100" id="takePhoto" onclick="ambilPresensi()">
+                        <i class="fas fa-camera me-2"></i>Ambil Presensi
+                    </button>
+                </div>
+                <div class="col-12 col-md-4">
+                    <a href="{{ route('dashboard') }}" class="btn btn-custom btn-danger-custom w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
+                    </a>
+                </div>
+
+            </div>
+
+            {{-- Status Presensi yang Muncul Setelah Berhasil --}}
+            {{-- Status Container Lengkap yang Muncul Setelah Presensi --}}
+            <div class="user-info text-center" id="status" style="display:none;">
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Status Message Alert - BARU DITAMBAHKAN -->
+                        <div class="alert alert-success text-center fw-semibold mb-3" role="alert" id="status-message"
+                            style="display:none;">
+                            Status akan muncul di sini
+                        </div>
+
+                        <!-- nama & status -->
+                        <h6 class="mb-2 fw-bold text-dark">
+                            <i class="fas fa-user me-2"></i>Nama: {{ $user->name }}
+                        </h6>
+
+                        <!-- Info Presensi -->
+                        <small class="text-muted" id="info-presensi">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Anda Sudah Absensi (datang / pulang) Hari Ini
+                        </small>
+
+                        <!-- lokasi -->
+                        <div class="p-3 text-center mb-2">
+                            <div class="fw-bold text-secondary mb-1">
+                                <i class="fa-solid fa-location-dot me-1 text-danger"></i> Lokasi
+                            </div>
+                            <div id="lokasi" class="text-wrap small"></div>
+                        </div>
+
+                        <!-- perangkat -->
+                        <div class="p-3 text-center">
+                            <div class="fw-bold text-secondary mb-1">
+                                <i class="fa-solid fa-laptop me-1 text-black"></i> Info Perangkat
+                            </div>
+                            <div id="device-info" class="text-wrap small text-center">
+                                <div id="perangkat" class="small text-wrap"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <canvas id="canvas" style="display:none;"></canvas>
+
+        </div>
+    </div>
+
+    <!-- Modal Tutorial -->
+    <div class="modal fade" id="tutorialModal" tabindex="-1" aria-labelledby="tutorialModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="tutorialModalLabel">
+                        <i class="fas fa-graduation-cap me-2"></i>Petunjuk Absensi Wajah
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="tutorial-step">
+                        <div class="d-flex align-items-center">
+                            <span class="step-number p-3">1</span>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Posisikan kamera</h6>
+                                <p class="mb-0 text-muted">Pastikan kamera perangkat dalam keadaan bersih dan aplikasi
+                                    memiliki izin akses kamera.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step">
+                        <div class="d-flex align-items-center">
+                            <span class="step-number p-3">2</span>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Tempatkan wajah</h6>
+                                <p class="mb-0 text-muted">Tempatkan wajah Anda di area yang cukup terang, lalu arahkan
+                                    ke kamera dan posisikan di tengah layar.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step">
+                        <div class="d-flex align-items-center">
+                            <span class="step-number p-3">3</span>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Ambil Absensi</h6>
+                                <p class="mb-0 text-muted">Tahan posisi beberapa saat hingga proses verifikasi selesai,
+                                    jangan menggerakkan perangkat terlalu banyak.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step">
+                        <div class="d-flex align-items-center">
+                            <span class="step-number p-3">4</span>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Lapor</h6>
+                                <p class="mb-0 text-muted">Jika wajah belum berhasil terdeteksi, coba ulangi dengan
+                                    pencahayaan lebih baik atau posisi wajah yang jelas. Jika tetap gagal, silakan
+                                    hubungi operator instansi Anda.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step">
+                        <div class="d-flex align-items-center">
+                            <span class="step-number p-3">5</span>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Berhasil</h6>
+                                <p class="mb-0 text-muted">Setelah verifikasi berhasil, sistem akan menampilkan lokasi,
+                                    perangkat, waktu, serta status absensi Anda.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step">
+                        <div class="d-flex align-items-center">
+                            <span class="step-number p-3">6</span>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Catatan</h6>
+                                <p class="mb-0 text-muted">Data wajah hanya digunakan untuk kebutuhan verifikasi
+                                    absensi
+                                    dan tidak disalahgunakan.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Tips:</strong> Gunakan pencahayaan yang cukup dan pastikan tidak ada bayangan menutupi
+                        wajah untuk hasil terbaik.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-custom btn-primary-custom" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-2"></i>Mengerti
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- JQuery terbaru -->
+    {{-- <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> --}}
+
+    <!-- Bootstrap 5.3.3 JS Bundle -->
+    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
+
+    {{-- <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script> --}}
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+
+
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
@@ -88,6 +450,7 @@
         const statusWajah = document.getElementById('status-wajah');
         const circleTimer = document.getElementById('circle-timer');
         const status = document.getElementById('status');
+        const statusMessage = document.getElementById('status-message');
 
         //menyalakan stream untuk mengambil selfie
         async function mulaiVideo() {
@@ -120,9 +483,22 @@
 
         //* mulai presensi
         async function ambilPresensi() {
-            status.innerText = '';
+            const placeholder = document.getElementById("placeholder");
+
+            if (statusMessage) {
+                statusMessage.innerText = '';
+                statusMessage.style.display = 'none';
+            }
             status.style.display = 'none';
             preview.style.display = 'none';
+
+            // hide placeholder
+            if (placeholder) {
+                console.log("sembunyikan placeholder...");
+                placeholder.style.display = "none";
+            }
+
+            // show video
             video.style.display = 'block';
 
             statusWajah.style.display = "block";
@@ -131,6 +507,8 @@
             await loadModels();
             await deteksiWajahStabil();
         }
+
+
         // Stabilizer wajah: deteksi wajah stabil selama beberapa frame
         let stabilFrameCount = 0;
         const requiredStabilFrames = 10;
@@ -209,7 +587,11 @@
                 .withFaceDescriptor();
 
             if (!deteksiPegawai) {
-                status.innerText = "❌ Wajah tidak ditemukan di foto pegawai.";
+                if (statusMessage) {
+                    statusMessage.innerText = "❌ Wajah tidak ditemukan di foto pegawai.";
+                    statusMessage.className = "alert alert-danger text-center fw-semibold mb-3";
+                    statusMessage.style.display = 'block';
+                }
                 status.style.display = 'block';
                 return;
             }
@@ -222,7 +604,11 @@
 
             //pengecekan apakah ada wajah pas selfie
             if (!deteksiSelfie) {
-                status.innerText = "❌ Wajah tidak terdeteksi di selfie.";
+                if (statusMessage) {
+                    statusMessage.innerText = "❌ Wajah tidak terdeteksi di selfie.";
+                    statusMessage.className = "alert alert-danger text-center fw-semibold mb-3";
+                    statusMessage.style.display = 'block';
+                }
                 status.style.display = 'block';
                 return;
             }
@@ -233,16 +619,26 @@
             const similarity = Math.max(0, (1 - jarak)) * 100;
             const akurasi = similarity.toFixed(2);
             const matchingInfo = document.getElementById('matching-info');
-            matchingInfo.innerText = `Tingkat kemiripan wajah: ${similarity.toFixed(2)}%`;
-            matchingInfo.style.display = 'block';
+            if (matchingInfo) {
+                matchingInfo.innerText = `Tingkat kemiripan wajah: ${similarity.toFixed(2)}%`;
+                matchingInfo.style.display = 'block';
+            }
 
             if (jarak > threshold) {
-                status.innerText = "❌ Wajah tidak cocok dengan data pegawai.";
+                if (statusMessage) {
+                    statusMessage.innerText = "❌ Wajah tidak cocok dengan data pegawai.";
+                    statusMessage.className = "alert alert-danger text-center fw-semibold mb-3";
+                    statusMessage.style.display = 'block';
+                }
                 status.style.display = 'block';
                 return;
             }
 
-            status.innerText = "✅ Wajah cocok. Mengambil lokasi...";
+            if (statusMessage) {
+                statusMessage.innerText = "✅ Wajah cocok. Mengambil lokasi...";
+                statusMessage.className = "alert alert-success text-center fw-semibold mb-3";
+                statusMessage.style.display = 'block';
+            }
             status.style.display = 'block';
 
             //* mulai mencari lokasi pengguna
@@ -254,12 +650,19 @@
                             latitude,
                             longitude
                         } = position.coords;
-                        document.getElementById('lokasi').innerText =
-                            `Lokasi: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                        const lokasiElement = document.getElementById('lokasi');
+                        if (lokasiElement) {
+                            lokasiElement.innerText = `Lokasi: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                        }
 
                         // Deteksi spoofing sederhana
                         if (navigator.userAgent.includes('FakeGPS') || navigator.userAgent.includes('Mock')) {
-                            status.innerText = "❌ Sistem mendeteksi kemungkinan penggunaan Fake GPS.";
+                            if (statusMessage) {
+                                statusMessage.innerText = "❌ Sistem mendeteksi kemungkinan penggunaan Fake GPS.";
+                                statusMessage.className = "alert alert-danger text-center fw-semibold mb-3";
+                                statusMessage.style.display = 'block';
+                            }
+                            status.style.display = 'block';
                             return;
                         }
 
@@ -376,15 +779,25 @@
                             .then(res => res.json())
                             .then(data => {
                                 console.log("Response Laravel:", data);
+
+
                             });
 
                         if (hasil.valid) {
-                            status.innerText = `✅ Presensi sukses: lokasi valid.
-                                                    Instansi: ${hasil.instansi}`;
+                            if (statusMessage) {
+                                statusMessage.innerText =
+                                    `✅ Presensi sukses: lokasi valid. Instansi: ${hasil.instansi}`;
+                                statusMessage.className = "alert alert-success text-center fw-semibold mb-3";
+                                statusMessage.style.display = 'block';
+                            }
                             status.style.display = 'block';
 
                         } else {
-                            status.innerText = "❌ Lokasi di luar radius semua instansi.";
+                            if (statusMessage) {
+                                statusMessage.innerText = "❌ Lokasi di luar radius semua instansi.";
+                                statusMessage.className = "alert alert-danger text-center fw-semibold mb-3";
+                                statusMessage.style.display = 'block';
+                            }
                             status.style.display = 'block';
 
                         }
@@ -396,7 +809,10 @@
                         }
                     },
                     error => {
-                        document.getElementById('lokasi').innerText = 'Gagal mendapatkan lokasi.';
+                        const lokasiElement = document.getElementById('lokasi');
+                        if (lokasiElement) {
+                            lokasiElement.innerText = 'Gagal mendapatkan lokasi.';
+                        }
                         // Kamera dan lokasi sudah dinonaktifkan setelah presensi gagal mendapatkan lokasi
                     }, {
                         maximumAge: 0,
@@ -405,21 +821,95 @@
                     }
                 );
             } else {
-                document.getElementById('lokasi').innerText = 'Geolocation tidak didukung oleh browser.';
+                const lokasiElement = document.getElementById('lokasi');
+                if (lokasiElement) {
+                    lokasiElement.innerText = 'Geolocation tidak didukung oleh browser.';
+                }
             }
+
+
 
             // Info perangkat
             const perangkatInfo = `
         Browser: ${navigator.userAgent}
         Platform: ${navigator.platform}
       `;
-            document.getElementById('perangkat').innerText = perangkatInfo;
-
-            status.style.display = 'block';
+            const perangkatElement = document.getElementById('perangkat');
+            if (perangkatElement) {
+                perangkatElement.innerText = perangkatInfo;
+            }
 
 
         }
     </script>
+
+    {{-- sccript untuk ganti kaemrera --}}
+
+    <script>
+        let currentStream;
+        let currentCameraIndex = 0;
+        let videoDevices = [];
+
+        // ambil semua kamera yang ada
+        async function getCameras() {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            videoDevices = devices.filter(device => device.kind === 'videoinput');
+            console.log("kamera terdeteksi:", videoDevices);
+        }
+
+        // start kamera sesuai index
+        async function startCamera(cameraIndex = 0) {
+            // stop kamera lama biar nggak bentrok
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+
+            const constraints = {
+                video: {
+                    deviceId: {
+                        exact: videoDevices[cameraIndex].deviceId
+                    }
+                }
+            };
+
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = currentStream; // langsung pake const video kamu di global
+            } catch (err) {
+                console.error("gagal nyalain kamera:", err);
+            }
+        }
+
+        // event tombol ganti kamera
+        document.getElementById("switchCamera").addEventListener("click", async () => {
+            if (videoDevices.length > 1) {
+                currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
+                await startCamera(currentCameraIndex);
+            } else {
+                alert("tidak ada kamera lain yang tersedia!");
+            }
+        });
+
+        // inisialisasi saat halaman load
+        getCameras().then(() => {
+            if (videoDevices.length > 0) {
+                startCamera(currentCameraIndex);
+            }
+        });
+    </script>
+
+    {{-- modal  --}}
+
+    <script>
+        const tutorialModal = document.getElementById('tutorialModal');
+        tutorialModal.addEventListener('click', function(e) {
+            if (e.target === tutorialModal) {
+                const modalInstance = bootstrap.Modal.getInstance(tutorialModal);
+                modalInstance.hide();
+            }
+        });
+    </script>
+
 </body>
 
 </html>
