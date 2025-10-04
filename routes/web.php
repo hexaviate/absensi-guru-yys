@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HariLiburController;
 use App\Http\Controllers\InstansiController;
 use App\Http\Controllers\IzinController;
@@ -71,6 +72,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('izinIndexOperator', 'izinIndexOperator')->name("izinIndexOperator");
         Route::get('viewIzinVerify', 'viewIzinVerify')->name("viewIzinVerify");
         Route::put('izinVerify/{id}', 'izinVerify')->name("izinVerify");
+
+        Route::get('dashboardOperator', [DashboardController::class, 'operatorDashboard'])->name('operatorDashboard');
 
 
 
