@@ -22,7 +22,8 @@ class AuthController extends Controller
 
         if (auth('web')->attempt($credential)) {
             $user = User::where('username', $request->username)->first();
-            return redirect()->route('dashboard', compact('user'));
+
+            return redirect()->route('operatorDashboard');
         } else {
             return back();
         }
