@@ -91,6 +91,7 @@ class UsersController extends Controller
             "telp" => $request->telp,
             "username" => $request->username,
             "password" => $request->password,
+            "jarak_tempuh" => $request->jarak_tempuh,
             "foto_presensi" => $imageNamePresensi,
             "foto" => $imageName,
         ]);
@@ -180,7 +181,7 @@ class UsersController extends Controller
 
         // Update password hanya jika diisi
         if ($request->filled('password')) {
-            $dataUpdate['password'] = Hash::make($request->password);
+            $dataUpdate['password'] = bcrypt($request->password);
         }
 
         // Handle Foto Presensi
