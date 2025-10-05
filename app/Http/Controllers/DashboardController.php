@@ -23,7 +23,8 @@ class DashboardController extends Controller
 
         // $totalGuruInstansi = User::where('instansi_id', $instansi->id)->count();
         $totalGuruInstansi = $instansi->user->count();
-        $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->whereDate('created_at', today())->latest()->get();
+        $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
+        // dd($guruHadirHariIni);
         $totalGuruIzin = Izin::where('instansi_id', $instansi->id)->where('status', 'diterima')->whereDate('created_at', today())->count();
 
         return view('dashboard.main', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user'));

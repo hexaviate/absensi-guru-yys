@@ -105,14 +105,14 @@
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled list-unstyled-border">
-                            @forelse ($guruHadirHariIni as $item)
+                            @forelse ($guruHadirHariIni as $guru)
                                 <li class="media">
                                     <img class="mr-3 rounded-circle" width="50"
                                         src="{{ asset('foto_presensi/' . ($guru->foto_presensi ?? 'default.png')) }}"
                                         alt="avatar">
                                     <div class="media-body">
                                         <div class="float-right text-primary">{{ $guru->created_at->diffForHumans() }}</div>
-                                        <div class="media-title">{{ $guru->nama }}</div>
+                                        <div class="media-title">{{ $guru->user->name }}</div>
                                         <small class="text-muted">Hadir pada {{ $guru->created_at->format('H:i') }}</small>
                                     </div>
                                 </li>
