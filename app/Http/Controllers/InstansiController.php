@@ -48,6 +48,8 @@ class InstansiController extends Controller
             "kepala_instansi" => "required",
             "alamat_instansi" => "required",
             "telp_instansi" => "required|numeric",
+            "latitude" => "required",
+            "longitude" => "required",
             // "user_id" => "exist:user,id|required",
             "user_id" => "required|unique:user_has_instansi,user_id",
             "user_id.*" => "exists:users,id"
@@ -62,6 +64,8 @@ class InstansiController extends Controller
             "kepala_instansi" => $request->kepala_instansi,
             "alamat_instansi" => $request->alamat_instansi,
             "telp_instansi" => $request->telp_instansi,
+            "latitude" => $request->latitude,
+            "longitude" => $request->longitude
         ]);
 
         $instansi->user()->attach($request->user_id);
