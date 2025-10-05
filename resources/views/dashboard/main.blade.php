@@ -106,19 +106,22 @@
                     <div class="card-body">
                         <ul class="list-unstyled list-unstyled-border">
                             @forelse ($guruHadirHariIni as $guru)
-                                <li class="media">
-                                    <img class="mr-3 rounded-circle" width="50"
-                                        src="{{ asset('foto_presensi/' . ($guru->foto_presensi ?? 'default.png')) }}"
+                                <li class="media align-items-center">
+                                    <img class="mr-2 rounded-circle avatar-presensi"
+                                        src="{{ asset('foto_presensi/' . ($guru->user->foto_presensi ?? 'default.png')) }}"
                                         alt="avatar">
-                                    <div class="media-body">
-                                        <div class="float-right text-primary">{{ $guru->created_at->diffForHumans() }}</div>
-                                        <div class="media-title">{{ $guru->user->name }}</div>
-                                        <small class="text-muted">Hadir pada {{ $guru->created_at->format('H:i') }}</small>
+                                    <div class="media-body d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="media-judul font-weight-bold">{{ $guru->user->name }}</div>
+                                            <small class="text-muted justify-content-between">Hadir pada
+                                                {{ $guru->created_at->format('H:i') }}</small>
+                                        </div>
                                     </div>
                                 </li>
+
                             @empty
                                 <li class="media">
-                                    <h4>Belum Ada Yang Absensi Hari Ini</h4>
+                                    <small>Belum Ada Riwayat Absensi Hari Ini</small>
                                 </li>
                             @endforelse
                         </ul>
@@ -136,6 +139,27 @@
 
 @push('style')
     <style>
+        .avatar-presensi {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .media-judul {
+            margin-top: 0;
+            margin-bottom: 2px;
+            font-weight: 600;
+            font-size: 15px;
+            color: color(fontdark);
+
+
+            a {
+                font-weight: inherit;
+                color: #000;
+            }
+        }
+
         /* card dasar */
         .custom-card {
             background-color: #ffffff;

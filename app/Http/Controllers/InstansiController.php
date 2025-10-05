@@ -49,8 +49,8 @@ class InstansiController extends Controller
             "alamat_instansi" => "required",
             "telp_instansi" => "required|numeric",
             // "user_id" => "exist:user,id|required",
-            "user_id" => "required|unique:user_has_instansi,user_id",
-            "user_id.*" => "exists:users,id"
+            // "user_id" => "required|unique:user_has_instansi,user_id",
+            // "user_id.*" => "exists:users,id"
         ]);
 
         if ($validate->fails()) {
@@ -64,7 +64,7 @@ class InstansiController extends Controller
             "telp_instansi" => $request->telp_instansi,
         ]);
 
-        $instansi->user()->attach($request->user_id);
+        // $instansi->user()->attach($request->user_id);
 
         return redirect()->route('instansi.index');
 

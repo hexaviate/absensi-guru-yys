@@ -13,33 +13,37 @@
              <span>Dashboard</span>
          </a>
      </li>
-     <li class="menu-header">Management</li>
-     <li
-         class="dropdown {{ Route::is('role.*') || Route::is('user.*') || Route::is('instansi.*') || Route::is('tapel.*') || Route::is('jadwal.*') || Route::is('hariLibur.*') ? 'active' : '' }}">
-         <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
-             <i class="fas fa-cogs"></i> <span>Management</span>
-         </a>
-         <ul class="dropdown-menu">
-             <li class="{{ Route::is('role.*') ? 'active' : '' }}">
-                 <a class="nav-link" href="{{ route('role.index') }}">Management Peran</a>
-             </li>
-             <li class="{{ Route::is('user.*') ? 'active' : '' }}">
-                 <a class="nav-link" href="{{ route('user.index') }}">Management User</a>
-             </li>
-             <li class="{{ Route::is('instansi.*') ? 'active' : '' }}">
-                 <a class="nav-link" href="{{ route('instansi.index') }}">Management Instansi</a>
-             </li>
-             <li class="{{ Route::is('tapel.*') ? 'active' : '' }}">
-                 <a class="nav-link" href="{{ route('tapel.index') }}">Management Kaldik</a>
-             </li>
-             <li class="{{ Route::is('jadwal.*') ? 'active' : '' }}">
-                 <a class="nav-link" href="{{ route('jadwal.index') }}">Management Jadwal</a>
-             </li>
-             <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
-                 <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
-             </li>
-         </ul>
-     </li>
+
+
+     @hasanyrole('admin_yayasan|operator_instansi')
+         <li class="menu-header">Management</li>
+         <li
+             class="dropdown {{ Route::is('role.*') || Route::is('user.*') || Route::is('instansi.*') || Route::is('tapel.*') || Route::is('jadwal.*') || Route::is('hariLibur.*') ? 'active' : '' }}">
+             <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+                 <i class="fas fa-cogs"></i> <span>Management</span>
+             </a>
+             <ul class="dropdown-menu">
+                 <li class="{{ Route::is('role.*') ? 'active' : '' }}">
+                     <a class="nav-link" href="{{ route('role.index') }}">Management Peran</a>
+                 </li>
+                 <li class="{{ Route::is('user.*') ? 'active' : '' }}">
+                     <a class="nav-link" href="{{ route('user.index') }}">Management User</a>
+                 </li>
+                 <li class="{{ Route::is('instansi.*') ? 'active' : '' }}">
+                     <a class="nav-link" href="{{ route('instansi.index') }}">Management Instansi</a>
+                 </li>
+                 <li class="{{ Route::is('tapel.*') ? 'active' : '' }}">
+                     <a class="nav-link" href="{{ route('tapel.index') }}">Management Kaldik</a>
+                 </li>
+                 <li class="{{ Route::is('jadwal.*') ? 'active' : '' }}">
+                     <a class="nav-link" href="{{ route('jadwal.index') }}">Management Jadwal</a>
+                 </li>
+                 <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
+                     <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
+                 </li>
+             </ul>
+         </li>
+     @endhasrole
 
      <li class="menu-header">PRESENSI</li>
 
