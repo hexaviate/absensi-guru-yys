@@ -95,12 +95,12 @@
                             <div class="col-md-6 mb-3">
                                 <label for="hari" class="form-label">Hari</label>
                                 <select class="form-control" id="hari" name="hari">
-                                    <option value="senin">Senin</option>
-                                    <option value="selasa">Selasa</option>
-                                    <option value="rabu">Rabu</option>
-                                    <option value="kamis">Kamis</option>
-                                    <option value="sabtu">Sabtu</option>
-                                    <option value="ahad">Ahad</option>
+                                    <option value="Senin">Senin</option>
+                                    <option value="Selasa">Selasa</option>
+                                    <option value="Rabu">Rabu</option>
+                                    <option value="Kamis">Kamis</option>
+                                    <option value="Sabtu">Sabtu</option>
+                                    <option value="Minggu">Ahad</option>
                                 </select>
                             </div>
                         </div>

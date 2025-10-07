@@ -42,7 +42,7 @@ class HariLiburController extends Controller
         }
 
         $tapel = Tapel::all();
-        $instansi = Instansi::where('id', $user->id)->get(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
+        $instansi = $user->instansi;
         return view('hariLibur.tambah', compact('tapel', 'instansi'));
 
     }

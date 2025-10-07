@@ -191,11 +191,11 @@ class UsersController extends Controller
                     unlink(public_path('foto/' . $target->foto_presensi));
                 }
 
-                $imageName = 'presensi_' . time() . '_' . uniqid() . '.' . $request->foto_presensi->extension();
+               $imageName = time() . '.' . $request->foto_presensi->extension();
 
                 $manager = ImageManager::withDriver(new Driver());
                 $image = $manager->read($request->file('foto_presensi'));
-                $image->encode(new AutoEncoder(quality: 50))->save(public_path('foto/' . $imageName));
+                $image->encode(new AutoEncoder(quality: 50))->save(public_path('foto_presensi/' . $imageName));
 
                 $dataUpdate['foto_presensi'] = $imageName;
             } catch (\Exception $e) {

@@ -31,7 +31,6 @@
                                             <th>Kepala Instansi</th>
                                             <th>Alamat Instansi</th>
                                             <th>Telp Instansi</th>
-                                            <th>Admin</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -43,14 +42,6 @@
                                                 <td>{{ $item->kepala_instansi }}</td>
                                                 <td>{{ $item->alamat_instansi }}</td>
                                                 <td>{{ $item->telp_instansi }}</td>
-                                                <td>
-                                                    @foreach ($item->user as $user)
-                                                        {{ $user->name }}
-                                                        @if (!$loop->last)
-                                                            ,
-                                                        @endif
-                                                    @endforeach
-                                                </td>
                                                 <td class="d-flex">
                                                     <a href="{{ route('instansi.edit', $item->id) }}"
                                                         class="btn btn-warning mx-2">Edit</a>

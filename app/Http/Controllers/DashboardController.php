@@ -23,11 +23,30 @@ class DashboardController extends Controller
 
         // $totalGuruInstansi = User::where('instansi_id', $instansi->id)->count();
         $totalGuruInstansi = $instansi->user->count();
-        $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
+        $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
         // dd($guruHadirHariIni);
         $totalGuruIzin = Izin::where('instansi_id', $instansi->id)->where('status', 'diterima')->whereDate('created_at', today())->count();
 
         return view('dashboard.main', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user'));
         // $guruBelumHadir = User::
+    }
+
+    public function adminDashboard()
+    {
+        $user = auth()->user();
+        $instansi = $user->instansi->first();
+        if (!$user) {
+            return redirect()->route('login')->with('error', "anda belum login");
+        }
+
+        // if (!$user->role == 'operator_instansi') {
+        //     return redirect()->route('login')->with('error', "anda tidak punya akses");
+        // }
+
+        // $totalGuruInstansi = User::where('instansi_id', $instansi->id)->count();
+        $totalGuruInstansi = $instansi->user->count();
+        $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
+        // dd($guruHadirHariIni);
+        $totalGuruIzin = Izin::where('instansi_id', $instansi->id)->where('status', 'diterima')->whereDate('created_at', today())->count();
     }
 }
