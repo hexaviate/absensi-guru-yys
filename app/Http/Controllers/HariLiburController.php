@@ -43,7 +43,8 @@ class HariLiburController extends Controller
 
         $tapel = Tapel::all();
         $instansi = Instansi::where('id', $user->id)->get(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
-        return view('hariLibur.tambah', compact('tapel', 'instansi'));
+        $instansiId = $user->instansi()->first()->id;
+        return view('hariLibur.tambah', compact('tapel', 'instansi', 'instansiId'));
 
     }
 
@@ -103,8 +104,10 @@ class HariLiburController extends Controller
 
         $hariLibur = HariLibur::findOrFail($id);
         $tapel = Tapel::all();
-        $instansi = Instansi::where('id', 3)->get(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
-        return view('hariLibur.edit', compact('tapel', 'instansi', 'hariLibur'));
+        $instansi = Instansi::where('id', $user->instansi()->first()->id)->get(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
+        $instansiId = $user->instansi()->first()->id;
+
+        return view('hariLibur.edit', compact('tapel', 'instansi', 'hariLibur', 'instansiId'));
     }
 
     /**

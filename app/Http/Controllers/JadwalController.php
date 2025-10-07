@@ -31,14 +31,15 @@ class JadwalController extends Controller
     public function create()
     {
         $user = auth()->user();
+        $instansiId = $user->instansi()->first()->id;
         if (!$user->can('manage jadwal')) {
             return redirect()->intended('dashboard');
         }
 
-        $tapel = Tapel::all();
-        $user = User::all();
+        $tapel = Tapel::where('status', "aktif")->first();
+        $userList = User::where('instansi_id', $instansiId)->get();
         $instansi = Instansi::all();
-        return view('jadwal.tambah', compact('tapel', 'instansi', 'user'));
+        return view('jadwal.tambah', compact('tapel', 'instansi', 'userList', 'instansiUser'));
     }
 
     /**
@@ -106,11 +107,12 @@ class JadwalController extends Controller
             return redirect()->intended('dashboard');
         }
 
-        $tapel = Tapel::all();
-        $user = User::all();
+        $instansiId = $user->instansi()->first()->id;
+        $tapel = Tapel::where('status', "aktif")->first();
+        $userList = User::where('instansi_id', $instansiId)->get();
         $instansi = Instansi::all();
         $jadwal = Jadwal::find($id);
-        return view('jadwal.edit', compact('jadwal', 'tapel', 'user', 'instansi'));
+        return view('jadwal.edit', compact('jadwal', 'tapel', 'userList', 'instansi', 'instansiId'));
     }
 
     /**

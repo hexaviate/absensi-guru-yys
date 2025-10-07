@@ -34,9 +34,10 @@ class IzinController extends Controller
         if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
             return redirect()->intended('dashboard');
         }
+        $instansiId = $user->instansi()->first()->id;
 
         $instansi = $user->instansi;
-        return view('izin.users.tambah', compact('instansi'));
+        return view('izin.users.tambah', compact('instansi', 'instansiId'));
 
     }
 
@@ -47,6 +48,8 @@ class IzinController extends Controller
         if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
             return redirect()->intended('dashboard');
         }
+
+
 
         $validate = Validator::make($request->all(), [
             'bukti_izin' => 'required',
@@ -60,6 +63,9 @@ class IzinController extends Controller
 
         foreach ($request->instansi_id as $instansi) {
 
+            if ($user->izin()->where('tanggal', today()->toDateString())->where('instansi_id', $instansi)->exists()) {
+                return redirect()->back()->with('error', 'anda telah melakukan izin hari ini di instansi' . $instansi);
+            }
 
             $instansiUser = $user->instansi();
 
@@ -103,6 +109,8 @@ class IzinController extends Controller
 
         $izin = Izin::find($id);
         $instansi = $user->instansi;
+        $instansiId = $user->instansi()->first()->id;
+
 
         if ($izin->status != 'belum_diverifikasi') {
             return redirect()->intended('dashboard')->with('error', 'izin ini telah diverifikasi');
@@ -112,7 +120,7 @@ class IzinController extends Controller
             return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
         }
 
-        return view('izin.users.edit', compact('izin', 'instansi'));
+        return view('izin.users.edit', compact('izin', 'instansi', 'instansiId'));
 
     }
 
@@ -270,12 +278,23 @@ class IzinController extends Controller
 
 
         if ($izin->status == 'diterima') {
+
+            if (Presensi::where('instansi_id', $izin->instansi_id)->where('user_id', $izin->user_id)->where('tanggal', $izin->tanggal)->exists()) {
+                $presensi = Presensi::where('instansi_id', $izin->instansi_id)->where('user_id', $izin->user_id)->where('tanggal', $izin->tanggal)->first();
+                $presensi->update([
+                    "izin_id" => $izin->id,
+                    "pulang" => "-"
+                ]);
+            }
+
+
+
             Presensi::create([
                 "instansi_id" => $izin->instansi_id,
                 "user_id" => $izin->user_id,
                 "izin_id" => $izin->id,
                 "status" => 'izin',
-                "tanggal" => Carbon::now()->toDateString(),
+                "tanggal" => $izin->tanggal,
             ]);
         }
 
