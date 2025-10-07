@@ -1,10 +1,11 @@
 <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-  <title>General Dashboard &mdash; Stisla</title>
+  {{-- <title>General Dashboard &mdash; Stisla</title> --}}
+  <title>Absensi Guru YYS &mdash; SLF</title>
 
   @stack('style')
 
-  
+
   <!-- General CSS Files -->
   <link rel="stylesheet" href="{{asset('asset/dist/assets/modules/bootstrap/css/bootstrap.min.css')}}">
   <link rel="stylesheet" href="{{asset('asset/dist/assets/modules/fontawesome/css/all.min.css')}}">

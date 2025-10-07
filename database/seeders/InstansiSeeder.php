@@ -2,42 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\Instansi;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Instansi;
 
 class InstansiSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Instansi::create([
-            "nama_instansi" => "rumah 1",
-            "kepala_instansi" => "Pak Ini",
-            "alamat_instansi" => "kajen",
-            "telp_instansi" => "081",
-            "latitude" => "-6.6116567",
-            "longitude" => "111.0661932"
-        ]);
+        $data = [
+            ['PAUD Terpadu Salafiyah', 'Bu Rahma', 'Jl. PAUD Salafiyah No.1'],
+            ['MI Salafiyah', 'Pak Ahmad', 'Jl. MI Salafiyah No.2'],
+            ['MTs Salafiyah', 'Bu Nur', 'Jl. MTs Salafiyah No.3'],
+            ['MA Salafiyah', 'Pak Yusuf', 'Jl. MA Salafiyah No.4'],
+            ['SMK Salafiyah', 'Bu Lina', 'Jl. SMK Salafiyah No.5'],
+            ['PATTA', 'Pak Hadi', 'Jl. PATTA Salafiyah No.6'],
+        ];
 
-        Instansi::create([
-            "nama_instansi" => "SMK 1",
-            "kepala_instansi" => "Bu Ini",
-            "alamat_instansi" => "kajen",
-            "telp_instansi" => "081",
-            "latitude" => "-6.60795",
-            "longitude" => "111.059405"
-        ]);
-
-        Instansi::create([
-            "nama_instansi" => "Rumah Pak Hamdan",
-            "kepala_instansi" => "Pak Hamdan",
-            "alamat_instansi" => "Tunjungrejo",
-            "telp_instansi" => "081",
-            "latitude" => "-6.592996353118405",
-            "longitude" => "111.06748580403307"
-        ]);
+        foreach ($data as $d) {
+            Instansi::create([
+                'nama_instansi'   => $d[0],
+                'kepala_instansi' => $d[1],
+                'alamat_instansi' => $d[2],
+                'telp_instansi'   => '08' . rand(111111111, 999999999),
+                'latitude'        => fake()->latitude(-6.62, -6.59),
+                'longitude'       => fake()->longitude(111.05, 111.08),
+            ]);
+        }
     }
 }
