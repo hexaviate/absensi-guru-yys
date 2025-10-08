@@ -126,28 +126,6 @@
 
             <!-- Data Umum Instansi -->
             <div class="col-lg-4 col-md-12 col-12 col-sm-12">
-                <div class="card custom-card">
-                    <div class="card-header">
-                        <h4>Data Umum Instansi</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <h5 class="mb-0 font-weight-bold text-primary">SMA Negeri 1 Jepara</h5>
-                        </div>
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">Jumlah Guru Aktif</h6>
-                                <h3 class="mb-0 text-primary">45</h3>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">Hari Efektif Bulan Ini</h6>
-                                <h3 class="mb-0 text-success">22</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Ringkasan Kehadiran Hari Ini -->
                 <div class="card custom-card">

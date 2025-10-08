@@ -15,7 +15,7 @@ class IzinSeeder extends Seeder
      */
     public function run(): void
     {
-         DB::table('izins')->insert([
+        DB::table('izins')->insert([
             "user_id" => 3,
             "instansi_id" => 1,
             "bukti_izin" => "operator.pdf",
