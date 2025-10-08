@@ -25,33 +25,29 @@
                         @csrf
                         <div class="row">
                             {{-- Tahun Pelajaran --}}
-                            <div class="col-md-6 mb-3">
+                           <div class="col-md-6 mb-3">
                                 <label for="tapel" class="form-label">Tahun Pelajaran</label>
-                                <select class="form-control" id="tapel" name="tapel_id">
-                                    @forelse ($tapel as $item)
-                                        <option value="{{ $item->id }}"
-                                            {{ old('tapel_id') == $item->id ? 'selected' : '' }}>
-                                            {{ $item->kode }}
-                                        </option>
-                                    @empty
-                                        <option disabled>Tidak ada instansi</option>
-                                    @endforelse
-                                </select>
+                                <input type="text" class="form-control"
+                                    value="{{ $tapel ? $tapel->kode : 'Tidak ada tapel aktif' }}" readonly>
+                                <input type="hidden" name="tapel_id" value="{{ $tapel ? $tapel->id : '' }}">
                             </div>
 
                             {{-- Instansi --}}
-                            <div class="col-md-6 mb-3">
-                                <label for="instansi" class="form-label">Instansi</label>
-                                <select class="form-control" id="instansi" name="instansi_id">
+                             <div class="col-md-6 mb-3">
+                                <label class="form-label">Instansi</label>
+                                <div class="selectgroup selectgroup-pills">
                                     @forelse ($instansi as $item)
-                                        <option value="{{ $item->id }}"
-                                            {{ old('instansi_id') == $item->id ? 'selected' : '' }}>
-                                            {{ $item->nama_instansi }}
-                                        </option>
+                                        <label class="selectgroup-item">
+                                            <input type="radio" name="instansi_id" value="{{ $item->id }}"
+                                                class="selectgroup-input"
+                                                {{ old('instansi_id') == $item->id ? 'checked' : '' }}
+                                                {{ count(value: $instansi) == 1 ? 'checked' : '' }}>
+                                            <span class="selectgroup-button">{{ $item->nama_instansi }}</span>
+                                        </label>
                                     @empty
-                                        <option disabled>Tidak ada instansi</option>
+                                        <p class="text-muted mb-0">Tidak ada instansi</p>
                                     @endforelse
-                                </select>
+                                </div>
                             </div>
                         </div>
 

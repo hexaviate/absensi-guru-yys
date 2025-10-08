@@ -35,16 +35,9 @@
                             <!-- tapel_id dropdown -->
                             <div class="col-md-6 mb-3">
                                 <label for="tapel" class="form-label">Tahun Pelajaran</label>
-                                <select class="form-control" id="tapel" name="tapel_id" autofocus>
-                                    @forelse ($tapel as $item)
-                                        <option value="{{ $item->id }}"
-                                            {{ $jadwal->tapel_id == $item->id ? 'selected' : '' }}>
-                                            {{ $item->kode }}
-                                        </option>
-                                    @empty
-                                        <option> Tidak Ada Data Tahun Pelajaran</option>
-                                    @endforelse
-                                </select>
+                                <input type="text" class="form-control"
+                                    value="{{ $tapel ? $tapel->kode : 'Tidak ada tapel aktif' }}" readonly>
+                                <input type="hidden" name="tapel_id" value="{{ $tapel ? $tapel->id : '' }}">
                             </div>
 
                             <!-- instansi radio -->
@@ -97,7 +90,8 @@
                                 <label for="hari" class="form-label">Hari</label>
                                 <select class="form-control" id="hari" name="hari">
                                     <option value="senin" {{ $jadwal->hari == 'senin' ? 'selected' : '' }}>Senin</option>
-                                    <option value="selasa" {{ $jadwal->hari == 'selasa' ? 'selected' : '' }}>Selasa</option>
+                                    <option value="selasa" {{ $jadwal->hari == 'selasa' ? 'selected' : '' }}>Selasa
+                                    </option>
                                     <option value="rabu" {{ $jadwal->hari == 'rabu' ? 'selected' : '' }}>Rabu</option>
                                     <option value="kamis" {{ $jadwal->hari == 'kamis' ? 'selected' : '' }}>Kamis</option>
                                     <option value="sabtu" {{ $jadwal->hari == 'sabtu' ? 'selected' : '' }}>Sabtu</option>
@@ -146,6 +140,21 @@
 
             let searchTimer;
             let currentIndex = -1;
+
+            // Auto-enable user search jika hanya ada 1 instansi
+            if (instansiRadios.length === 1) {
+                const singleInstansi = instansiRadios[0];
+                if (singleInstansi.checked) {
+                    userSearch.disabled = false;
+                    userSearch.placeholder = "Ketik nama user (min. 2 karakter)...";
+
+                    // Auto-focus hanya jika field user masih kosong (mode create)
+                    // Tidak auto-focus jika sudah ada data user (mode edit)
+                    if (!userIdInput.value || userIdInput.value === '') {
+                        userSearch.focus();
+                    }
+                }
+            }
 
             // Enable/Disable user search berdasarkan instansi yang dipilih
             instansiRadios.forEach(radio => {

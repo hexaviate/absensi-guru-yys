@@ -41,10 +41,11 @@ class HariLiburController extends Controller
             return redirect()->intended('dashboard');
         }
 
-        $tapel = Tapel::all();
-
-        $instansi = Instansi::where('id', $user->id)->get(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
         $instansiId = $user->instansi()->first()->id;
+        $tapel = Tapel::where('status', "aktif")->first();
+        // $userList = User::where('instansi_id', $instansiId)->get();
+        // $instansi = Instansi::all();
+        $instansi = $user->instansi()->get();
         return view('hariLibur.tambah', compact('tapel', 'instansi', 'instansiId'));
 
     }

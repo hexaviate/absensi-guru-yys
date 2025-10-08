@@ -37,9 +37,9 @@ class JadwalController extends Controller
         }
 
         $tapel = Tapel::where('status', "aktif")->first();
-        $userList = User::where('instansi_id', $instansiId)->get();
-        $instansi = Instansi::all();
-        return view('jadwal.tambah', compact('tapel', 'instansi', 'userList', 'instansiUser'));
+        $userList = $user->instansi()->get();
+        $instansi = $user->instansi()->get();
+        return view('jadwal.tambah', compact('tapel', 'instansi', 'userList', 'instansiId'));
     }
 
     /**
@@ -109,10 +109,11 @@ class JadwalController extends Controller
 
         $instansiId = $user->instansi()->first()->id;
         $tapel = Tapel::where('status', "aktif")->first();
-        $userList = User::where('instansi_id', $instansiId)->get();
-        $instansi = Instansi::all();
+        // $userList = User::where('instansi_id', $instansiId)->get();
+        // $instansi = Instansi::all();
+        $instansi = $user->instansi()->get();
         $jadwal = Jadwal::find($id);
-        return view('jadwal.edit', compact('jadwal', 'tapel', 'userList', 'instansi', 'instansiId'));
+        return view('jadwal.edit', compact('jadwal', 'tapel', 'instansi', 'instansiId'));
     }
 
     /**
