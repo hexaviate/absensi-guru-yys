@@ -2,261 +2,198 @@
 @section('main')
     <section class="section">
         <div class="section-header">
-            <h1>Dashboard Guru</h1>
-            <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item active">Dashboard</div>
-            </div>
+            <h1>Dashboard Operator Instansi</h1>
         </div>
 
-        <!-- Notifikasi Penting -->
-        <div class="alert alert-warning alert-has-icon alert-dismissible show fade">
-            <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <div class="alert-body">
-                <div class="alert-title">Perhatian!</div>
-                ⚠️ Kamu belum melakukan absen pulang di SD Harapan hari ini
-            </div>
-            <button class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
-        </div>
-
-        <!-- Card Status Kehadiran Hari Ini -->
+        <!-- Summary Cards -->
         <div class="row">
-            <div class="col-12">
-                <h6 class="mb-3 font-weight-bold text-dark">Status Kehadiran Hari Ini</h6>
+            <div class="col-lg-4 col-md-6 col-12 mb-3">
+                <div class="stats-card">
+                    <div class="card-body">
+                        <h2 class="stats-number">45</h2>
+                        <p class="stats-label">Total Guru</p>
+                    </div>
+                </div>
             </div>
-
-            <!-- Container untuk instansi cards dengan layout responsif -->
-            <div class="col-12">
-                <div class="instansi-container">
-                    <!-- Instansi 1: SD Harapan -->
-                    <div class="instansi-card-wrapper">
-                        <div class="card card-custom shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div>
-                                        <h6 class="font-weight-bold text-primary mb-1">SD Harapan</h6>
-                                        <small class="text-muted">Selasa, 7 Oktober 2025</small>
-                                    </div>
-                                    <span class="badge badge-warning badge-lg">⏳ Belum Pulang</span>
-                                </div>
-
-                                <div class="attendance-time-row">
-                                    <div class="time-item">
-                                        <i class="fa-solid fa-right-to-bracket text-success"></i>
-                                        <div class="time-detail">
-                                            <small class="text-muted d-block">Jam Datang</small>
-                                            <strong class="text-dark">07:22 WIB</strong>
-                                        </div>
-                                    </div>
-                                    <div class="time-divider"></div>
-                                    <div class="time-item">
-                                        <i class="fa-solid fa-right-from-bracket text-danger"></i>
-                                        <div class="time-detail">
-                                            <small class="text-muted d-block">Jam Pulang</small>
-                                            <strong class="text-muted">-- : --</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="col-lg-4 col-md-6 col-12 mb-3">
+                <div class="stats-card">
+                    <div class="card-body">
+                        <h2 class="stats-number">39</h2>
+                        <p class="stats-label">Kehadiran Hari Ini</p>
                     </div>
-
-                    <!-- Instansi 2: SMP Cendekia -->
-                    <div class="instansi-card-wrapper">
-                        <div class="card card-custom shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div>
-                                        <h6 class="font-weight-bold text-primary mb-1">SMP Cendekia</h6>
-                                        <small class="text-muted">Selasa, 7 Oktober 2025</small>
-                                    </div>
-                                    <span class="badge badge-success badge-lg">✅ Hadir</span>
-                                </div>
-
-                                <div class="attendance-time-row">
-                                    <div class="time-item">
-                                        <i class="fa-solid fa-right-to-bracket text-success"></i>
-                                        <div class="time-detail">
-                                            <small class="text-muted d-block">Jam Datang</small>
-                                            <strong class="text-dark">07:15 WIB</strong>
-                                        </div>
-                                    </div>
-                                    <div class="time-divider"></div>
-                                    <div class="time-item">
-                                        <i class="fa-solid fa-right-from-bracket text-danger"></i>
-                                        <div class="time-detail">
-                                            <small class="text-muted d-block">Jam Pulang</small>
-                                            <strong class="text-dark">15:30 WIB</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-12 mb-3">
+                <div class="stats-card">
+                    <div class="card-body">
+                        <h2 class="stats-number">86.6%</h2>
+                        <p class="stats-label">Tingkat Kehadiran</p>
                     </div>
-
-                    <!-- Instansi 3: SMA Bintang (Contoh untuk 3 instansi) -->
-                    <!-- Uncomment jika ada 3 instansi -->
-                    <!--
-                        <div class="instansi-card-wrapper">
-                            <div class="card card-custom shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div>
-                                            <h6 class="font-weight-bold text-primary mb-1">SMA Bintang</h6>
-                                            <small class="text-muted">Selasa, 7 Oktober 2025</small>
-                                        </div>
-                                        <span class="badge badge-success badge-lg">✅ Hadir</span>
-                                    </div>
-
-                                    <div class="attendance-time-row">
-                                        <div class="time-item">
-                                            <i class="fa-solid fa-right-to-bracket text-success"></i>
-                                            <div class="time-detail">
-                                                <small class="text-muted d-block">Jam Datang</small>
-                                                <strong class="text-dark">07:00 WIB</strong>
-                                            </div>
-                                        </div>
-                                        <div class="time-divider"></div>
-                                        <div class="time-item">
-                                            <i class="fa-solid fa-right-from-bracket text-danger"></i>
-                                            <div class="time-detail">
-                                                <small class="text-muted d-block">Jam Pulang</small>
-                                                <strong class="text-dark">14:00 WIB</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        -->
                 </div>
             </div>
         </div>
 
-        <!-- Riwayat Absensi & Rekap Bulanan -->
         <div class="row">
-            <!-- Riwayat Absensi Terakhir -->
-            <div class="col-12 col-lg-7 mb-4">
-                <div class="card card-custom shadow-sm">
+            <!-- Chart Statistik Kehadiran -->
+            <div class="col-lg-8 col-md-12 col-12 col-sm-12">
+                {{-- <div class="card">
                     <div class="card-header">
-                        <h6 class="font-weight-bold mb-0">
-                            <i class="fa-solid fa-clock-rotate-left text-primary"></i> Riwayat Absensi (5 Hari Terakhir)
-                        </h6>
+                        <h4>Statistik Kehadiran Guru</h4>
                     </div>
                     <div class="card-body">
-                        <ul class="list-unstyled history-list">
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>7 Okt</strong>
-                                    <small>Selasa</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SD Harapan</div>
-                                    <div class="history-status status-present">
-                                        <i class="fa-solid fa-circle-check"></i> Hadir
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>6 Okt</strong>
-                                    <small>Senin</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SMP Cendekia</div>
-                                    <div class="history-status status-present">
-                                        <i class="fa-solid fa-circle-check"></i> Hadir
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>5 Okt</strong>
-                                    <small>Minggu</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SD Harapan</div>
-                                    <div class="history-status status-leave">
-                                        <i class="fa-solid fa-file-lines"></i> Izin
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>4 Okt</strong>
-                                    <small>Sabtu</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SMP Cendekia</div>
-                                    <div class="history-status status-present">
-                                        <i class="fa-solid fa-circle-check"></i> Hadir
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>3 Okt</strong>
-                                    <small>Jumat</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SD Harapan</div>
-                                    <div class="history-status status-absent">
-                                        <i class="fa-solid fa-circle-xmark"></i> Alpha
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
+                        <div id="chartKehadiran"></div>
+                    </div>
+                </div> --}}
+
+                <!-- Tabel Riwayat Presensi -->
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <h4>Riwayat Presensi Hari Ini</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Foto</th>
+                                        <th>Nama Guru</th>
+                                        <th>Waktu Hadir</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <img alt="image" src="https://ui-avatars.com/api/?name=Ahmad+Fauzi&background=6777ef&color=fff"
+                                                class="rounded-circle" width="45" height="45">
+                                        </td>
+                                        <td>Ahmad Fauzi, S.Pd</td>
+                                        <td>07:15 WIB</td>
+                                        <td>
+                                            <span class="badge badge-success">Hadir</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img alt="image" src="https://ui-avatars.com/api/?name=Siti+Nurhaliza&background=28a745&color=fff"
+                                                class="rounded-circle" width="45" height="45">
+                                        </td>
+                                        <td>Siti Nurhaliza, M.Pd</td>
+                                        <td>07:22 WIB</td>
+                                        <td>
+                                            <span class="badge badge-success">Hadir</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img alt="image" src="https://ui-avatars.com/api/?name=Budi+Santoso&background=ffc107&color=fff"
+                                                class="rounded-circle" width="45" height="45">
+                                        </td>
+                                        <td>Budi Santoso, S.Pd</td>
+                                        <td>08:10 WIB</td>
+                                        <td>
+                                            <span class="badge badge-warning">Izin</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img alt="image" src="https://ui-avatars.com/api/?name=Dewi+Lestari&background=17a2b8&color=fff"
+                                                class="rounded-circle" width="45" height="45">
+                                        </td>
+                                        <td>Dewi Lestari, S.Si</td>
+                                        <td>07:35 WIB</td>
+                                        <td>
+                                            <span class="badge badge-success">Hadir</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img alt="image" src="https://ui-avatars.com/api/?name=Eko+Prasetyo&background=fd7e14&color=fff"
+                                                class="rounded-circle" width="45" height="45">
+                                        </td>
+                                        <td>Eko Prasetyo, M.Pd</td>
+                                        <td>-</td>
+                                        <td>
+                                            <span class="badge badge-danger">Alpha</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Rekap Bulanan -->
-            <div class="col-12 col-lg-5 mb-4">
-                <div class="card card-custom shadow-sm card-recap-monthly">
-                    <div class="card-header border-0">
-                        <h6 class="font-weight-bold mb-0">
-                            <i class="fa-solid fa-calendar-days text-primary"></i> Rekap Bulan Ini
-                        </h6>
+            <!-- Data Umum Instansi -->
+            <div class="col-lg-4 col-md-12 col-12 col-sm-12">
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <h4>Data Umum Instansi</h4>
                     </div>
                     <div class="card-body">
-                        <div class="monthly-recap">
-                            <div class="recap-item">
-                                <div class="recap-icon text-success">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                </div>
-                                <div class="recap-info">
-                                    <h3 class="mb-0 text-dark">18x</h3>
-                                    <small class="text-muted">Hadir</small>
-                                </div>
-                            </div>
-                            <div class="recap-divider"></div>
-                            <div class="recap-item">
-                                <div class="recap-icon text-warning">
-                                    <i class="fa-solid fa-file-lines"></i>
-                                </div>
-                                <div class="recap-info">
-                                    <h3 class="mb-0 text-dark">3x</h3>
-                                    <small class="text-muted">Izin</small>
-                                </div>
-                            </div>
-                            <div class="recap-divider"></div>
-                            <div class="recap-item">
-                                <div class="recap-icon text-danger">
-                                    <i class="fa-solid fa-circle-xmark"></i>
-                                </div>
-                                <div class="recap-info">
-                                    <h3 class="mb-0 text-dark">1x</h3>
-                                    <small class="text-muted">Alpha</small>
-                                </div>
+                        <div class="mb-4">
+                            <h5 class="mb-0 font-weight-bold text-primary">SMA Negeri 1 Jepara</h5>
+                        </div>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Jumlah Guru Aktif</h6>
+                                <h3 class="mb-0 text-primary">45</h3>
                             </div>
                         </div>
-                        <div class="progress mt-4" style="height: 8px;">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: 81.8%"
-                                aria-valuenow="81.8" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Hari Efektif Bulan Ini</h6>
+                                <h3 class="mb-0 text-success">22</h3>
+                            </div>
                         </div>
-                        <small class="d-block mt-2 text-muted">Tingkat kehadiran: <strong
-                                class="text-dark">81.8%</strong></small>
+                    </div>
+                </div>
+
+                <!-- Ringkasan Kehadiran Hari Ini -->
+                <div class="card custom-card">
+                    <div class="card-header">
+                        <h4>Ringkasan Kehadiran</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="font-weight-bold">
+                                    {{-- <i class="fas fa-check-circle text-success"></i> --}}
+                                     Hadir
+                                </span>
+                                <span class="badge badge-success badge-pill">39</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 86.6%"
+                                    aria-valuenow="86.6" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="font-weight-bold">
+                                    {{-- <i class="fas fa-file-alt text-warning"></i> --}}
+                                    Izin
+                                </span>
+                                <span class="badge badge-warning badge-pill">4</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 8.8%"
+                                    aria-valuenow="8.8" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="font-weight-bold">
+                                    {{-- <i class="fas fa-times-circle text-danger"></i> --}}
+                                     Alpha
+                                </span>
+                                <span class="badge badge-danger badge-pill">2</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 4.4%"
+                                    aria-valuenow="4.4" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -266,337 +203,253 @@
 
 @push('style')
     <style>
-        /* ========================================
-               INSTANSI CARDS - MOBILE FIRST LAYOUT
-               ======================================== */
-
-        .instansi-container {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        /* Mobile: 1 column, full width */
-        @media (max-width: 575.98px) {
-            .instansi-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Tablet: 2 columns untuk 2-3 cards, 1 column untuk 1 card */
-        @media (min-width: 576px) and (max-width: 991.98px) {
-            .instansi-container {
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            }
-        }
-
-        /* Desktop: Maksimal 3 columns */
-        @media (min-width: 992px) {
-            .instansi-container {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-                gap: 1.25rem;
-            }
-
-            /* Jika hanya 1 card, buat tidak terlalu lebar */
-            .instansi-container:has(.instansi-card-wrapper:only-child) {
-                grid-template-columns: minmax(320px, 600px);
-            }
-
-            /* Jika 2 cards, buat seimbang */
-            .instansi-container:has(.instansi-card-wrapper:nth-child(2):last-child) {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .instansi-card-wrapper {
-            min-height: 160px;
-        }
-
-        /* Card Custom Styling */
-        .card-custom {
-            border: 1px solid #e4e6fc;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            height: 100%;
-            background-color: #ffffff;
-        }
-
-        .card-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(103, 119, 239, 0.12) !important;
-            border-color: #d0d5f6;
-        }
-
-        .card-custom .card-header {
-            background-color: #fff;
-            border-bottom: 1px solid #f0f1f5;
-            padding: 1rem 1.25rem;
-            border-radius: 12px 12px 0 0;
-        }
-
-        .card-custom .card-body {
-            padding: 1.25rem;
-        }
-
-        /* Badge Styling */
-        .badge-lg {
-            padding: 0.45rem 0.75rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border-radius: 6px;
-        }
-
-        /* Attendance Time Row */
-        .attendance-time-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #f8f9fc;
-            padding: 1rem;
+        /* Stats Cards dengan gradient */
+        .stats-card {
+            background: linear-gradient(135deg, #6777ef 0%, #89b6ff 100%);
+            border: none;
             border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            height: 100%;
         }
 
-        .time-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex: 1;
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
-        .time-item i {
-            font-size: 1.5rem;
-        }
-
-        .time-detail small {
-            font-size: 0.75rem;
-        }
-
-        .time-detail strong {
-            font-size: 1rem;
-        }
-
-        .time-divider {
-            width: 2px;
-            height: 40px;
-            background-color: #dee2e6;
-            margin: 0 1rem;
-        }
-
-        /* Comparison Box */
-        .comparison-box {
-            display: flex;
-            gap: 1rem;
-            flex-direction: column;
-        }
-
-        .comparison-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            background-color: #f8f9fc;
-        }
-
-        .comparison-item.today {
-            border-left: 4px solid #6777ef;
-        }
-
-        .comparison-item.yesterday {
-            border-left: 4px solid #95a5a6;
-        }
-
-        .comparison-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-        }
-
-        .comparison-time {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #333;
-        }
-
-        /* History List */
-        .history-list {
-            margin: 0;
-        }
-
-        .history-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #f0f1f5;
-            transition: background-color 0.2s;
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .history-item:hover {
-            background-color: #f8f9fc;
-        }
-
-        .history-date {
-            min-width: 70px;
+        .stats-card .card-body {
             text-align: center;
-            padding-right: 1rem;
-            border-right: 2px solid #e4e6fc;
+            padding: 25px;
         }
 
-        .history-date strong {
-            display: block;
-            font-size: 1rem;
-            color: #333;
-        }
-
-        .history-date small {
-            color: #6c757d;
-            font-size: 0.75rem;
-        }
-
-        .history-detail {
-            flex: 1;
-            padding-left: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .history-location {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .history-status {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .status-present {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-leave {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .status-absent {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Monthly Recap - White Background */
-        /* Fix untuk card recap monthly agar tidak terlalu tinggi */
-        .card-recap-monthly {
-            height: fit-content;
-            align-self: start;
-        }
-
-        .card-recap-monthly .card-body {
-            padding: 1.5rem 1.25rem;
-        }
-
-        .card-recap-monthly .card-header {
-            background-color: #f8f9fc;
-        }
-
-        .monthly-recap {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        .recap-item {
-            text-align: center;
-        }
-
-        .recap-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .recap-info h3 {
-            font-size: 2rem;
+        .stats-number {
+            font-size: 2.5rem;
             font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .recap-info small {
-            font-size: 0.85rem;
+        .stats-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0;
+            opacity: 0.95;
         }
 
-        .recap-divider {
-            width: 1px;
-            height: 60px;
-            background-color: #e4e6fc;
+        /* Card dasar dengan hover effect */
+        .custom-card {
+            background-color: #ffffff;
+            border: 1px solid #e4e6fc;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .attendance-time-row {
-                flex-direction: column;
-                gap: 0.75rem;
-                padding: 0.875rem;
-            }
-
-            .time-divider {
-                width: 100%;
-                height: 1px;
-                margin: 0;
-            }
-
-            .time-item {
-                width: 100%;
-                padding: 0.5rem;
-                background-color: #fff;
-                border-radius: 6px;
-            }
-
-            .monthly-recap {
-                flex-direction: column;
-                gap: 1.5rem;
-                padding: 0.5rem 0;
-            }
-
-            .recap-divider {
-                width: 80%;
-                height: 1px;
-            }
-
-            .badge-lg {
-                font-size: 0.75rem;
-                padding: 0.35rem 0.6rem;
-            }
+        .custom-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        @media (max-width: 576px) {
-            .card-custom .card-body {
-                padding: 1rem;
+        @media (max-width: 767px) {
+            .stats-number {
+                font-size: 2rem;
             }
 
-            .history-item {
-                padding: 0.875rem;
-                flex-wrap: wrap;
-            }
-
-            .history-date {
-                min-width: 60px;
-            }
-
-            .history-detail {
-                flex-wrap: wrap;
-                gap: 0.5rem;
+            .stats-label {
+                font-size: 0.85rem;
             }
         }
     </style>
 @endpush
 
 @push('script')
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        // Generate 14 hari terakhir
+        function generateLast14Days() {
+            const labels = [];
+            const today = new Date();
+
+            for (let i = 13; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+
+                const dayName = date.toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'short'
+                });
+                labels.push(dayName);
+            }
+
+            return labels;
+        }
+
+        // Generate data dummy untuk 14 hari
+        function generateDummyData() {
+            const hadir = [];
+            const izin = [];
+            const alpha = [];
+            const totalGuru = 45;
+
+            for (let i = 0; i < 14; i++) {
+                const hadirCount = Math.floor(Math.random() * 7) + 37; // 37-43
+                const izinCount = Math.floor(Math.random() * 4) + 2; // 2-5
+                const alphaCount = totalGuru - hadirCount - izinCount;
+
+                hadir.push(hadirCount);
+                izin.push(izinCount);
+                alpha.push(alphaCount > 0 ? alphaCount : 0);
+            }
+
+            return { hadir, izin, alpha };
+        }
+
+        const categories = generateLast14Days();
+        const data = generateDummyData();
+
+        // Konfigurasi ApexCharts
+        const options = {
+            series: [
+                {
+                    name: 'Hadir',
+                    data: data.hadir
+                },
+                {
+                    name: 'Izin',
+                    data: data.izin
+                },
+                {
+                    name: 'Alpha',
+                    data: data.alpha
+                }
+            ],
+            chart: {
+                type: 'area',
+                height: 350,
+                stacked: false,
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800,
+                    animateGradually: {
+                        enabled: true,
+                        delay: 150
+                    },
+                    dynamicAnimation: {
+                        enabled: true,
+                        speed: 350
+                    }
+                },
+                toolbar: {
+                    show: true,
+                    tools: {
+                        download: true,
+                        zoom: true,
+                        zoomin: true,
+                        zoomout: true,
+                        pan: true,
+                        reset: true
+                    }
+                },
+                zoom: {
+                    enabled: true
+                }
+            },
+            colors: ['#28a745', '#ffc107', '#dc3545'],
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.6,
+                    opacityTo: 0.2,
+                    stops: [0, 90, 100]
+                }
+            },
+            xaxis: {
+                categories: categories,
+                labels: {
+                    style: {
+                        fontSize: '12px',
+                        colors: '#6c757d'
+                    }
+                }
+            },
+            yaxis: {
+                min: 0,
+                max: 50,
+                tickAmount: 5,
+                labels: {
+                    formatter: function(value) {
+                        return Math.round(value);
+                    },
+                    style: {
+                        fontSize: '12px',
+                        colors: '#6c757d'
+                    }
+                },
+                title: {
+                    text: 'Jumlah Guru',
+                    style: {
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: '#6c757d'
+                    }
+                }
+            },
+            markers: {
+                size: 4,
+                strokeColors: '#fff',
+                strokeWidth: 2,
+                hover: {
+                    size: 6
+                }
+            },
+            legend: {
+                show: true,
+                position: 'top',
+                horizontalAlign: 'end',
+                fontSize: '13px',
+                fontWeight: 500,
+                markers: {
+                    width: 12,
+                    height: 12,
+                    radius: 3
+                }
+            },
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: function(value) {
+                        return value + ' guru';
+                    }
+                }
+            },
+            grid: {
+                borderColor: '#e7e7e7',
+                strokeDashArray: 4,
+                xaxis: {
+                    lines: {
+                        show: true
+                    }
+                }
+            }
+        };
+
+        // Render chart
+        const chart = new ApexCharts(document.querySelector("#chartKehadiran"), options);
+        chart.render();
+    </script>
 @endpush
