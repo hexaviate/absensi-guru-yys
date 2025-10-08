@@ -94,45 +94,47 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Instansi 3: SMA Bintang (Contoh untuk 3 instansi) -->
-                    <!-- Uncomment jika ada 3 instansi -->
-                    <!--
-                        <div class="instansi-card-wrapper">
-                            <div class="card card-custom shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div>
-                                            <h6 class="font-weight-bold text-primary mb-1">SMA Bintang</h6>
-                                            <small class="text-muted">Selasa, 7 Oktober 2025</small>
+        <div class="row">
+            <div class="col-12">
+                <h6 class="mb-3 font-weight-bold text-dark">Jadwal Hari Ini</h6>
+            </div>
+
+            <!-- Jadwal 1: SD Harapan -->
+            <div class="col-12 mb-3">
+                <div class="card card-jadwal shadow-sm border-0">
+                    <div class="card-body p-3">
+                        <div class="row align-items-center">
+                            <div class="col-5">
+                                <h6 class="font-weight-bold text-dark mb-0">SD Harapan</h6>
+                            </div>
+                            <div class="col-7">
+                                <div class="row">
+                                    <div class="col-6 text-center">
+                                        <div class="time-box bg-success-light">
+                                            <small class="text-success d-block mb-1">Masuk</small>
+                                            <strong class="text-dark">07:00</strong>
                                         </div>
-                                        <span class="badge badge-success badge-lg">✅ Hadir</span>
                                     </div>
-
-                                    <div class="attendance-time-row">
-                                        <div class="time-item">
-                                            <i class="fa-solid fa-right-to-bracket text-success"></i>
-                                            <div class="time-detail">
-                                                <small class="text-muted d-block">Jam Datang</small>
-                                                <strong class="text-dark">07:00 WIB</strong>
-                                            </div>
-                                        </div>
-                                        <div class="time-divider"></div>
-                                        <div class="time-item">
-                                            <i class="fa-solid fa-right-from-bracket text-danger"></i>
-                                            <div class="time-detail">
-                                                <small class="text-muted d-block">Jam Pulang</small>
-                                                <strong class="text-dark">14:00 WIB</strong>
-                                            </div>
+                                    <div class="col-6 text-center">
+                                        <div class="time-box bg-danger-light">
+                                            <small class="text-danger d-block mb-1">Pulang</small>
+                                            <strong class="text-dark">12:00</strong>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        -->
+                    </div>
                 </div>
             </div>
+
+
         </div>
+
 
         <!-- Riwayat Absensi & Rekap Bulanan -->
         <div class="row">
@@ -140,7 +142,7 @@
             <div class="col-12 col-lg-7 mb-4">
                 <div class="card card-custom shadow-sm">
                     <div class="card-header">
-                        <h6 class="font-weight-bold mb-0">
+                        <h6 class="font-weight-bold text-dark mb-0">
                             <i class="fa-solid fa-clock-rotate-left text-primary"></i> Riwayat Absensi (5 Hari Terakhir)
                         </h6>
                     </div>
@@ -215,7 +217,7 @@
             <div class="col-12 col-lg-5 mb-4">
                 <div class="card card-custom shadow-sm card-recap-monthly">
                     <div class="card-header border-0">
-                        <h6 class="font-weight-bold mb-0">
+                        <h6 class="font-weight-bold text-dark mb-0">
                             <i class="fa-solid fa-calendar-days text-primary"></i> Rekap Bulan Ini
                         </h6>
                     </div>
@@ -266,9 +268,35 @@
 
 @push('style')
     <style>
-        /* ========================================
-               INSTANSI CARDS - MOBILE FIRST LAYOUT
-               ======================================== */
+        .card-jadwal {
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            transition: all 0.3s ease;
+            border-left: 4px solid #007bff;
+        }
+
+        .card-jadwal:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .time-box {
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .time-box:hover {
+            transform: scale(1.05);
+        }
+
+        .bg-success-light {
+            background-color: #d4edda;
+        }
+
+        .bg-danger-light {
+            background-color: #f8d7da;
+        }
 
         .instansi-container {
             display: grid;

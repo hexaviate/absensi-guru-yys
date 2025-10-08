@@ -25,7 +25,7 @@ class AuthController extends Controller
 
             //* login untuk admin yayasan
             if ($user->hasRole('admin_yayasan')) {
-                return view('tesAuth.dasAdmin');
+                return redirect()->route('adminYysDashboard');
             }
 
             //* login untuk operator instansi
@@ -36,12 +36,12 @@ class AuthController extends Controller
 
             //* login untuk tenaga pendidik
             else if ($user->hasRole('tenaga_pendidik')) {
-                return view('tesAuth.dasPendidik');
+                return redirect()->route('userDashboard');
             }
 
             //* login untuk tenaga kependidikan
             else if ($user->hasRole('tenaga_kependidikan')) {
-                return view('tesAuth.dasKependidikan');
+                return redirect()->route('userDashboard');
             }
 
         } else {

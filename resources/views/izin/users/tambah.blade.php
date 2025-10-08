@@ -15,34 +15,42 @@
                     <h5 class="mb-0">Tambah User</h5>
                 </div>
                 @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <div class="card-body">
                     <form enctype="multipart/form-data" action="{{ route('izinCreate') }}" method="POST">
                         @csrf
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Instansi</label>
-                                    <div class="selectgroup selectgroup-pills">
-                                        @forelse ($instansi as $item)
-                                            <label class="selectgroup-item">
-                                                <input type="checkbox" name="instansi_id[]" value="{{ $item->id }}"
-                                                    class="selectgroup-input"
-                                                    {{ collect(old('instansi_id'))->contains($item->id) ? 'checked' : '' }}>
-                                                <span class="selectgroup-button">{{ $item->nama_instansi }}</span>
-                                            </label>
-                                        @empty
-                                            <p class="text-muted mb-0">Tidak ada instansi</p>
-                                        @endforelse
-                                    </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Instansi</label>
+                                <div class="selectgroup selectgroup-pills">
+                                    @php
+                                        $user = auth()->user();
+                                    @endphp
+
+                                    @forelse ($instansi as $item)
+                                        @if ($user->hasRole('admin_yayasan') && $item->nama_instansi !== 'PUSPELA')
+                                            @continue
+                                        @endif
+
+                                        <label class="selectgroup-item">
+                                            <input type="radio" name="instansi_id" value="{{ $item->id }}"
+                                                class="selectgroup-input"
+                                                {{ old('instansi_id') == $item->id ? 'checked' : '' }}
+                                                {{ count($instansi) == 1 ? 'checked' : '' }}>
+                                            <span class="selectgroup-button">{{ $item->nama_instansi }}</span>
+                                        </label>
+                                    @empty
+                                        <p class="text-muted mb-0">Tidak ada instansi</p>
+                                    @endforelse
+
                                 </div>
                             </div>
 
