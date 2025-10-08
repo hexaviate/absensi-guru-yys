@@ -12,10 +12,10 @@ class DashboardController extends Controller
     public function operatorDashboard()
     {
         $user = auth()->user();
-        $instansi = $user->instansi->first();
         if (!$user) {
             return redirect()->route('login')->with('error', "anda belum login");
         }
+        $instansi = $user->instansi->first();
 
         // if (!$user->role == 'operator_instansi') {
         //     return redirect()->route('login')->with('error', "anda tidak punya akses");
@@ -27,7 +27,7 @@ class DashboardController extends Controller
         // dd($guruHadirHariIni);
         $totalGuruIzin = Izin::where('instansi_id', $instansi->id)->where('status', 'diterima')->whereDate('created_at', today())->count();
 
-        return view('dashboard.main', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user'));
+        return view('dashboard.operator', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user'));
         // $guruBelumHadir = User::
     }
 
