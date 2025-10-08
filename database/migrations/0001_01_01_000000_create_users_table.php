@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('password');
             $table->string('jarak_tempuh')->nullable();
             $table->string('foto_presensi');
-            $table->string('foto');
+            $table->string('foto')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

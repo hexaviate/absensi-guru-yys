@@ -31,7 +31,7 @@ class PresensiSeeder extends Seeder
                 'user_id'     => $user->id,
                 'datang'      => $datang->format('H:i:s'),
                 'pulang'      => $pulang->format('H:i:s'),
-                'bukti_izin'  => rand(0, 5) === 1 ? 'izin.jpg' : null,
+                'izin_id'     => null,
                 'tanggal'     => $tanggal->toDateString(),
                 'status'      => rand(0, 5) === 1 ? 'izin' : 'hadir',
                 'akurasi'     => $faker->randomFloat(2, 70, 99) . '%',

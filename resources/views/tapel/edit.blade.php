@@ -18,10 +18,19 @@
                     <form action="{{ route('tapel.update', $tapel->id) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        <div class="mb-3">
-                            <label for="kode" class="form-label">Kode Tapel</label>
-                            <input type="text" class="form-control" id="kode" name="kode"
-                                placeholder="Masukkan Tapel"  value="{{ old('kode', $tapel->kode) }}">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="kode" class="form-label">Kode Tapel</label>
+                                <input type="text" class="form-control" id="kode" name="kode"
+                                    placeholder="Masukkan Tapel" value="{{ old('kode', $tapel->code) }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-control" id="status" name="status">
+                                    <option value="aktif" {{ $jadwal->hari == 'sabtu' ? 'aktif' : '' }}>Aktif</option>
+                                    <option value="tidak_aktif" {{ $jadwal->hari == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="text-end">
                             <button type="submit" class="btn btn-primary px-4">Simpan</button>

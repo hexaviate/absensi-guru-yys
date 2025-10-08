@@ -97,8 +97,7 @@
                                 <label for="hari" class="form-label">Hari</label>
                                 <select class="form-control" id="hari" name="hari">
                                     <option value="senin" {{ $jadwal->hari == 'senin' ? 'selected' : '' }}>Senin</option>
-                                    <option value="selasa" {{ $jadwal->hari == 'selasa' ? 'selected' : '' }}>Selasa
-                                    </option>
+                                    <option value="selasa" {{ $jadwal->hari == 'selasa' ? 'selected' : '' }}>Selasa</option>
                                     <option value="rabu" {{ $jadwal->hari == 'rabu' ? 'selected' : '' }}>Rabu</option>
                                     <option value="kamis" {{ $jadwal->hari == 'kamis' ? 'selected' : '' }}>Kamis</option>
                                     <option value="sabtu" {{ $jadwal->hari == 'sabtu' ? 'selected' : '' }}>Sabtu</option>

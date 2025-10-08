@@ -71,7 +71,7 @@ class UsersController extends Controller
         // $request->foto_presensi->move(public_path('foto_presensi/'), $imagePresensi);
 
         // * Upload untuk Foto Profil
-        $imageName = time() . '.' . $request->foto_profil->extension();
+        // $imageName = time() . '.' . $request->foto->extension();
 
         // $request->image->move(public_path('images'), $imageName);
 
@@ -79,8 +79,8 @@ class UsersController extends Controller
         $manager = ImageManager::withDriver(new Driver());
 
         //read image
-        $imageProfil = $manager->read($request->file('foto_profil'));
-        $imageProfil->encode(new AutoEncoder(50))->save(public_path('foto/' . $imageName));
+        // $imageProfil = $manager->read($request->file('foto'));
+        // $imageProfil->encode(new AutoEncoder(50))->save(public_path('foto/' . $imageName));
 
         //read image
         $imagePresensi = $manager->read($request->file('foto_presensi'));
@@ -93,7 +93,7 @@ class UsersController extends Controller
             "password" => $request->password,
             "jarak_tempuh" => $request->jarak_tempuh,
             "foto_presensi" => $imageNamePresensi,
-            "foto" => $imageName,
+            // "foto" => $imageName,
         ]);
 
         $user->instansi()->attach($request->instansi_id);
@@ -191,11 +191,11 @@ class UsersController extends Controller
                     unlink(public_path('foto/' . $target->foto_presensi));
                 }
 
-                $imageName = 'presensi_' . time() . '_' . uniqid() . '.' . $request->foto_presensi->extension();
+               $imageName = time() . '.' . $request->foto_presensi->extension();
 
                 $manager = ImageManager::withDriver(new Driver());
                 $image = $manager->read($request->file('foto_presensi'));
-                $image->encode(new AutoEncoder(quality: 50))->save(public_path('foto/' . $imageName));
+                $image->encode(new AutoEncoder(quality: 50))->save(public_path('foto_presensi/' . $imageName));
 
                 $dataUpdate['foto_presensi'] = $imageName;
             } catch (\Exception $e) {

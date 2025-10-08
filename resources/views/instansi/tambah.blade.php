@@ -47,25 +47,16 @@
                                     placeholder="Masukkan Kepala Instansi">
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <div class="selectgroup selectgroup-pills">
-                                        <div class="form-group">
-                                            <label>Pilih Admin</label>
-                                            <select class="form-control form-control-lg" name="user_id">
-                                                    @forelse ($user as $item)
-                                                    <option value="{{ $item->id }}"
-                                                        {{ old('user_id', $item->id) == $item->id ? 'selected' : '' }}>
-                                                        {{ $item->name }}
-                                                    </option>
-                                                    @empty
-                                                    <p class="text-muted mb-0">Tidak ada role</p>
-                                                    @endforelse
-                                                </select>
-                                        </div>
-                                    </div>
-                                </div>
+                         <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="latitude" class="form-label">Latitude Instansi</label>
+                                <input type="text" class="form-control" id="latitude" name="latitude"
+                                    placeholder="Masukkan Latitude">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="longitude" class="form-label">Longtitude Instansi</label>
+                                <input type="text" class="form-control" id="longitude" name="longitude"
+                                    placeholder="Masukkan Longtitude">
                             </div>
                         </div>
                 </div>

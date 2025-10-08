@@ -57,16 +57,28 @@
                             <div class="col-md-6 mb-3">
                                 <label for="foto_presensi" class="form-label">Foto Presensi</label>
                                 <input type="file" class="form-control" id="foto_presensi" name="foto_presensi">
-                                @if ($user->foto_presensi)
-                                    <small class="d-block mt-2">Foto saat ini:</small>
-                                    <img src="{{ asset('foto_presensi/' . $user->foto_presensi) }}" alt="Foto Presensi" width="80"
-                                        class="rounded mt-1">
-                                @endif
+
+                                <div class="d-flex align-items-start mt-3 gap-3 ">
+                                    @if ($user->foto_presensi)
+                                        <div>
+                                            <small class="d-block">Foto Sebelumnya:</small>
+                                            <img src="{{ asset('foto_presensi/' . $user->foto_presensi) }}" alt="Foto Lama"
+                                                 style="object-fit: cover; height: 120px; width: 120px;" class="rounded border mr-4">
+                                        </div>
+                                    @endif
+
+                                    <div>
+                                        <small class="d-block">Foto Baru:</small>
+                                        <img id="preview_foto" src="#" alt="Preview Foto"
+                                            class="rounded border d-none"  style="object-fit: cover; height: 120px; width: 120px;">
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="jarak_tempuh" class="form-label">Jarak Tempuh (km)</label>
                                 <input type="number" class="form-control" id="jarak_tempuh" name="jarak_tempuh"
-                                    placeholder="Masukkan jarak tempuh" value="{{ old('jarak_tempuh', $user->jarak_tempuh) }}" step="0.01">
+                                    placeholder="Masukkan jarak tempuh"
+                                    value="{{ old('jarak_tempuh', $user->jarak_tempuh) }}" step="0.01">
                             </div>
                         </div>
 
@@ -116,3 +128,24 @@
         </div>
     </section>
 @endsection
+
+@push('script')
+    <script>
+        document.getElementById('foto_presensi').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('preview_foto');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                preview.classList.add('d-none');
+            }
+        });
+    </script>
+@endpush

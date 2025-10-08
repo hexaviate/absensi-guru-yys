@@ -51,8 +51,8 @@ class InstansiController extends Controller
             "latitude" => "required",
             "longitude" => "required",
             // "user_id" => "exist:user,id|required",
-            "user_id" => "required|unique:user_has_instansi,user_id",
-            "user_id.*" => "exists:users,id"
+            // "user_id" => "required|unique:user_has_instansi,user_id",
+            // "user_id.*" => "exists:users,id"
         ]);
 
         if ($validate->fails()) {
@@ -68,7 +68,7 @@ class InstansiController extends Controller
             "longitude" => $request->longitude
         ]);
 
-        $instansi->user()->attach($request->user_id);
+        // $instansi->user()->attach($request->user_id);
 
         return redirect()->route('instansi.index');
 
