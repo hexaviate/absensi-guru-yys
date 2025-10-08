@@ -22,6 +22,8 @@ class PresensiController extends Controller
         $user = auth()->user();
         $fotoPresensi = $user->foto_presensi;
         $lokasi = $user->instansi()->get(['latitude', 'longitude', 'nama_instansi', 'instansi_id']);
+        // $hariIni = Carbon::now()->isoFormat('dddd');
+        // dd($hariIni);
         return view('tesPresensi.index', compact('user', 'lokasi', 'fotoPresensi'));
 
     }

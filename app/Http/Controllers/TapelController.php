@@ -53,8 +53,14 @@ class TapelController extends Controller
             return redirect()->route('tapel.create')->withErrors($validate)->withInput();
         }
 
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
+        $tapelAktif->update([
+            "status" => "tidak_aktif"
+        ]);
+
         Tapel::create([
-            "kode" => $request->kode
+            "kode" => $request->kode,
+            "status" => "aktif"
         ]);
 
         return redirect()->route('tapel.index');
@@ -100,8 +106,13 @@ class TapelController extends Controller
             return redirect()->route('instansi.create', $id)->withErrors($validate)->withInput();
         }
 
+        if ($request->status == "aktif" && Tapel::where('status', "aktif")->exists()) {
+            return redirect()->back()->with('error', "Tapel aktif tidak boelh lebih dari satu");
+        }
+
         $target->update([
-            "kode" => $request->kode
+            "kode" => $request->kode,
+            "status" => $request->status
         ]);
 
         return redirect()->route('tapel.index');

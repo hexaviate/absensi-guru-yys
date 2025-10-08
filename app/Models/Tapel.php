@@ -9,7 +9,54 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Tapel extends Model
 {
     use SoftDeletes;
-    protected $guarded = [];
+    protected $table = 'tapels';
+
+    protected $fillable = [
+        'kode',
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
+
+
+    // Accessor untuk mendapatkan tahun ajaran dalam format yang mudah dibaca
+    public function getTahunAjaranAttribute()
+    {
+        return $this->kode;
+    }
+
+    // Method untuk mendapatkan range tanggal berdasarkan tahun ajaran
+    public function getDateRange()
+    {
+        // Support both formats: 2025-2026 and 2025/2026
+        $years = preg_split('/[-\/]/', $this->kode);
+
+        if (count($years) == 2) {
+            $startYear = trim($years[0]);
+            $endYear = trim($years[1]);
+
+            return [
+                'start' => $startYear . '-07-01',  // 1 Juli tahun pertama
+                'end' => $endYear . '-06-30'       // 30 Juni tahun kedua
+            ];
+        }
+
+        return null;
+    }
+
+    // Scope untuk mendapatkan tapel aktif (bisa disesuaikan dengan logika bisnis)
+    public function scopeActive($query)
+    {
+        return $query->whereNull('deleted_at')
+            ->orderBy('kode', 'desc');
+    }
+
 
     /**
      * Get all of the jadwal for the Tapel

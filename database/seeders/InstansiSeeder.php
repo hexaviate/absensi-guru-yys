@@ -7,11 +7,9 @@ use App\Models\Instansi;
 
 class InstansiSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+
         // 1
         Instansi::create([
             "nama_instansi" => "MI",
@@ -75,5 +73,15 @@ class InstansiSeeder extends Seeder
         //!
         //MI
 
+        // foreach ($data as $d) {
+        //     Instansi::create([
+        //         'nama_instansi' => $d[0],
+        //         'kepala_instansi' => $d[1],
+        //         'alamat_instansi' => $d[2],
+        //         'telp_instansi' => '08' . rand(111111111, 999999999),
+        //         'latitude' => fake()->latitude(-6.62, -6.59),
+        //         'longitude' => fake()->longitude(111.05, 111.08),
+        //     ]);
+        // }
     }
 }
