@@ -23,7 +23,27 @@ class AuthController extends Controller
         if (auth('web')->attempt($credential)) {
             $user = User::where('username', $request->username)->first();
 
-            return redirect()->route('operatorDashboard');
+            //* login untuk admin yayasan
+            if ($user->hasRole('admin_yayasan')) {
+                return view('tesAuth.dasAdmin');
+            }
+
+            //* login untuk operator instansi
+            else if ($user->hasRole('operator_instansi')) {
+                return redirect()->route('operatorDashboard');
+            }
+
+
+            //* login untuk tenaga pendidik
+            else if ($user->hasRole('tenaga_pendidik')) {
+                return view('tesAuth.dasPendidik');
+            }
+
+            //* login untuk tenaga kependidikan
+            else if ($user->hasRole('tenaga_kependidikan')) {
+                return view('tesAuth.dasKependidikan');
+            }
+
         } else {
             return back();
         }
