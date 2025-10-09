@@ -10,7 +10,7 @@
             <div class="col-lg-4 col-md-6 col-12 mb-3">
                 <div class="stats-card">
                     <div class="card-body">
-                        <h2 class="stats-number">45</h2>
+                        <h2 class="stats-number">{{ $totalGuruInstansi }}</h2>
                         <p class="stats-label">Total Guru</p>
                     </div>
                 </div>
@@ -18,7 +18,7 @@
             <div class="col-lg-4 col-md-6 col-12 mb-3">
                 <div class="stats-card">
                     <div class="card-body">
-                        <h2 class="stats-number">39</h2>
+                        <h2 class="stats-number">{{ $totalGuruHadir }}</h2>
                         <p class="stats-label">Kehadiran Hari Ini</p>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
             <div class="col-lg-4 col-md-6 col-12 mb-3">
                 <div class="stats-card">
                     <div class="card-body">
-                        <h2 class="stats-number">86.6%</h2>
+                        <h2 class="stats-number">{{ $persentaseHadir }} %</h2>
                         <p class="stats-label">Tingkat Kehadiran</p>
                     </div>
                 </div>
@@ -62,61 +62,24 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            <img alt="image" src="https://ui-avatars.com/api/?name=Ahmad+Fauzi&background=6777ef&color=fff"
-                                                class="rounded-circle" width="45" height="45">
-                                        </td>
-                                        <td>Ahmad Fauzi, S.Pd</td>
-                                        <td>07:15 WIB</td>
-                                        <td>
-                                            <span class="badge badge-success">Hadir</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <img alt="image" src="https://ui-avatars.com/api/?name=Siti+Nurhaliza&background=28a745&color=fff"
-                                                class="rounded-circle" width="45" height="45">
-                                        </td>
-                                        <td>Siti Nurhaliza, M.Pd</td>
-                                        <td>07:22 WIB</td>
-                                        <td>
-                                            <span class="badge badge-success">Hadir</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <img alt="image" src="https://ui-avatars.com/api/?name=Budi+Santoso&background=ffc107&color=fff"
-                                                class="rounded-circle" width="45" height="45">
-                                        </td>
-                                        <td>Budi Santoso, S.Pd</td>
-                                        <td>08:10 WIB</td>
-                                        <td>
-                                            <span class="badge badge-warning">Izin</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <img alt="image" src="https://ui-avatars.com/api/?name=Dewi+Lestari&background=17a2b8&color=fff"
-                                                class="rounded-circle" width="45" height="45">
-                                        </td>
-                                        <td>Dewi Lestari, S.Si</td>
-                                        <td>07:35 WIB</td>
-                                        <td>
-                                            <span class="badge badge-success">Hadir</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <img alt="image" src="https://ui-avatars.com/api/?name=Eko+Prasetyo&background=fd7e14&color=fff"
-                                                class="rounded-circle" width="45" height="45">
-                                        </td>
-                                        <td>Eko Prasetyo, M.Pd</td>
-                                        <td>-</td>
-                                        <td>
-                                            <span class="badge badge-danger">Alpha</span>
-                                        </td>
-                                    </tr>
+                                    @forelse ($guruHadirHariIni as $item)
+                                        <tr>
+                                            <td>
+                                                <img src="{{ asset('foto_presensi/' . $item->user->foto) }}"
+                                                    alt="foto {{ $item->user->name }}" class="rounded-circle" width="45"
+                                                    height="45">
+                                            </td>
+                                            <td>{{ $item->user->name ?? '-' }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($item->jam_datang)->format('H:i') }}</td>
+                                            <td>
+                                                <span class="badge badge-success">Hadir</span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="text-center">Belum Ada Yang Absensi</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -136,40 +99,31 @@
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="font-weight-bold">
-                                    {{-- <i class="fas fa-check-circle text-success"></i> --}}
-                                     Hadir
+                                    Hadir
                                 </span>
-                                <span class="badge badge-success badge-pill">39</span>
+                                <span class="badge badge-success badge-pill">{{ $totalGuruHadir }}</span>
                             </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 86.6%"
-                                    aria-valuenow="86.6" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar"
+                                    style="width: {{ $persentaseHadir }}%" aria-valuenow="{{ $persentaseHadir }}"
+                                    aria-valuemin="0" aria-valuemax="100">
+
+                                </div>
                             </div>
+
                         </div>
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="font-weight-bold">
-                                    {{-- <i class="fas fa-file-alt text-warning"></i> --}}
                                     Izin
                                 </span>
-                                <span class="badge badge-warning badge-pill">4</span>
+                                <span class="badge badge-warning badge-pill">{{$totalGuruIzin}}</span>
                             </div>
                             <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 8.8%"
-                                    aria-valuenow="8.8" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="font-weight-bold">
-                                    {{-- <i class="fas fa-times-circle text-danger"></i> --}}
-                                     Alpha
-                                </span>
-                                <span class="badge badge-danger badge-pill">2</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: 4.4%"
-                                    aria-valuenow="4.4" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-warning" role="progressbar"
+                                    style="width: {{ $persentaseIzin }}%" aria-valuenow="{{ $persentaseIzin }}"
+                                    aria-valuemin="0" aria-valuemax="100">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -246,190 +200,6 @@
 @endpush
 
 @push('script')
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script>
-        // Generate 14 hari terakhir
-        function generateLast14Days() {
-            const labels = [];
-            const today = new Date();
-
-            for (let i = 13; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - i);
-
-                const dayName = date.toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'short'
-                });
-                labels.push(dayName);
-            }
-
-            return labels;
-        }
-
-        // Generate data dummy untuk 14 hari
-        function generateDummyData() {
-            const hadir = [];
-            const izin = [];
-            const alpha = [];
-            const totalGuru = 45;
-
-            for (let i = 0; i < 14; i++) {
-                const hadirCount = Math.floor(Math.random() * 7) + 37; // 37-43
-                const izinCount = Math.floor(Math.random() * 4) + 2; // 2-5
-                const alphaCount = totalGuru - hadirCount - izinCount;
-
-                hadir.push(hadirCount);
-                izin.push(izinCount);
-                alpha.push(alphaCount > 0 ? alphaCount : 0);
-            }
-
-            return { hadir, izin, alpha };
-        }
-
-        const categories = generateLast14Days();
-        const data = generateDummyData();
-
-        // Konfigurasi ApexCharts
-        const options = {
-            series: [
-                {
-                    name: 'Hadir',
-                    data: data.hadir
-                },
-                {
-                    name: 'Izin',
-                    data: data.izin
-                },
-                {
-                    name: 'Alpha',
-                    data: data.alpha
-                }
-            ],
-            chart: {
-                type: 'area',
-                height: 350,
-                stacked: false,
-                animations: {
-                    enabled: true,
-                    easing: 'easeinout',
-                    speed: 800,
-                    animateGradually: {
-                        enabled: true,
-                        delay: 150
-                    },
-                    dynamicAnimation: {
-                        enabled: true,
-                        speed: 350
-                    }
-                },
-                toolbar: {
-                    show: true,
-                    tools: {
-                        download: true,
-                        zoom: true,
-                        zoomin: true,
-                        zoomout: true,
-                        pan: true,
-                        reset: true
-                    }
-                },
-                zoom: {
-                    enabled: true
-                }
-            },
-            colors: ['#28a745', '#ffc107', '#dc3545'],
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 3
-            },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.6,
-                    opacityTo: 0.2,
-                    stops: [0, 90, 100]
-                }
-            },
-            xaxis: {
-                categories: categories,
-                labels: {
-                    style: {
-                        fontSize: '12px',
-                        colors: '#6c757d'
-                    }
-                }
-            },
-            yaxis: {
-                min: 0,
-                max: 50,
-                tickAmount: 5,
-                labels: {
-                    formatter: function(value) {
-                        return Math.round(value);
-                    },
-                    style: {
-                        fontSize: '12px',
-                        colors: '#6c757d'
-                    }
-                },
-                title: {
-                    text: 'Jumlah Guru',
-                    style: {
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        color: '#6c757d'
-                    }
-                }
-            },
-            markers: {
-                size: 4,
-                strokeColors: '#fff',
-                strokeWidth: 2,
-                hover: {
-                    size: 6
-                }
-            },
-            legend: {
-                show: true,
-                position: 'top',
-                horizontalAlign: 'end',
-                fontSize: '13px',
-                fontWeight: 500,
-                markers: {
-                    width: 12,
-                    height: 12,
-                    radius: 3
-                }
-            },
-            tooltip: {
-                shared: true,
-                intersect: false,
-                y: {
-                    formatter: function(value) {
-                        return value + ' guru';
-                    }
-                }
-            },
-            grid: {
-                borderColor: '#e7e7e7',
-                strokeDashArray: 4,
-                xaxis: {
-                    lines: {
-                        show: true
-                    }
-                }
-            }
-        };
-
-        // Render chart
-        const chart = new ApexCharts(document.querySelector("#chartKehadiran"), options);
-        chart.render();
-    </script>
 @endpush
 
 
