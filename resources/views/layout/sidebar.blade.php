@@ -11,6 +11,7 @@
         $user = auth()->user();
     @endphp
 
+
     @if ($user->hasRole('admin_yayasan'))
         <li class="menu-header mt-5">Dashboard</li>
         <li class="{{ Route::is('adminYysDashboard') ? 'active' : '' }}">
@@ -32,7 +33,6 @@
     @endif
 
     @if ($user->hasAnyRole(['tenaga_pendidik', 'tenaga_kependidikan']))
-
         <li class="menu-header mt-5">Dashboard</li>
         <li class="{{ Route::is('userDashboard') ? 'active' : '' }}">
             <a href="{{ route('userDashboard') }}" class="nav-link">
@@ -73,7 +73,7 @@
                 </li>
             </ul>
         </li>
-    @endhasrole
+    @endhasanyrole
 
     <li class="menu-header">PRESENSI</li>
 
@@ -118,8 +118,20 @@
         </ul>
     </li>
 
+    @if ($user->hasAnyRole('admin_yayasan||operator_instansi'))
+        <li class="menu-header">Rekap</li>
 
+        <li class="{{ Route::is('rekap_absensi.index') ? 'active' : '' }}">
+            <a href="{{ route('rekap_absensi.index') }}" class="nav-link">
+                <i class="fas fa-file-lines"></i>
+                <span>Laporan Absensi</span>
+            </a>
+        </li>
+    @endif
+
+
+    {{--
     <li class="">
         <a href="{{ route('rekap_absensi.index') }}" class="nav-link"><i
                 class="fa-solid fa-file-lines"></i><span>Laporan Absensi</span></a>
-    </li>
+    </li> --}}

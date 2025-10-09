@@ -1,3 +1,5 @@
+Isi rekap_absensi.blade.php no error:
+
 @extends('layout.main')
 @section('main')
     <section class="section">
@@ -405,3 +407,4 @@
         });
     </script>
 @endpush
+
