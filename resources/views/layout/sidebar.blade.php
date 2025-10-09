@@ -23,8 +23,8 @@
 
     @if ($user->hasRole('operator_instansi'))
         <li class="menu-header mt-5">Dashboard</li>
-        <li class="{{ Route::is('dashboardOperator') ? 'active' : '' }}">
-            <a href="{{ route('userDashboard') }}" class="nav-link">
+        <li class="{{ Route::is('operatorDashboard') ? 'active' : '' }}">
+            <a href="{{ route('operatorDashboard') }}" class="nav-link">
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </a>
