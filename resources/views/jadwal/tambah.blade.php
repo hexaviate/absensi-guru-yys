@@ -33,13 +33,9 @@
                             <!-- tapel_id dropdown -->
                             <div class="col-md-6 mb-3">
                                 <label for="tapel" class="form-label">Tahun Pelajaran</label>
-                                <select class="form-control" id="tapel" name="tapel_id" autofocus>
-                                    @forelse ($tapel as $item)
-                                        <option value="{{ $item->id }}">{{ $item->kode }}</option>
-                                    @empty
-                                        <option> Tidak Ada Data Tahun Pelajaran</option>
-                                    @endforelse
-                                </select>
+                                <input type="text" class="form-control"
+                                    value="{{ $tapel ? $tapel->kode : 'Tidak ada tapel aktif' }}" readonly>
+                                <input type="hidden" name="tapel_id" value="{{ $tapel ? $tapel->id : '' }}">
                             </div>
 
                             <!-- instansi checkbox -->
@@ -51,7 +47,8 @@
                                         <label class="selectgroup-item">
                                             <input type="radio" name="instansi_id" value="{{ $item->id }}"
                                                 class="selectgroup-input"
-                                                {{ old('instansi_id') == $item->id ? 'checked' : '' }}>
+                                                {{ old('instansi_id') == $item->id ? 'checked' : '' }}
+                                                {{ count($instansi) == 1 ? 'checked' : '' }}>
                                             <span class="selectgroup-button">{{ $item->nama_instansi }}</span>
                                         </label>
                                     @empty
@@ -143,6 +140,16 @@
 
             let searchTimer;
             let currentIndex = -1;
+
+            // Auto-enable user search jika hanya ada 1 instansi
+            if (instansiRadios.length === 1) {
+                const singleInstansi = instansiRadios[0];
+                if (singleInstansi.checked) {
+                    userSearch.disabled = false;
+                    userSearch.focus();
+                    userSearch.placeholder = "Ketik nama user (min. 2 karakter)...";
+                }
+            }
 
             // Enable/Disable user search berdasarkan instansi yang dipilih
             instansiRadios.forEach(radio => {

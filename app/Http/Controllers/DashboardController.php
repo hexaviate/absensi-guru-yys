@@ -68,5 +68,17 @@ class DashboardController extends Controller
         $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
         // dd($guruHadirHariIni);
         $totalGuruIzin = Izin::where('instansi_id', $instansi->id)->where('status', 'diterima')->whereDate('created_at', today())->count();
+
+        return view('dashboard.yys', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user'));
+    }
+
+    public function userDashboard()
+    {
+        $user = auth()->user();
+        $instansi = $user->instansi->first();
+        if (!$user) {
+            return redirect()->route('login')->with('error', "anda belum login");
+        }
+        return view('dashboard.user');
     }
 }
