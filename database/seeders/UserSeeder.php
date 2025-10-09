@@ -255,7 +255,7 @@ class UserSeeder extends Seeder
             'password' => '123',
             'foto_presensi' => 'pegawai.jpg',
             'foto' => 'pegawai.jpg',
-        ])->assignRole('operator_instansi')->instansi()->attach([2]);
+        ])->assignRole('operator_   nsi')->instansi()->attach([2]);
 
         //MA
         User::create([

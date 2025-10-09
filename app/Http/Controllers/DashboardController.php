@@ -28,25 +28,18 @@ class DashboardController extends Controller
             $query->whereDate('tanggal', today()->toDateString());
         })->get();
         $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
-        // dd($guruHadirHariIni);
         $totalGuruIzin = Izin::where('instansi_id', $instansi->id)->where('status', 'diterima')->whereDate('created_at', today())->count();
+        $totalGuruHadir = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->count();
 
-        //semua dashboard ad ini
-        $presensiHariIni = Presensi::where('user_id', $user->id)->where('instansi_id', $instansi->id)->whereDate('tanggal', today()->toDateString())->first();
-        $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->get();
+        $persentaseHadir = $totalGuruInstansi > 0
+            ? round(($totalGuruHadir / $totalGuruInstansi) * 100, 2)
+            : 0;
 
-        if (!$presensiHariIni && now() > Carbon::createFromTime('06', '00', '00')) {
+        $persentaseIzin = $totalGuruInstansi > 0
+            ? round(($totalGuruIzin / $totalGuruInstansi) * 100, 2)
+            : 0;
 
-            return view('dashboard.operator', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user', 'guruBelumHadir', 'jadwalHariIni'))->with('error', 'Anda belum melakukan absensi Datang');
-
-        } elseif (!$presensiHariIni->pulang) {
-
-            return view('dashboard.operator', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user', 'guruBelumHadir', 'presensiHariIni', 'jadwalHariIni'))->with('error', 'Anda belum melakukan absensi Pulang');
-
-        }
-
-        return view('dashboard.operator', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user', 'guruBelumHadir', 'presensiHariIni', 'jadwalHariIni'));
-        // $guruBelumHadir = User::
+        return view('dashboard.operator', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruHadir', 'persentaseHadir', 'persentaseIzin'));
     }
 
     public function adminDashboard()
