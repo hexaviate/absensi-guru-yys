@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Izin;
 use App\Models\Presensi;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -23,10 +22,7 @@ class DashboardController extends Controller
         // }
 
         // $totalGuruInstansi = User::where('instansi_id', $instansi->id)->count();
-        $totalGuruInstansi = $instansi->user->get();
-        $guruBelumHadir = User::where('instansi_id', $instansi->id)->whereDoesntHave('presensi', function ($query) {
-            $query->whereDate('tanggal', today()->toDateString());
-        })->get();
+        $totalGuruInstansi = $instansi->user->count();
         $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
         $totalGuruIzin = Izin::where('instansi_id', $instansi->id)->where('status', 'diterima')->whereDate('created_at', today())->count();
         $totalGuruHadir = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->count();
@@ -50,8 +46,6 @@ class DashboardController extends Controller
             return redirect()->route('login')->with('error', "anda belum login");
         }
 
-        $presensiHariIni = Presensi::where('user_id', $user->id)->where('instansi_id', $instansi->id)->whereDate('tanggal', today()->toDateString())->get();
-        $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->get();
         // if (!$user->role == 'operator_instansi') {
         //     return redirect()->route('login')->with('error', "anda tidak punya akses");
         // }
@@ -76,4 +70,4 @@ class DashboardController extends Controller
     }
 }
 
-// ini dari saya
+// ini dari dsaya
