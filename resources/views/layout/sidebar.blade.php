@@ -32,7 +32,6 @@
     @endif
 
     @if ($user->hasAnyRole(['tenaga_pendidik', 'tenaga_kependidikan']))
-
         <li class="menu-header mt-5">Dashboard</li>
         <li class="{{ Route::is('userDashboard') ? 'active' : '' }}">
             <a href="{{ route('userDashboard') }}" class="nav-link">
@@ -119,7 +118,12 @@
     </li>
 
 
+     @hasanyrole('admin_yayasan|operator_instansi')
+    <li class="menu-header">RECAP</li>
+
     <li class="">
-        <a href="{{ route('rekap_absensi.index') }}" class="nav-link"><i
-                class="fa-solid fa-file-lines"></i><span>Laporan Absensi</span></a>
+        <a href="{{ route('rekap_absensi.index') }}" class="nav-link"><i class="fa fa-file"></i><span>Laporan
+                Absensi</span></a>
     </li>
+
+    @endhasrole
