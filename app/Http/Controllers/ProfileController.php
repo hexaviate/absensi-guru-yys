@@ -19,8 +19,11 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
         $instansiName = $user->instansi()->get();
+        $role = $user->roles()->get();
+        // $ = $user->instansi()->get();
 
-        return view('profile.index', compact('user','instansiName'));
+
+        return view('profile.index', compact('user','instansiName','role'));
     }
 
     public function viewEditProfile(string $id)
