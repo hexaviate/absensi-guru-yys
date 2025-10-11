@@ -19,14 +19,6 @@ class InstansiSeeder extends Seeder
             "longitude" => "111.0661932"
         ]);
 
-        Instansi::create([
-            "nama_instansi" => "PUSPELA",
-            "kepala_instansi" => "Pak Ini",
-            "alamat_instansi" => "kajen",
-            "telp_instansi" => "081",
-            "latitude" => "6.6080718",
-            "longitude" => "111.0594748"
-        ]);
 
         // 2
         Instansi::create([
@@ -78,6 +70,14 @@ class InstansiSeeder extends Seeder
             "longitude" => "111.06748509804d0"
         ]);
 
+        Instansi::create([
+            "nama_instansi" => "PUSPELA",
+            "kepala_instansi" => "Pak Ini",
+            "alamat_instansi" => "kajen",
+            "telp_instansi" => "081",
+            "latitude" => "6.6080718",
+            "longitude" => "111.0594748"
+        ]);
         //!
         //MI
 

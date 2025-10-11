@@ -34,7 +34,7 @@
                                 <h4 class="user-name">{{ $user->name ?? 'Nama User' }}</h4>
                                 <p class="user-role">Pengguna Sistem</p>
                                     @foreach ($role as $item)
-                                        <h1 class="text-white">{{$item->name}}</h1>
+                                        <h1 class="text-white">{{$item->name}}<./h1>
                                     @endforeach
                                     @foreach ($instansiName as $item)
                                         <h1 class="text-white">{{$item->nama_instansi}}</h1>

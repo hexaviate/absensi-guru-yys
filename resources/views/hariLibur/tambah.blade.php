@@ -38,7 +38,7 @@
                                 <div class="selectgroup selectgroup-pills">
                                     @forelse ($instansi as $item)
                                         <label class="selectgroup-item">
-                                            <input type="radio" name="instansi_id" value="{{ $item->id }}"
+                                            <input type="checkbox" name="instansi_id" value="{{ $item->id }}"
                                                 class="selectgroup-input"
                                                 {{ old('instansi_id') == $item->id ? 'checked' : '' }}
                                                 {{ count(value: $instansi) == 1 ? 'checked' : '' }}>
@@ -65,6 +65,15 @@
                                 <input type="date" class="form-control" id="tanggal" name="tanggal"
                                     value="{{ old('tanggal') }}">
                             </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="waktu" class="form-label">Waktu</label>
+                                <input type="time" id="waktu" name="waktu" class="form-control">
+                            </div>
+                            </div>
+
                         </div>
 
                         <div class="text-end">
