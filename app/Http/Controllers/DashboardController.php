@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Izin;
 use App\Models\Presensi;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -62,11 +63,21 @@ class DashboardController extends Controller
     public function userDashboard()
     {
         $user = auth()->user();
-        $instansi = $user->instansi->first();
+
+        $presensiHariIni = Presensi::where('user_id', $user->id)->whereDate('tanggal', today()->toDateString())->get();
+        $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->get();
+
+        $izinBulanIni = $user->izin()->whereMonth('created_at', now()->month)->count();
+        $presensiMingguIni = $user->presensi()->whereBetween('created_at', [
+            Carbon::now()->startOfWeek(),
+            Carbon::now()->endOfWeek()
+        ])->get();
+        $instansi = $user->instansi->get();
+
         if (!$user) {
             return redirect()->route('login')->with('error', "anda belum login");
         }
-        return view('dashboard.user');
+        return view('dashboard.user', compact('presensiHariIni', 'jadwalHariIni', 'instansi', 'izinBulanIni'));
     }
 }
 

@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->foreignId('instansi_id')->constrained()->cascadeOnDelete();
             $table->string('keterangan');
             $table->date('tanggal');
-            $table->time('waktu');
+            $table->time('waktu')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

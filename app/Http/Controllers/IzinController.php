@@ -73,24 +73,44 @@ class IzinController extends Controller
             //     // return redirect()->back()->with('error', 'tidak  tidak terdaftar pada instansi ini');
             // }
 
-            // * Upload untuk Foto Profil
-            $buktiIzin = time() . $instansi . '.' . $request->bukti_izin->extension();
+            if ($request->bukti_izin->extension() == "pdf") {
+
+                $file = time() . '.' . $request->bukti_izin->extension();
+                $request->bukti_izin->move(public_path('bukti_izin/'), $file);
 
 
-            //img interevention
-            $manager = ImageManager::withDriver(new Driver());
+                Izin::create([
+                    'user_id' => $user->id,
+                    'instansi_id' => $instansi,
+                    'bukti_izin' => $file,
+                    'tanggal' => Carbon::now()->toDateString(),
+                    'keterangan' => $request->keterangan,
+                ]);
 
-            //read image
-            $fotoIzin = $manager->read($request->file('bukti_izin'));
-            $fotoIzin->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $buktiIzin));
+            } else {
 
-            Izin::create([
-                'user_id' => $user->id,
-                'instansi_id' => $instansi,
-                'bukti_izin' => $buktiIzin,
-                'tanggal' => Carbon::now()->toDateString(),
-                'keterangan' => $request->keterangan,
-            ]);
+                // * Upload untuk Foto Profil
+                $buktiIzin = time() . $instansi . '.' . $request->bukti_izin->extension();
+
+
+                //img interevention
+                $manager = ImageManager::withDriver(new Driver());
+
+                //read image
+                $fotoIzin = $manager->read($request->file('bukti_izin'));
+                $fotoIzin->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $buktiIzin));
+
+                Izin::create([
+                    'user_id' => $user->id,
+                    'instansi_id' => $instansi,
+                    'bukti_izin' => $buktiIzin,
+                    'tanggal' => Carbon::now()->toDateString(),
+                    'keterangan' => $request->keterangan,
+                ]);
+
+            }
+
+
         }
 
 
@@ -155,8 +175,6 @@ class IzinController extends Controller
         if ($request->bukti_izin) {
             // * Upload untuk Foto izin
             $buktiIzin = time() . '.' . $request->file('bukti_izin')->extension();
-
-
             //*delete file yang sudah ada sebelumnya
             $filePath = public_path('bukti_izin/' . $buktiIzin);
 
@@ -164,16 +182,24 @@ class IzinController extends Controller
                 File::delete($filePath);
             }
 
-            //img interevention
-            $manager = ImageManager::withDriver(new Driver());
+            if ($request->bukti_izin->extension() == "pdf") {
+                $file = time() . '.' . $request->bukti_izin->extension();
+                $request->bukti_izin->move(public_path('bukti_izin/'), $file);
 
-            //read image
-            $fotoIzin = $manager->read($request->file('bukti_izin'));
-            $fotoIzin->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $buktiIzin));
+                $izin->update([
+                    "bukti_izin" => $file,
+                ]);
+            } else {
+                //img interevention
+                $manager = ImageManager::withDriver(new Driver());
+                //read image
+                $fotoIzin = $manager->read($request->file('bukti_izin'));
+                $fotoIzin->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $buktiIzin));
 
-            $izin->update([
-                "bukti_izin" => $buktiIzin,
-            ]);
+                $izin->update([
+                    "bukti_izin" => $buktiIzin,
+                ]);
+            }
         }
 
 
