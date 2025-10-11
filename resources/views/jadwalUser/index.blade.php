@@ -26,12 +26,13 @@
                                             <label for="filter_instansi">Filter Instansi</label>
                                             <select name="filter_instansi" id="filter_instansi" class="form-control">
                                                 <option value="">-- Semua Instansi --</option>
-                                                @foreach ($instansiList as $instansi)
-                                                    <option value="{{ $instansi->id }}"
-                                                        {{ request('filter_instansi') == $instansi->id ? 'selected' : '' }}>
-                                                        {{ $instansi->nama_instansi }}
-                                                    </option>
-                                                @endforeach
+                                                {{-- @foreach ($instansiList as $instansi) --}}
+                                                    <option>
+                                                        smk
+                                                        {{-- {{ request('filter_instansi') == $instansi->id ? 'selected' : '' }}>
+                                                        {{ $instansi->nama_instansi }} --}}
+                                                    {{-- </option> --}}
+                                                {{-- @endforeach --}}
                                             </select>
                                         </div>
                                     </div>
