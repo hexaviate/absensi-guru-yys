@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-     public function run(): void
+    public function run(): void
     {
         $admin = User::create([
             "name" => 'Pak Admin',
@@ -255,7 +255,7 @@ class UserSeeder extends Seeder
             'password' => '123',
             'foto_presensi' => 'pegawai.jpg',
             'foto' => 'pegawai.jpg',
-        ])->assignRole('operator_   nsi')->instansi()->attach([2]);
+        ])->assignRole('operator_instansi')->instansi()->attach([2]);
 
         //MA
         User::create([

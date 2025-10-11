@@ -78,7 +78,8 @@ class HariLiburController extends Controller
                 'tapel_id' => $request->tapel_id,
                 'instansi_id' => $request->instansi_id,
                 'keterangan' => $request->keterangan,
-                'tanggal' => $request->tanggal
+                'tanggal' => $request->tanggal,
+                'waktu' => $request->waktu,
             ]);
 
             return redirect()->route('hariLibur.index')->with('success', 'Berhasil menambah Hari Libur');
@@ -125,6 +126,7 @@ class HariLiburController extends Controller
             'instansi_id' => 'required|exists:instansis,id',
             'keterangan' => 'required|string',
             'tanggal' => 'required',
+            'waktu' => 'required|sometimes',
         ]);
 
         if ($validate->fails()) {
@@ -140,7 +142,8 @@ class HariLiburController extends Controller
                 'tapel_id' => $request->tapel_id,
                 'instansi_id' => $request->instansi_id,
                 'keterangan' => $request->keterangan,
-                'tanggal' => $request->tanggal
+                'tanggal' => $request->tanggal,
+                'waktu' => $request->waktu,
             ]);
 
             return redirect()->route('hariLibur.index')->with('success', 'Berhasil menambah Hari Libur');
