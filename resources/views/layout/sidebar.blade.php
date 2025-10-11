@@ -12,7 +12,7 @@
     @endphp
 
 
-    @if ($user->hasRole('admin_yayasan'))
+    @if ($user->hasRole(roles: 'admin_yayasan'))
         <li class="menu-header mt-5">Dashboard</li>
         <li class="{{ Route::is('adminYysDashboard') ? 'active' : '' }}">
             <a href="{{ route('adminYysDashboard') }}" class="nav-link">
@@ -24,8 +24,8 @@
 
     @if ($user->hasRole('operator_instansi'))
         <li class="menu-header mt-5">Dashboard</li>
-        <li class="{{ Route::is('dashboardOperator') ? 'active' : '' }}">
-            <a href="{{ route('userDashboard') }}" class="nav-link">
+        <li class="{{ Route::is('operatorDashboard') ? 'active' : '' }}">
+            <a href="{{ route('operatorDashboard') }}" class="nav-link">
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </a>
@@ -118,20 +118,8 @@
         </ul>
     </li>
 
-    @if ($user->hasAnyRole('admin_yayasan||operator_instansi'))
-        <li class="menu-header">Rekap</li>
 
-        <li class="{{ Route::is('rekap_absensi.index') ? 'active' : '' }}">
-            <a href="{{ route('rekap_absensi.index') }}" class="nav-link">
-                <i class="fas fa-file-lines"></i>
-                <span>Laporan Absensi</span>
-            </a>
-        </li>
-    @endif
-
-
-    {{--
     <li class="">
         <a href="{{ route('rekap_absensi.index') }}" class="nav-link"><i
                 class="fa-solid fa-file-lines"></i><span>Laporan Absensi</span></a>
-    </li> --}}
+    </li>

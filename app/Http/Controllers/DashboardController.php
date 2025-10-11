@@ -24,11 +24,18 @@ class DashboardController extends Controller
         // $totalGuruInstansi = User::where('instansi_id', $instansi->id)->count();
         $totalGuruInstansi = $instansi->user->count();
         $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
-        // dd($guruHadirHariIni);
         $totalGuruIzin = Izin::where('instansi_id', $instansi->id)->where('status', 'diterima')->whereDate('created_at', today())->count();
+        $totalGuruHadir = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->count();
 
-        return view('dashboard.operator', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user'));
-        // $guruBelumHadir = User::
+        $persentaseHadir = $totalGuruInstansi > 0
+            ? round(($totalGuruHadir / $totalGuruInstansi) * 100, 2)
+            : 0;
+
+        $persentaseIzin = $totalGuruInstansi > 0
+            ? round(($totalGuruIzin / $totalGuruInstansi) * 100, 2)
+            : 0;
+
+        return view('dashboard.operator', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruHadir', 'persentaseHadir', 'persentaseIzin'));
     }
 
     public function adminDashboard()
@@ -62,3 +69,5 @@ class DashboardController extends Controller
         return view('dashboard.user');
     }
 }
+
+// ini dari dsaya
