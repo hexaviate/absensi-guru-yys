@@ -80,9 +80,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('viewIzinVerify', 'viewIzinVerify')->name("viewIzinVerify");
         Route::put('izinVerify/{id}', 'izinVerify')->name("izinVerify");
 
-        // Route::get('dashboardOperator', [DashboardController::class, 'operatorDashboard'])->name('operatorDashboard');
-        // Route::get('DashboardAdmin', [DashboardController::class, 'adminDashboard'])->name('adminYysDashboard');
-        // Route::get('DashboardUser', [DashboardController::class, 'userDashboard'])->name('userDashboard');
+        Route::get('dashboardOperator', [DashboardController::class, 'operatorDashboard'])->name('operatorDashboard');
+        Route::get('DashboardAdmin', [DashboardController::class, 'adminDashboard'])->name('adminYysDashboard');
+        Route::get('DashboardUser', [DashboardController::class, 'userDashboard'])->name('userDashboard');
 
         //?---------------------------------------------------------{Operator/Admin}-----------------------------------------------------------------------//
 

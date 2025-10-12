@@ -306,10 +306,16 @@ class IzinController extends Controller
         if ($izin->status == 'diterima') {
 
             if (Presensi::where('instansi_id', $izin->instansi_id)->where('user_id', $izin->user_id)->where('tanggal', $izin->tanggal)->exists()) {
+
                 $presensi = Presensi::where('instansi_id', $izin->instansi_id)->where('user_id', $izin->user_id)->where('tanggal', $izin->tanggal)->first();
+
+                if ($presensi->pulang) {
+                    return redirect()->back()->with('error', 'User ini telah emiliki data presensi');
+                }
+
                 $presensi->update([
                     "izin_id" => $izin->id,
-                    "pulang" => "-"
+                    "pulang" => ""
                 ]);
             }
 
