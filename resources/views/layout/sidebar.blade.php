@@ -11,6 +11,7 @@
         $user = auth()->user();
     @endphp
 
+
     @if ($user->hasRole(roles: 'admin_yayasan'))
         <li class="menu-header mt-5">Dashboard</li>
         <li class="{{ Route::is('adminYysDashboard') ? 'active' : '' }}">
@@ -86,7 +87,7 @@
 
             </ul>
         </li>
-    @endhasrole
+    @endhasanyrole
 
     <li class="menu-header">PRESENSI</li>
 

@@ -34,12 +34,6 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 
 Route::middleware(['auth'])->group(function () {
-
-    Route::get('dashboardOperator', [DashboardController::class, 'operatorDashboard'])->name('operatorDashboard');
-    Route::get('DashboardAdmin', [DashboardController::class, 'adminDashboard'])->name('adminYysDashboard');
-    Route::get('DashboardUser', [DashboardController::class, 'userDashboard'])->name('userDashboard');
-
-
     Route::controller(PresensiController::class)->group(function () {
         Route::get('presensi', 'viewPresensi')->name('presensi');
         Route::post('prosesPresensi', 'prosesPresensi')->name('prosesPresensi');

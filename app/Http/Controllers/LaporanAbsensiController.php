@@ -4,70 +4,185 @@ namespace App\Http\Controllers;
 
 use App\Exports\RekapHarianExport;
 use App\Exports\RekapBulananExport;
-use App\Exports\RekapTahunanExport;  // Tambahkan import baru
+use App\Exports\RekapTahunanExport;
 use App\Models\Instansi;
 use App\Models\Presensi;
-use App\Models\Tapel;  // Tambahkan import Tapel
+use App\Models\Tapel;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LaporanAbsensiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Presensi::with(['user', 'instansi']);
+        $user = auth()->user();
 
-        // ngeFILTER STATUS
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
 
-        // ngeFILTER INSTANSI
-        if ($request->filled('instansi')) {
-            $query->where('instansi_id', $request->instansi);
-        }
+        try {
+            // $instansiOperator = $user->instansi()->get();
 
-        // ngeFILTER HARIAN
-        if ($request->filled('tanggal')) {
-            $query->whereDate('tanggal', $request->tanggal);
-        }
+            // Base query dengan eager loading dan validasi relasi
+            $query = Presensi::with(['user', 'instansi'])
+                ->whereHas('user') // Pastikan user exists
+                ->whereHas('instansi'); // Pastikan instansi exists
 
-        // ngeFILTER BULANAN (dari - sampai)
-        if ($request->filled('dari_tanggal') && $request->filled('sampai_tanggal')) {
-            $query->whereBetween('tanggal', [$request->dari_tanggal, $request->sampai_tanggal]);
-        }
+            // Filter berdasarkan role - CRITICAL: ini harus di awal
 
-        // ngeFILTER TAHUN AJARAN (menggunakan tapel) - dengan debug
-        if ($request->filled('tahun_ajaran')) {
-            $tapel = Tapel::find($request->tahun_ajaran);
-            if ($tapel) {
-                $dateRange = $tapel->getDateRange();
 
-                // Debug log untuk memastikan range tanggal benar
-                \Log::info('Filter Tahun Ajaran Debug:', [
-                    'tapel_id' => $request->tahun_ajaran,
-                    'tapel_kode' => $tapel->kode,
-                    'date_range' => $dateRange
+            if ($user->hasRole('operator_instansi')) {
+                // Ambil instansi yang dimiliki user melalui relasi
+                $instansiUser = $user->instansi()->first();
+
+                if (!$instansiUser) {
+                    Log::error('Operator instansi tidak memiliki relasi instansi', [
+                        'user_id' => $user->id,
+                        'user_name' => $user->name
+                    ]);
+
+                    return view('laporan.rekap_absensi', [
+                        'presensi' => collect([]),
+                        'instansi' => collect([]),
+                        'tapels' => collect([]),
+                        'user' => $user
+                    ])->with('error', 'Akun Anda belum terhubung dengan instansi. Silakan hubungi administrator.');
+                }
+
+                // Filter hanya untuk instansi miliknya
+                $query->where('instansi_id', $instansiUser->id);
+
+                Log::info('Operator Instansi Access:', [
+                    'user_id' => $user->id,
+                    'user_name' => $user->name,
+                    'instansi_id' => $instansiUser->id,
+                    'instansi_name' => $instansiUser->nama_instansi
                 ]);
+            } elseif ($user->hasRole('admin_yayasan')) {
+                // Admin yayasan bisa pilih instansi spesifik
+                if ($request->filled('instansi')) {
+                    $query->where('instansi_id', $request->instansi);
 
-                if ($dateRange) {
-                    $query->whereBetween('tanggal', [$dateRange['start'], $dateRange['end']]);
+                    Log::info('Admin Yayasan Filter:', [
+                        'user_id' => $user->id,
+                        'selected_instansi' => $request->instansi
+                    ]);
+                } else {
+                    Log::info('Admin Yayasan - Viewing All Instansi');
                 }
             }
+
+            // Filter STATUS
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            // Filter HARIAN (tanggal spesifik)
+            if ($request->filled('tanggal')) {
+                $query->whereDate('tanggal', $request->tanggal);
+            }
+
+            // Filter BULANAN (range tanggal)
+            if ($request->filled('dari_tanggal') && $request->filled('sampai_tanggal')) {
+                $query->whereBetween('tanggal', [$request->dari_tanggal, $request->sampai_tanggal]);
+            }
+
+            // Filter TAHUNAN (berdasarkan tahun ajaran)
+            if ($request->filled('tahun_ajaran')) {
+                $tapel = Tapel::find($request->tahun_ajaran);
+
+                if ($tapel) {
+                    $dateRange = $tapel->getDateRange();
+
+                    if ($dateRange && isset($dateRange['start']) && isset($dateRange['end'])) {
+                        $query->whereBetween('tanggal', [$dateRange['start'], $dateRange['end']]);
+
+                        Log::info('Tahun Ajaran Filter Applied:', [
+                            'tapel_kode' => $tapel->kode,
+                            'date_range' => $dateRange
+                        ]);
+                    }
+                }
+            }
+
+            // Get hasil query dengan ordering
+            $presensi = $query->orderBy('tanggal', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // Debug: Log query SQL
+            Log::info('Query Executed:', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings()
+            ]);
+
+            // Validasi data yang didapat
+            $invalidRecords = $presensi->filter(function ($item) {
+                return !$item->user || !$item->instansi;
+            });
+
+            if ($invalidRecords->isNotEmpty()) {
+                Log::warning('Found records with missing relations:', [
+                    'count' => $invalidRecords->count(),
+                    'ids' => $invalidRecords->pluck('id')->toArray()
+                ]);
+            }
+
+            // Debug log
+            Log::info('Query Result Summary:', [
+                'user_role' => $user->getRoleNames()->first(),
+                'user_id' => $user->id,
+                'user_instansi_id' => $user->instansi_id ?? 'null',
+                'filter_instansi' => $request->instansi ?? 'all',
+                'filter_status' => $request->status ?? 'all',
+                'filter_tanggal' => $request->tanggal ?? 'none',
+                'total_records' => $presensi->count(),
+                'has_data' => $presensi->isNotEmpty(),
+                'sample_record' => $presensi->first() ? [
+                    'id' => $presensi->first()->id,
+                    'user_id' => $presensi->first()->user_id,
+                    'user_name' => $presensi->first()->user->name ?? 'NULL',
+                    'instansi_id' => $presensi->first()->instansi_id,
+                    'instansi_name' => $presensi->first()->instansi->nama_instansi ?? 'NULL'
+                ] : null
+            ]);
+
+            // Get list instansi berdasarkan role
+            if ($user->hasRole('operator_instansi')) {
+                $instansiUser = $user->instansi()->first();
+                $instansi = $instansiUser ? collect([$instansiUser]) : collect([]);
+            } else {
+                $instansi = Instansi::all();
+            }
+
+
+            // Get list tahun ajaran aktif
+            $tapels = Tapel::active()->orderBy('kode', 'desc')->get();
+
+            return view('laporan.rekap_absensi', compact('presensi', 'instansi', 'tapels', 'user'));
+        } catch (\Exception $e) {
+            Log::error('ERROR in LaporanAbsensiController@index:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $user->id ?? null
+            ]);
+
+
+
+            // Fallback dengan data kosong
+            return view('laporan.rekap_absensi', [
+                'presensi' => collect([]),
+                'instansi' => collect([]),
+                'tapels' => collect([]),
+                'user' => $user,
+            ])->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $presensi = $query->orderBy('tanggal', 'desc')->get();
-
-        // Debug log untuk hasil query
-        \Log::info('Query Result Count: ' . $presensi->count());
-
-        $instansi = Instansi::all();
-        $tapels = Tapel::active()->get(); // Ambil semua tahun ajaran
-
-        return view('laporan.rekap_absensi', compact('presensi', 'instansi', 'tapels'));
     }
+
 
     public function exportExcel(Request $request)
     {
