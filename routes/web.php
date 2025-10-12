@@ -13,6 +13,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TapelController;
 use App\Http\Controllers\UsersController;
 use App\Models\HariLibur;
+use FontLib\Table\Type\name;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -57,9 +58,9 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::controller(ProfileController::class)->group(function () {
-        Route::get('viewEditProfile', 'viewEditProfile');
+        Route::get('viewEditProfile/{id}', 'viewEditProfile')->name('viewEditProfile');
         Route::get('viewProfile', 'viewProfile')->name('viewProfile');
-        Route::post('editProfile', 'editProfile');
+        Route::post('editProfile', 'editProfile')->name('editProfile');
         Route::get('jadwalUser', 'viewJadwalMingguIni')->name('jadwalUser');
         Route::get('viewRiwayatAbsensi', 'viewRiwayatAbsensi');
         Route::get('viewJadwalHariIni', 'viewJadwalHariIni');
