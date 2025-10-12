@@ -34,7 +34,7 @@ class ProfileController extends Controller
             return redirect()->intended('login');
         }
 
-        return view('editProfile', compact('user')); //view nanti diganti
+        return view('profile.editProfile', compact('user'));
     }
 
 

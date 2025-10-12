@@ -10,6 +10,13 @@
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/bootstrap/css/bootstrap.min.css') }}">
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/fontawesome/css/all.min.css') }}">
 
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Atau jika pakai versi 5 -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+
 <!-- CSS Libraries -->
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/jqvmap/dist/jqvmap.min.css') }}">
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/weather-icon/css/weather-icons.min.css') }}">
@@ -21,6 +28,10 @@
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/ionicons/css/ionicons.min.css') }}">
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/izitoast/css/iziToast.min.css') }}">
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/css/components.css') }}">
+
+
+<link rel="shortcut icon" href="{{ asset('/') }}asset/image/logoYayasan.png" type="image/x-icon">
+
 <!-- Start GA -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script>
 <script>
