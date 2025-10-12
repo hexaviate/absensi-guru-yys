@@ -94,7 +94,7 @@
                         <div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Total Guru Yayasan</h6>
-                                <h3 class="mb-0 text-success">749</h3>
+                                <h3 class="mb-0 text-success">{{ $totalGuruInstansi }}</h3>
                             </div>
                         </div>
                     </div>

@@ -4,8 +4,8 @@
         <div class="section-header" style="">
             <h1>Edit Tapel</h1>
             <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item active"><a href="#">User</a></div>
-                <div class="breadcrumb-item">Tapel</div>
+                <div class="breadcrumb-item active"><a href="#">Tapel</a></div>
+                <div class="breadcrumb-item">Dashboard</div>
             </div>
         </div>
 

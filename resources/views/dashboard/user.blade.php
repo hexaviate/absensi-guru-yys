@@ -30,68 +30,61 @@
             <div class="col-12">
                 <div class="instansi-container">
                     <!-- Instansi 1: SD Harapan -->
-                    <div class="instansi-card-wrapper">
-                        <div class="card card-custom shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div>
-                                        <h6 class="font-weight-bold text-primary mb-1">SD Harapan</h6>
-                                        <small class="text-muted">Selasa, 7 Oktober 2025</small>
-                                    </div>
-                                    <span class="badge badge-warning badge-lg">⏳ Belum Pulang</span>
-                                </div>
+                    <div class="col-12">
+                        <div class="instansi-container">
+                            @forelse($presensiHariIni as $presensi)
+                                <div class="instansi-card-wrapper">
+                                    <div class="card card-custom shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <div>
+                                                    <h6 class="font-weight-bold text-primary mb-1">
+                                                        {{ $presensi->instansi->nama_instansi ?? 'N/A' }}
+                                                    </h6>
+                                                    <small class="text-muted">
+                                                        {{ \Carbon\Carbon::parse($presensi->tanggal)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
+                                                    </small>
+                                                </div>
 
-                                <div class="attendance-time-row">
-                                    <div class="time-item">
-                                        <i class="fa-solid fa-right-to-bracket text-success"></i>
-                                        <div class="time-detail">
-                                            <small class="text-muted d-block">Jam Datang</small>
-                                            <strong class="text-dark">07:22 WIB</strong>
-                                        </div>
-                                    </div>
-                                    <div class="time-divider"></div>
-                                    <div class="time-item">
-                                        <i class="fa-solid fa-right-from-bracket text-danger"></i>
-                                        <div class="time-detail">
-                                            <small class="text-muted d-block">Jam Pulang</small>
-                                            <strong class="text-muted">-- : --</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                                @if ($presensi->jam_pulang)
+                                                    <span class="badge badge-success badge-lg">✅ Hadir</span>
+                                                @else
+                                                    <span class="badge badge-warning badge-lg">⏳ Belum Pulang</span>
+                                                @endif
+                                            </div>
 
-                    <!-- Instansi 2: SMP Cendekia -->
-                    <div class="instansi-card-wrapper">
-                        <div class="card card-custom shadow-sm">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div>
-                                        <h6 class="font-weight-bold text-primary mb-1">SMP Cendekia</h6>
-                                        <small class="text-muted">Selasa, 7 Oktober 2025</small>
-                                    </div>
-                                    <span class="badge badge-success badge-lg">✅ Hadir</span>
-                                </div>
-
-                                <div class="attendance-time-row">
-                                    <div class="time-item">
-                                        <i class="fa-solid fa-right-to-bracket text-success"></i>
-                                        <div class="time-detail">
-                                            <small class="text-muted d-block">Jam Datang</small>
-                                            <strong class="text-dark">07:15 WIB</strong>
-                                        </div>
-                                    </div>
-                                    <div class="time-divider"></div>
-                                    <div class="time-item">
-                                        <i class="fa-solid fa-right-from-bracket text-danger"></i>
-                                        <div class="time-detail">
-                                            <small class="text-muted d-block">Jam Pulang</small>
-                                            <strong class="text-dark">15:30 WIB</strong>
+                                            <div class="attendance-time-row">
+                                                <div class="time-item">
+                                                    <i class="fa-solid fa-right-to-bracket text-success"></i>
+                                                    <div class="time-detail">
+                                                        <small class="text-muted d-block">Jam Datang</small>
+                                                        <strong class="text-dark">
+                                                            {{ $presensi->datang ? \Carbon\Carbon::parse($presensi->datanng)->format('H:i') . ' WIB' : '-- : --' }}
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                                <div class="time-divider"></div>
+                                                <div class="time-item">
+                                                    <i class="fa-solid fa-right-from-bracket text-danger"></i>
+                                                    <div class="time-detail">
+                                                        <small class="text-muted d-block">Jam Pulang</small>
+                                                        <strong
+                                                            class="{{ $presensi->pulang ? 'text-dark' : 'text-muted' }}">
+                                                            {{ $presensi->pulang ? \Carbon\Carbon::parse($presensi->pulang)->format('H:i') . ' WIB' : '-- : --' }}
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            @empty
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <i class="fa-solid fa-info-circle"></i> Belum ada presensi hari ini
+                                    </div>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -102,27 +95,33 @@
             <div class="col-12">
                 <h6 class="mb-3 font-weight-bold text-dark">Jadwal Hari Ini</h6>
             </div>
-
-            <!-- Jadwal 1: SD Harapan -->
-            <div class="col-12 mb-3">
-                <div class="card card-jadwal shadow-sm border-0">
-                    <div class="card-body p-3">
-                        <div class="row align-items-center">
-                            <div class="col-5">
-                                <h6 class="font-weight-bold text-dark mb-0">SD Harapan</h6>
-                            </div>
-                            <div class="col-7">
-                                <div class="row">
-                                    <div class="col-6 text-center">
-                                        <div class="time-box bg-success-light">
-                                            <small class="text-success d-block mb-1">Masuk</small>
-                                            <strong class="text-dark">07:00</strong>
+            @forelse($jadwalHariIni as $jadwal)
+                <div class="col-12 mb-3">
+                    <div class="card card-jadwal shadow-sm border-0">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-5">
+                                    <h6 class="font-weight-bold text-dark mb-0">
+                                        {{ $jadwal->instansi->nama_instansi ?? 'N/A' }}
+                                    </h6>
+                                </div>
+                                <div class="col-7">
+                                    <div class="row">
+                                        <div class="col-6 text-center">
+                                            <div class="time-box bg-success-light">
+                                                <small class="text-success d-block mb-1">Masuk</small>
+                                                <strong class="text-dark">
+                                                    {{ $jadwal->datang ? \Carbon\Carbon::parse($jadwal->datang)->format('H:i') : '--:--' }}
+                                                </strong>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-6 text-center">
-                                        <div class="time-box bg-danger-light">
-                                            <small class="text-danger d-block mb-1">Pulang</small>
-                                            <strong class="text-dark">12:00</strong>
+                                        <div class="col-6 text-center">
+                                            <div class="time-box bg-danger-light">
+                                                <small class="text-danger d-block mb-1">Pulang</small>
+                                                <strong class="text-dark">
+                                                    {{ $jadwal->pulang ? \Carbon\Carbon::parse($jadwal->pulang)->format('H:i') : '--:--' }}
+                                                </strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -130,7 +129,13 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            @empty
+                <div class="col-12 mb-3">
+                    <div class="alert alert-info">
+                        <i class="fa-solid fa-calendar-xmark"></i> Tidak ada jadwal untuk hari ini
+                    </div>
+                </div>
+            @endforelse
 
 
         </div>
@@ -143,71 +148,64 @@
                 <div class="card card-custom shadow-sm">
                     <div class="card-header">
                         <h6 class="font-weight-bold text-dark mb-0">
-                            <i class="fa-solid fa-clock-rotate-left text-primary"></i> Riwayat Absensi (5 Hari Terakhir)
+                            <i class="fa-solid fa-clock-rotate-left text-primary"></i> Riwayat Absensi
                         </h6>
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled history-list">
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>7 Okt</strong>
-                                    <small>Selasa</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SD Harapan</div>
-                                    <div class="history-status status-present">
-                                        <i class="fa-solid fa-circle-check"></i> Hadir
+                            @forelse($presensiMingguIni->groupBy('tanggal') as $tanggal => $presensiPerHari)
+                                <li class="history-item">
+                                    <div class="history-date">
+                                        <strong>{{ \Carbon\Carbon::parse($tanggal)->format('d M') }}</strong>
+                                        <small>{{ \Carbon\Carbon::parse($tanggal)->locale('id')->isoFormat('dddd') }}</small>
                                     </div>
-                                </div>
-                            </li>
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>6 Okt</strong>
-                                    <small>Senin</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SMP Cendekia</div>
-                                    <div class="history-status status-present">
-                                        <i class="fa-solid fa-circle-check"></i> Hadir
+                                    <div class="history-detail">
+                                        <div class="history-location">
+                                            {{-- Gabungkan nama instansi dengan separator " - " --}}
+                                            {{ $presensiPerHari->pluck('instansi.nama_instansi')->filter()->implode(' - ') }}
+                                        </div>
+
+                                        {{-- Tentukan status berdasarkan semua presensi di hari itu --}}
+                                        @php
+                                            $semuaHadir = $presensiPerHari->every(fn($p) => $p->datang && $p->pulang);
+                                            $adaIzin = $presensiPerHari->contains(
+                                                fn($p) => $p->keterangan == 'izin' || $p->status == 'izin',
+                                            );
+                                            $adaBelumPulang = $presensiPerHari->contains(
+                                                fn($p) => $p->datang && !$p->pulang,
+                                            );
+                                            $semuaAlpha = $presensiPerHari->every(fn($p) => !$p->datang);
+                                        @endphp
+
+                                        @if ($semuaHadir)
+                                            <div class="history-status status-present">
+                                                <i class="fa-solid fa-circle-check"></i> Hadir
+                                            </div>
+                                        @elseif($adaIzin)
+                                            <div class="history-status status-leave">
+                                                <i class="fa-solid fa-file-lines"></i> Izin
+                                            </div>
+                                        @elseif($adaBelumPulang)
+                                            <div class="history-status status-leave">
+                                                <i class="fa-solid fa-clock"></i> Belum Pulang
+                                            </div>
+                                        @elseif($semuaAlpha)
+                                            <div class="history-status status-absent">
+                                                <i class="fa-solid fa-circle-xmark"></i> Alpha
+                                            </div>
+                                        @else
+                                            <div class="history-status status-leave">
+                                                <i class="fa-solid fa-clock"></i> Sebagian Hadir
+                                            </div>
+                                        @endif
                                     </div>
-                                </div>
-                            </li>
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>5 Okt</strong>
-                                    <small>Minggu</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SD Harapan</div>
-                                    <div class="history-status status-leave">
-                                        <i class="fa-solid fa-file-lines"></i> Izin
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>4 Okt</strong>
-                                    <small>Sabtu</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SMP Cendekia</div>
-                                    <div class="history-status status-present">
-                                        <i class="fa-solid fa-circle-check"></i> Hadir
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="history-item">
-                                <div class="history-date">
-                                    <strong>3 Okt</strong>
-                                    <small>Jumat</small>
-                                </div>
-                                <div class="history-detail">
-                                    <div class="history-location">SD Harapan</div>
-                                    <div class="history-status status-absent">
-                                        <i class="fa-solid fa-circle-xmark"></i> Alpha
-                                    </div>
-                                </div>
-                            </li>
+                                </li>
+                            @empty
+                                <li class="text-center text-muted py-4">
+                                    <i class="fa-solid fa-inbox"></i><br>
+                                    Belum ada riwayat presensi minggu ini
+                                </li>
+                            @endforelse
                         </ul>
                     </div>
                 </div>

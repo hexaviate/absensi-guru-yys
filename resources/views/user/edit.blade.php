@@ -63,14 +63,16 @@
                                         <div>
                                             <small class="d-block">Foto Sebelumnya:</small>
                                             <img src="{{ asset('foto_presensi/' . $user->foto_presensi) }}" alt="Foto Lama"
-                                                 style="object-fit: cover; height: 120px; width: 120px;" class="rounded border mr-4">
+                                                style="object-fit: cover; height: 120px; width: 120px;"
+                                                class="rounded border mr-4">
                                         </div>
                                     @endif
 
                                     <div>
                                         <small class="d-block">Foto Baru:</small>
                                         <img id="preview_foto" src="#" alt="Preview Foto"
-                                            class="rounded border d-none"  style="object-fit: cover; height: 120px; width: 120px;">
+                                            class="rounded border d-none"
+                                            style="object-fit: cover; height: 120px; width: 120px;">
                                     </div>
                                 </div>
                             </div>
@@ -85,13 +87,13 @@
                         <!-- role & instansi -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Role</label>
+                                <label class="form-label">Peran <span class="text-danger">*</span></label>
                                 <div class="selectgroup selectgroup-pills">
                                     @forelse ($role as $item)
                                         <label class="selectgroup-item">
-                                            <input type="checkbox" name="role_id[]" value="{{ $item->id }}"
-                                                class="selectgroup-input"
-                                                {{ in_array($item->id, old('role_id', $userRoles ?? [])) ? 'checked' : '' }}>
+                                            <input type="radio" name="role_id" value="{{ $item->id }}"
+                                                data-role-name="{{ $item->name }}" class="selectgroup-input role-radio"
+                                                {{ old('role_id', $user->roles->first()->id ?? '') == $item->id ? 'checked' : '' }}>
                                             <span class="selectgroup-button">{{ $item->name }}</span>
                                         </label>
                                     @empty
@@ -102,14 +104,19 @@
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Instansi</label>
-                                <div class="selectgroup selectgroup-pills">
+                                <div class="form-group">
                                     @forelse ($instansi as $item)
-                                        <label class="selectgroup-item">
-                                            <input type="checkbox" name="instansi_id[]" value="{{ $item->id }}"
-                                                class="selectgroup-input"
-                                                {{ in_array($item->id, old('instansi_id', $userInstansi ?? [])) ? 'checked' : '' }}>
-                                            <span class="selectgroup-button">{{ $item->nama_instansi }}</span>
-                                        </label>
+                                        <div class="form-check form-check-inline instansi-item"
+                                            data-instansi-name="{{ strtolower($item->nama_instansi) }}"
+                                            data-instansi-id="{{ $item->id }}">
+                                            <input class="form-check-input instansi-checkbox" type="checkbox"
+                                                id="instansi_{{ $item->id }}" name="instansi_id[]"
+                                                value="{{ $item->id }}"
+                                                {{ in_array($item->id, old('instansi_id', $user->instansi->pluck('id')->toArray())) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="instansi_{{ $item->id }}">
+                                                {{ $item->nama_instansi }}
+                                            </label>
+                                        </div>
                                     @empty
                                         <p class="text-muted mb-0">Tidak ada instansi</p>
                                     @endforelse
@@ -146,6 +153,145 @@
                 preview.src = '#';
                 preview.classList.add('d-none');
             }
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function() {
+
+            // Fungsi untuk filter dan validasi instansi berdasarkan role
+            function filterInstansiByRole() {
+                var selectedRole = $('.role-radio:checked').data('role-name');
+                var roleName = selectedRole ? selectedRole.toLowerCase() : '';
+
+                // Reset semua instansi
+                $('.instansi-item').show();
+                $('.instansi-checkbox').prop('disabled', false);
+
+                if (!roleName) {
+                    // Jika belum pilih role, disable semua instansi
+                    $('.instansi-checkbox').prop('disabled', true);
+                    return;
+                }
+
+                // ROLE: Admin Yayasan - Tampil semua instansi
+                if (roleName === 'admin_yayasan' || roleName === 'admin yayasan') {
+                    // Tampilkan semua
+                }
+
+                // ROLE: Operator Instansi - Maksimal 1 instansi, kecuali Puspela
+                else if (roleName === 'operator_instansi' || roleName === 'operator instansi') {
+                    // Sembunyikan Puspela
+                    $('.instansi-item').each(function() {
+                        var instansiName = $(this).data('instansi-name');
+                        if (instansiName.includes('puspela')) {
+                            $(this).hide();
+                            $(this).find('.instansi-checkbox').prop('checked', false);
+                        }
+                    });
+
+                    // Validasi maksimal 1 checkbox
+                    validateMaxInstansi(1);
+                }
+
+                // ROLE: Tenaga Pendidik - Semua kecuali Puspela
+                else if (roleName === 'tenaga_pendidik' || roleName === 'tenaga pendidik') {
+                    // Sembunyikan Puspela
+                    $('.instansi-item').each(function() {
+                        var instansiName = $(this).data('instansi-name');
+                        if (instansiName.includes('puspela')) {
+                            $(this).hide();
+                            $(this).find('.instansi-checkbox').prop('checked', false);
+                        }
+                    });
+                }
+
+                // ROLE: Tenaga Kependidikan - Maksimal 1, kecuali Puspela
+                else if (roleName === 'tenaga_kependidikan' || roleName === 'tenaga kependidikan') {
+                    // Sembunyikan Puspela
+                    $('.instansi-item').each(function() {
+                        var instansiName = $(this).data('instansi-name');
+                        if (instansiName.includes('puspela')) {
+                            $(this).hide();
+                            $(this).find('.instansi-checkbox').prop('checked', false);
+                        }
+                    });
+
+                    // Validasi maksimal 1 checkbox
+                    validateMaxInstansi(1);
+                }
+            }
+
+            // Fungsi validasi maksimal instansi
+            function validateMaxInstansi(maxCount) {
+                // Unbind dulu untuk avoid multiple binding
+                $('.instansi-checkbox').off('change.maxValidation');
+
+                $('.instansi-checkbox').on('change.maxValidation', function() {
+                    var checkedCount = $('.instansi-checkbox:checked:visible').length;
+
+                    if (checkedCount >= maxCount) {
+                        // Disable checkbox yang belum dicentang
+                        $('.instansi-checkbox:not(:checked):visible').prop('disabled', true);
+                    } else {
+                        // Enable semua checkbox yang visible
+                        $('.instansi-checkbox:visible').prop('disabled', false);
+                    }
+                });
+
+                // Trigger validation saat pertama load
+                $('.instansi-checkbox').trigger('change.maxValidation');
+            }
+
+            // Event ketika role dipilih
+            $('.role-radio').on('change', function() {
+                // Uncheck semua instansi saat ganti role
+                $('.instansi-checkbox').prop('checked', false);
+
+                // Filter instansi berdasarkan role
+                filterInstansiByRole();
+            });
+
+            // Jalankan filter saat pertama kali load (untuk data existing)
+            if ($('.role-radio:checked').length > 0) {
+                filterInstansiByRole();
+            } else {
+                // Disable instansi jika belum pilih role
+                $('.instansi-checkbox').prop('disabled', true);
+            }
+
+            // Validasi form submit
+            $('form').on('submit', function(e) {
+                var selectedRole = $('.role-radio:checked').data('role-name');
+                var roleName = selectedRole ? selectedRole.toLowerCase() : '';
+                var checkedInstansi = $('.instansi-checkbox:checked:visible').length;
+
+                // Validasi role harus dipilih
+                if (!roleName) {
+                    e.preventDefault();
+                    alert('Silakan pilih peran terlebih dahulu!');
+                    return false;
+                }
+
+                // Validasi instansi harus dipilih (kecuali admin yayasan yang bisa kosong)
+                if (checkedInstansi === 0 && roleName !== 'admin_yayasan' && roleName !== 'admin yayasan') {
+                    e.preventDefault();
+                    alert('Silakan pilih minimal 1 instansi!');
+                    return false;
+                }
+
+                // Validasi maksimal 1 instansi untuk Operator Instansi dan Tenaga Kependidikan
+                if ((roleName === 'operator_instansi' || roleName === 'operator instansi' ||
+                        roleName === 'tenaga_kependidikan' || roleName === 'tenaga kependidikan') &&
+                    checkedInstansi > 1) {
+                    e.preventDefault();
+                    alert('Maksimal memilih 1 instansi untuk peran ' + selectedRole + '!');
+                    return false;
+                }
+
+                return true;
+            });
         });
     </script>
 @endpush

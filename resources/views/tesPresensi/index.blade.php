@@ -306,10 +306,10 @@
                         </h6>
 
                         <!-- Info Presensi -->
-                        <small class="text-muted" id="info-presensi">
+                        {{-- <small class="text-muted" id="info-presensi">
                             <i class="fas fa-info-circle me-1"></i>
                             Anda Sudah Absensi (datang / pulang) Hari Ini
-                        </small>
+                        </small> --}}
 
                         <!-- lokasi -->
                         <div class="p-3 text-center mb-2">

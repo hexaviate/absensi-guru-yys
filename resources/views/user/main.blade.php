@@ -9,62 +9,75 @@
             </div>
         </div>
 
-        <div class="section-body">
-            <div class="shadow pb-2">
-                <a href="{{ route('user.create') }}" class="btn btn-primary m-2 shadow">Tambah Data User</a>
-            </div>
+        {{-- DATA USER UNTUK ADMIN YAYASAN --}}
 
-            <div class="row">
-                <div class="col-12">
-                    <div class="card shadow">
-                        <div class="card-header">
-                            <h4>Data User</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-md" id="example">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Name</th>
-                                            <th>No Telephone</th>
-                                            <th>Username</th>
-                                            <th>Foto Presensi</th>
-                                            <th>Foto</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+        @hasanyrole('admin_yayasan')
 
-                                        @forelse ($user as $item)
+            <div class="section-body">
+                <div class="shadow pb-2">
+                    <a href="{{ route('user.create') }}" class="btn btn-primary m-2 shadow">Tambah Data User</a>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header">
+                                <h4>Data User</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-md" id="example">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $item->name }}</td>
-                                                <td>{{ $item->telp }}</td>
-                                                <td>{{ $item->username }}</td>
-                                                <td>{{ $item->foto_presensi }}</td>
-                                                <td>{{ $item->foto }}</td>
-                                                <td class="d-flex">
-                                                    <a class="btn btn-warning mx-1"
-                                                        href="{{ route('user.edit', $item->id) }}">Edit</a>
-                                                    <form action="{{ route('user.destroy', $item->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button class="btn btn-danger mx-1">Hapus</button>
-                                                    </form>
-                                                </td>
+                                                <th>No</th>
+                                                <th>Name</th>
+                                                <th>No Telephone</th>
+                                                <th>Username</th>
+                                                <th>Foto Presensi</th>
+                                                <th>Foto</th>
+                                                <th>Action</th>
                                             </tr>
-                                        @empty
-                                            <p>Data Users Kosong, Perlu di Isi</p>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+
+                                            @forelse ($user as $item)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $item->name }}</td>
+                                                    <td>{{ $item->telp }}</td>
+                                                    <td>{{ $item->username }}</td>
+                                                    <td>{{ $item->foto_presensi }}</td>
+                                                    <td>{{ $item->foto }}</td>
+                                                    <td class="d-flex">
+                                                        <a class="btn btn-warning mx-1"
+                                                            href="{{ route('user.edit', $item->id) }}">Edit</a>
+                                                        <form action="{{ route('user.destroy', $item->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('delete')
+                                                            <button class="btn btn-danger mx-1">Hapus</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <p>Data Users Kosong, Perlu di Isi</p>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+        @endhasrole
+
+        {{-- END UNTUK ADMIN YAYASAN --}}
+
+        @hasanyrole('operator_instansi')
+
+        <h1>ini operator uinsat</h1>
+        @endhasrole
     </section>
 @endsection
 

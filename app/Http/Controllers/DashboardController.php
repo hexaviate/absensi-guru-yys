@@ -72,7 +72,6 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-
         if (!$user) {
             return redirect()->route('login')->with('error', "anda belum login");
         }
@@ -84,9 +83,8 @@ class DashboardController extends Controller
             Carbon::now()->startOfWeek(),
             Carbon::now()->endOfWeek()
         ])->get();
-        $instansi = $user->instansi->get();
-        return view('dashboard.user', compact('presensiHariIni', 'jadwalHariIni', 'instansi', 'izinBulanIni'));
+        $instansi = $user->instansi()->get();
+
+        return view('dashboard.user', compact('presensiHariIni', 'jadwalHariIni', 'instansi', 'izinBulanIni', 'presensiMingguIni'));
     }
 }
-
-// ini dari dsaya

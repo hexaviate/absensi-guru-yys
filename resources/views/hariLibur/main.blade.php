@@ -12,14 +12,14 @@
 
         <div class="section-body">
             <div class="shadow pb-2">
-                <a href="{{ route('hariLibur.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Instansi</a>
+                <a href="{{ route('hariLibur.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Hari Libur</a>
             </div>
 
             <div class="row">
                 <div class="col-12">
                     <div class="card shadow">
                         <div class="card-header">
-                            <h4>Data Instansi</h4>
+                            <h4>Data Hari Libur</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -55,7 +55,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center">Data Instansi Kosong</td>
+                                                <td colspan="7" class="text-center">Data HAri Libur Kosong</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
