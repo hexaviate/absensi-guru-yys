@@ -1,5 +1,3 @@
-Isi rekap_absensi.blade.php no error:
-
 @extends('layout.main')
 @section('main')
     <section class="section">
@@ -22,26 +20,36 @@ Isi rekap_absensi.blade.php no error:
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-control">
                                     <option value="">-- Semua Status --</option>
-                                    <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir</option>
+                                    <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir
+                                    </option>
                                     <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin</option>
                                 </select>
                             </div>
 
-                            <div class="col-md-4 col-lg-3 mb-3">
-                                <label class="form-label">Instansi</label>
-                                <select name="instansi" class="form-control">
-                                    <option value="">-- Semua Instansi --</option>
-                                    @foreach ($instansi as $i)
-                                        <option value="{{ $i->id }}" {{ request('instansi') == $i->id ? 'selected' : '' }}>
-                                            {{ $i->nama_instansi }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            @hasrole('admin_yayasan')
+                                <div class="col-md-4 col-lg-3 mb-3">
+                                    <label class="form-label">Instansi</label>
+                                    <select name="instansi" class="form-control">
+                                        <option value="">-- Semua Instansi --</option>
+                                        @foreach ($instansi as $i)
+                                            <option value="{{ $i->id }}"
+                                                {{ request('instansi') == $i->id ? 'selected' : '' }}>
+                                                {{ $i->nama_instansi }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endhasrole
+
+                            @hasrole('operator_instansi')
+                                <input type="hidden" name="instansi" value="{{ $user->instansi()->first()->id ?? '' }}">
+                            @endhasrole
+
 
                             <div class="col-md-4 col-lg-3 mb-3">
                                 <label class="form-label">Tanggal hari ini</label>
-                                <input type="date" name="tanggal" class="form-control" value="{{ request('tanggal', now()->toDateString()) }}">
+                                <input type="date" name="tanggal" class="form-control"
+                                    value="{{ request('tanggal', now()->toDateString()) }}">
                             </div>
                         </div>
 
@@ -54,10 +62,12 @@ Isi rekap_absensi.blade.php no error:
                                     <a href="{{ route('rekap_absensi.index') }}" class="btn btn-secondary mb-2 mb-sm-0">
                                         <i class="fas fa-redo"></i> Reset
                                     </a>
-                                    <button type="button" class="btn btn-danger mb-2 mb-sm-0" onclick="submitForm('{{ route('rekap_absensi.exportPDF') }}')">
+                                    <button type="button" class="btn btn-danger mb-2 mb-sm-0"
+                                        onclick="submitForm('{{ route('rekap_absensi.exportPDF') }}')">
                                         <i class="fas fa-file-pdf"></i> Export PDF
                                     </button>
-                                    <button type="button" class="btn btn-success mb-2 mb-sm-0" onclick="submitForm('{{ route('rekap_absensi.exportExcel') }}')">
+                                    <button type="button" class="btn btn-success mb-2 mb-sm-0"
+                                        onclick="submitForm('{{ route('rekap_absensi.exportExcel') }}')">
                                         <i class="fas fa-file-excel"></i> Export Excel
                                     </button>
                                 </div>
@@ -75,31 +85,42 @@ Isi rekap_absensi.blade.php no error:
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-control">
                                     <option value="">-- Semua Status --</option>
-                                    <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir</option>
-                                    <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin</option>
+                                    <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir
+                                    </option>
+                                    <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin
+                                    </option>
                                 </select>
                             </div>
 
-                            <div class="col-md-6 col-lg-3 mb-3">
-                                <label class="form-label">Instansi</label>
-                                <select name="instansi" class="form-control">
-                                    <option value="">-- Semua Instansi --</option>
-                                    @foreach ($instansi as $i)
-                                        <option value="{{ $i->id }}" {{ request('instansi') == $i->id ? 'selected' : '' }}>
-                                            {{ $i->nama_instansi }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            @hasrole('admin_yayasan')
+                                <div class="col-md-4 col-lg-3 mb-3">
+                                    <label class="form-label">Instansi</label>
+                                    <select name="instansi" class="form-control">
+                                        <option value="">-- Semua Instansi --</option>
+                                        @foreach ($instansi as $i)
+                                            <option value="{{ $i->id }}"
+                                                {{ request('instansi') == $i->id ? 'selected' : '' }}>
+                                                {{ $i->nama_instansi }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endhasrole
+
+                            @hasrole('operator_instansi')
+                                <input type="hidden" name="instansi" value="{{ $user->instansi()->first()->id ?? '' }}">
+                            @endhasrole
 
                             <div class="col-md-6 col-lg-3 mb-3">
                                 <label class="form-label">Dari Tanggal</label>
-                                <input type="date" name="dari_tanggal" class="form-control" value="{{ request('dari_tanggal') }}">
+                                <input type="date" name="dari_tanggal" class="form-control"
+                                    value="{{ request('dari_tanggal') }}">
                             </div>
 
                             <div class="col-md-6 col-lg-3 mb-3">
                                 <label class="form-label">Sampai Tanggal</label>
-                                <input type="date" name="sampai_tanggal" class="form-control" value="{{ request('sampai_tanggal') }}">
+                                <input type="date" name="sampai_tanggal" class="form-control"
+                                    value="{{ request('sampai_tanggal') }}">
                             </div>
                         </div>
 
@@ -112,10 +133,12 @@ Isi rekap_absensi.blade.php no error:
                                     <a href="{{ route('rekap_absensi.index') }}" class="btn btn-secondary mb-2 mb-sm-0">
                                         <i class="fas fa-redo"></i> Reset
                                     </a>
-                                    <button type="button" class="btn btn-danger mb-2 mb-sm-0" onclick="submitFormBulanan('{{ route('rekap_absensi.exportPDFBulanan') }}')">
+                                    <button type="button" class="btn btn-danger mb-2 mb-sm-0"
+                                        onclick="submitFormBulanan('{{ route('rekap_absensi.exportPDFBulanan') }}')">
                                         <i class="fas fa-file-pdf"></i> Export PDF
                                     </button>
-                                    <button type="button" class="btn btn-success mb-2 mb-sm-0" onclick="submitFormBulanan('{{ route('rekap_absensi.exportExcelBulanan') }}')">
+                                    <button type="button" class="btn btn-success mb-2 mb-sm-0"
+                                        onclick="submitFormBulanan('{{ route('rekap_absensi.exportExcelBulanan') }}')">
                                         <i class="fas fa-file-excel"></i> Export Excel
                                     </button>
                                 </div>
@@ -133,29 +156,39 @@ Isi rekap_absensi.blade.php no error:
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-control">
                                     <option value="">-- Semua Status --</option>
-                                    <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir</option>
-                                    <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin</option>
+                                    <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir
+                                    </option>
+                                    <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin
+                                    </option>
                                 </select>
                             </div>
 
-                            <div class="col-md-4 col-lg-3 mb-3">
-                                <label class="form-label">Instansi</label>
-                                <select name="instansi" class="form-control">
-                                    <option value="">-- Semua Instansi --</option>
-                                    @foreach ($instansi as $i)
-                                        <option value="{{ $i->id }}" {{ request('instansi') == $i->id ? 'selected' : '' }}>
-                                            {{ $i->nama_instansi }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            @hasrole('admin_yayasan')
+                                <div class="col-md-4 col-lg-3 mb-3">
+                                    <label class="form-label">Instansi</label>
+                                    <select name="instansi" class="form-control">
+                                        <option value="">-- Semua Instansi --</option>
+                                        @foreach ($instansi as $i)
+                                            <option value="{{ $i->id }}"
+                                                {{ request('instansi') == $i->id ? 'selected' : '' }}>
+                                                {{ $i->nama_instansi }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endhasrole
+
+                            @hasrole('operator_instansi')
+                                <input type="hidden" name="instansi" value="{{ $user->instansi()->first()->id ?? '' }}">
+                            @endhasrole
 
                             <div class="col-md-4 col-lg-3 mb-3">
                                 <label class="form-label">Tahun Ajaran</label>
                                 <select name="tahun_ajaran" class="form-control">
                                     <option value="">-- Semua Tahun Ajaran --</option>
                                     @foreach ($tapels as $tapel)
-                                        <option value="{{ $tapel->id }}" {{ request('tahun_ajaran') == $tapel->id ? 'selected' : '' }}>
+                                        <option value="{{ $tapel->id }}"
+                                            {{ request('tahun_ajaran') == $tapel->id ? 'selected' : '' }}>
                                             {{ $tapel->kode }}
                                         </option>
                                     @endforeach
@@ -172,10 +205,12 @@ Isi rekap_absensi.blade.php no error:
                                     <a href="{{ route('rekap_absensi.index') }}" class="btn btn-secondary mb-2 mb-sm-0">
                                         <i class="fas fa-redo"></i> Reset
                                     </a>
-                                    <button type="button" class="btn btn-danger mb-2 mb-sm-0" onclick="submitFormTahunan('{{ route('rekap_absensi.exportPDFTahunan') }}')">
+                                    <button type="button" class="btn btn-danger mb-2 mb-sm-0"
+                                        onclick="submitFormTahunan('{{ route('rekap_absensi.exportPDFTahunan') }}')">
                                         <i class="fas fa-file-pdf"></i> Export PDF
                                     </button>
-                                    <button type="button" class="btn btn-success mb-2 mb-sm-0" onclick="submitFormTahunan('{{ route('rekap_absensi.exportExcelTahunan') }}')">
+                                    <button type="button" class="btn btn-success mb-2 mb-sm-0"
+                                        onclick="submitFormTahunan('{{ route('rekap_absensi.exportExcelTahunan') }}')">
                                         <i class="fas fa-file-excel"></i> Export Excel
                                     </button>
                                 </div>
@@ -210,34 +245,37 @@ Isi rekap_absensi.blade.php no error:
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse ($presensi as $item)
+                                        @if ($presensi->count() > 0)
+                                            @foreach ($presensi as $item)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d-M-Y') }}</td>
+                                                    <td>{{ $item->user->name ?? '-' }}</td>
+                                                    <td>{{ $item->instansi->nama_instansi ?? '-' }}</td>
+                                                    <td>{{ $item->datang ?? '-' }}</td>
+                                                    <td>{{ $item->pulang ?? '-' }}</td>
+                                                    <td>
+                                                        <span
+                                                            class="badge @if ($item->status == 'hadir') bg-success @elseif($item->status == 'izin') bg-warning text-dark @else bg-danger @endif">
+                                                            {{ ucfirst($item->status) }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @if ($item->status == 'hadir')
+                                                            <i class="fas fa-times text-danger"></i>
+                                                        @else
+                                                            <i class="fas fa-check text-success"></i>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $item->akurasi ?? '0' }}%</td>
+                                                    <td>{{ $item->userAgent ?? '-' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @else
                                             <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d-M-Y') }}</td>
-                                                <td>{{ $item->user->name }}</td>
-                                                <td>{{ $item->instansi->nama_instansi }}</td>
-                                                <td>{{ $item->datang }}</td>
-                                                <td>{{ $item->pulang }}</td>
-                                                <td>
-                                                    <span class="badge @if ($item->status == 'hadir') bg-success @elseif($item->status == 'izin') bg-warning text-dark @else bg-danger @endif">
-                                                        {{ ucfirst($item->status) }}
-                                                    </span>
-                                                </td>
-                                                <td class="text-center">
-                                                    @if ($item->status == 'hadir')
-                                                        <i class="fas fa-times text-danger"></i>
-                                                    @else
-                                                        <i class="fas fa-check text-success"></i>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $item->akurasi }}%</td>
-                                                <td>{{ $item->userAgent }}</td>
+                                                <td colspan="10" class="text-center">Data Kosong</td>
                                             </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="10" class="text-center">Data Users Kosong, Perlu di Isi</td>
-                                            </tr>
-                                        @endforelse
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -252,7 +290,6 @@ Isi rekap_absensi.blade.php no error:
 @push('style')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <style>
-        /* Custom responsive button styling */
         .btn-group-responsive {
             gap: 0.5rem;
         }
@@ -275,14 +312,9 @@ Isi rekap_absensi.blade.php no error:
 @push('script')
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
-        // Fungsi untuk form harian
         function submitForm(action) {
-            console.log('Submitting to:', action);
             const form = document.getElementById('laporan-harian-form');
-            if (!form) {
-                console.error('Form not found!');
-                return;
-            }
+            if (!form) return;
 
             const exportForm = document.createElement('form');
             exportForm.method = 'GET';
@@ -301,20 +333,12 @@ Isi rekap_absensi.blade.php no error:
 
             document.body.appendChild(exportForm);
             exportForm.submit();
-
-            setTimeout(() => {
-                document.body.removeChild(exportForm);
-            }, 1000);
+            setTimeout(() => document.body.removeChild(exportForm), 1000);
         }
 
-        // Fungsi untuk form bulanan
         function submitFormBulanan(action) {
-            console.log('Submitting bulanan to:', action);
             const form = document.getElementById('laporan-bulanan-form');
-            if (!form) {
-                console.error('Form bulanan not found!');
-                return;
-            }
+            if (!form) return;
 
             const exportForm = document.createElement('form');
             exportForm.method = 'GET';
@@ -333,20 +357,12 @@ Isi rekap_absensi.blade.php no error:
 
             document.body.appendChild(exportForm);
             exportForm.submit();
-
-            setTimeout(() => {
-                document.body.removeChild(exportForm);
-            }, 1000);
+            setTimeout(() => document.body.removeChild(exportForm), 1000);
         }
 
-        // Fungsi untuk form tahunan
         function submitFormTahunan(action) {
-            console.log('Submitting tahunan to:', action);
             const form = document.getElementById('laporan-tahunan-form');
-            if (!form) {
-                console.error('Form tahunan not found!');
-                return;
-            }
+            if (!form) return;
 
             const exportForm = document.createElement('form');
             exportForm.method = 'GET';
@@ -365,14 +381,11 @@ Isi rekap_absensi.blade.php no error:
 
             document.body.appendChild(exportForm);
             exportForm.submit();
-
-            setTimeout(() => {
-                document.body.removeChild(exportForm);
-            }, 1000);
+            setTimeout(() => document.body.removeChild(exportForm), 1000);
         }
 
-        // Loading indicator untuk semua tombol export
         document.addEventListener('DOMContentLoaded', function() {
+            // Handler untuk tombol export
             const exportButtons = document.querySelectorAll(
                 '#laporan-harian-form .btn-danger, #laporan-harian-form .btn-success, ' +
                 '#laporan-bulanan-form .btn-danger, #laporan-bulanan-form .btn-success, ' +
@@ -392,19 +405,49 @@ Isi rekap_absensi.blade.php no error:
                 });
             });
 
-            // DataTable initialization
-            $('#example').DataTable({
-                "pagingType": "full_numbers",
-                "language": {
-                    "paginate": {
-                        "first": "<i class='fas fa-angle-double-left'></i>",
-                        "last": "<i class='fas fa-angle-double-right'></i>",
-                        "next": "<i class='fas fa-chevron-right'></i>",
-                        "previous": "<i class='fas fa-chevron-left'></i>"
-                    }
+            // Initialize DataTable dengan error handling
+            try {
+                // Cek apakah tabel sudah diinisialisasi
+                if ($.fn.DataTable.isDataTable('#example')) {
+                    $('#example').DataTable().destroy();
                 }
-            });
+
+                // Hitung jumlah kolom yang sebenarnya ada di thead
+                const columnCount = $('#example thead tr th').length;
+                console.log('Column count:', columnCount);
+
+                // Inisialisasi DataTable
+                $('#example').DataTable({
+                    "pagingType": "full_numbers",
+                    "language": {
+                        "paginate": {
+                            "first": "<i class='fas fa-angle-double-left'></i>",
+                            "last": "<i class='fas fa-angle-double-right'></i>",
+                            "next": "<i class='fas fa-chevron-right'></i>",
+                            "previous": "<i class='fas fa-chevron-left'></i>"
+                        },
+                        "emptyTable": "Data Kosong",
+                        "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                        "infoEmpty": "Menampilkan 0 sampai 0 dari 0 data",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "lengthMenu": "Tampilkan _MENU_ data",
+                        "search": "Cari:",
+                        "zeroRecords": "Data tidak ditemukan"
+                    },
+                    "order": [
+                        [1, "desc"]
+                    ], // Sort by tanggal (kolom ke-2)
+                    "columnDefs": [{
+                            "orderable": false,
+                            "targets": [7]
+                        } // Bukti Izin tidak bisa disort
+                    ]
+                });
+
+                console.log('DataTable initialized successfully');
+            } catch (error) {
+                console.error('Error initializing DataTable:', error);
+            }
         });
     </script>
 @endpush
-
