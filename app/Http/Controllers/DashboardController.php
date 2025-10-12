@@ -72,6 +72,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
+
         if (!$user) {
             return redirect()->route('login')->with('error', "anda belum login");
         }
