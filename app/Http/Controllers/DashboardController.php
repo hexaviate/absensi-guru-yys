@@ -48,24 +48,22 @@ class DashboardController extends Controller
             return redirect()->route('login')->with('error', "anda belum login");
         }
 
-        // if (!$user->role == 'operator_instansi') {
-        //     return redirect()->route('login')->with('error', "anda tidak punya akses");
-        // }
+        if (!$user->hasRole('admin_yayasan')) {
+            return redirect()->route('login')->with('error', "anda tidak punya akses");
+        }
 
         //Total guru setiap instansi
         $totalGuruPerInstansi = Instansi::withCount('user')->get();
-
-
-
-        // $totalGuruInstansi = User::where('instansi_id', $instansi->id)->count();
+        // total seluruh guru di yayasan
         $totalSemuaGuru = User::with('instansi')->count();
-        // dd(User::with('instansi')->count());
+        //total guru yang hadir hari ini (dilimit 5 data)
         $guruHadirHariIni = Presensi::where('status', 'hadir')->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
+        //total semua guru yang hadir hari ini
         $totalGuruHadirHariIni = Presensi::where('status', 'hadir')->where('tanggal', today()->toDateString())->latest()->count();
-        // dd($guruHadirHariIni);
+        //total guru yang izin hari ini
         $totalGuruIzin = Izin::where('status', 'diterima')->whereDate('created_at', today())->count();
 
-        return view('dashboard.yys', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruPerInstansi', 'totalSemuaGuru'));
+        return view('dashboard.yys', compact('guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruPerInstansi', 'totalSemuaGuru'));
     }
 
     public function userDashboard()

@@ -46,7 +46,7 @@ class TapelController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            "kode" => "required"
+            "kode" => "required|unique:tapels,kode"
         ]);
 
         if ($validate->fails()) {
@@ -54,9 +54,10 @@ class TapelController extends Controller
         }
 
         $tapelAktif = Tapel::where('status', 'aktif')->first();
-        $tapelAktif->update([
-            "status" => "tidak_aktif"
-        ]);
+
+        if ($tapelAktif) {
+            Tapel::where('status', 'aktif')->update(['status' => 'tidak_aktif']);
+        }
 
         Tapel::create([
             "kode" => $request->kode,
