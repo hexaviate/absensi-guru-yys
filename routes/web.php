@@ -44,11 +44,14 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
 
     Route::resource('user', UsersController::class);
+    Route::get('/users/data', [UsersController::class, 'getUsers'])->name('users.data');
     Route::resource('role', RoleController::class);
     Route::resource('instansi', InstansiController::class);
     Route::resource('tapel', TapelController::class);
     Route::resource('hariLibur', HariLiburController::class);
     Route::resource('jadwal', JadwalController::class);
+
+
 
 
     Route::controller(ProfileController::class)->group(function () {

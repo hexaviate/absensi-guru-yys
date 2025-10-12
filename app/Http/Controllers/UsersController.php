@@ -11,6 +11,7 @@ use Spatie\Permission\Models\Role;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\AutoEncoder;
+use Yajra\DataTables\Facades\DataTables;
 
 class UsersController extends Controller
 {
@@ -26,19 +27,33 @@ class UsersController extends Controller
         $user = User::all();
         $role = Role::all();
 
-        // if ($user->hasRole('admin_yayasan')) {
-        //     // hanya tampilkan PUSPELA
-        //     $instansi = Instansi::where('nama_instansi', 'PUSPELA')->get();
-        // } elseif ($user->hasAnyRole(['operator_instansi', 'tenaga_pendidik', 'tenaga_kependidikan'])) {
-        //     // tampilkan semua instansi kecuali PUSPELA
-        //     $instansi = Instansi::where('nama_instansi', '!=', 'PUSPELA')->get();
-        // } else {
-        //     $instansi = Instansi::all();
-        // }
-
         $instansi = Instansi::all();
         return view('user.main', compact('user', 'role', 'instansi'));
     }
+
+
+    public function getUsers()
+    {
+        try {
+            $query = User::with(['roles', 'instansi'])->select('users.*');
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('role', function ($row) {
+                    return $row->roles ? $row->roles->pluck('name')->join(', ') : '-';
+                })
+                ->addColumn('instansi', function ($row) {
+                    return $row->instansi ? $row->instansi->nama_instansi : '-';
+                })
+                ->addColumn('action', function ($row) {
+                    return '<a href="' . route('users.edit', $row->id) . '" class="btn btn-sm btn-primary">Edit</a>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
+
 
     /**
      * Show the form for creating a new resource.
