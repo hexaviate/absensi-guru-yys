@@ -2,7 +2,7 @@
 @section('main')
     <section class="section">
         <div class="section-header" style="">
-            <h1>Tambah Role</h1>
+            <h1>Tambah Peran</h1>
             <div class="section-header-breadcrumb">
                 <div class="breadcrumb-item active"><a href="#">Peran</a></div>
                 <div class="breadcrumb-item">Dashboard</div>

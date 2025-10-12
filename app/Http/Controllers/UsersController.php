@@ -25,6 +25,17 @@ class UsersController extends Controller
         }
         $user = User::all();
         $role = Role::all();
+
+        // if ($user->hasRole('admin_yayasan')) {
+        //     // hanya tampilkan PUSPELA
+        //     $instansi = Instansi::where('nama_instansi', 'PUSPELA')->get();
+        // } elseif ($user->hasAnyRole(['operator_instansi', 'tenaga_pendidik', 'tenaga_kependidikan'])) {
+        //     // tampilkan semua instansi kecuali PUSPELA
+        //     $instansi = Instansi::where('nama_instansi', '!=', 'PUSPELA')->get();
+        // } else {
+        //     $instansi = Instansi::all();
+        // }
+
         $instansi = Instansi::all();
         return view('user.main', compact('user', 'role', 'instansi'));
     }
@@ -191,7 +202,7 @@ class UsersController extends Controller
                     unlink(public_path('foto/' . $target->foto_presensi));
                 }
 
-               $imageName = time() . '.' . $request->foto_presensi->extension();
+                $imageName = time() . '.' . $request->foto_presensi->extension();
 
                 $manager = ImageManager::withDriver(new Driver());
                 $image = $manager->read($request->file('foto_presensi'));
