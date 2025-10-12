@@ -4,7 +4,7 @@
         <div class="section-header" style="">
             <h1>Tambah Role</h1>
             <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item active"><a href="#">User</a></div>
+                <div class="breadcrumb-item active"><a href="#">Peran</a></div>
                 <div class="breadcrumb-item">Dashboard</div>
             </div>
         </div>
@@ -12,7 +12,7 @@
         <div class="section-body">
             <div class="card shadow-sm" style="">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Tambah Role</h5>
+                    <h5 class="mb-0">Tambah Peran</h5>
                 </div>
                 @if ($errors->any())
                     <div class="alert alert-danger">

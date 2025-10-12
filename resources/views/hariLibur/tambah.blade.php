@@ -4,7 +4,7 @@
         <div class="section-header">
             <h1>Tambah Libur</h1>
             <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item active"><a href="#">Libur</a></div>
+                <div class="breadcrumb-item active"><a href="#">Hari Libur</a></div>
                 <div class="breadcrumb-item">Dashboard</div>
             </div>
         </div>
@@ -18,7 +18,7 @@
         <div class="section-body">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Tambah Libur</h5>
+                    <h5 class="mb-0">Tambah Hari Libur</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('hariLibur.store') }}" method="POST">

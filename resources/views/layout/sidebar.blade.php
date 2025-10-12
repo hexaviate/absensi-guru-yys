@@ -52,24 +52,38 @@
                 <i class="fas fa-cogs"></i> <span>Management</span>
             </a>
             <ul class="dropdown-menu">
-                <li class="{{ Route::is('role.*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('role.index') }}">Management Peran</a>
-                </li>
-                <li class="{{ Route::is('user.*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('user.index') }}">Management User</a>
-                </li>
-                <li class="{{ Route::is('instansi.*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('instansi.index') }}">Management Instansi</a>
-                </li>
-                <li class="{{ Route::is('tapel.*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('tapel.index') }}">Management Kaldik</a>
-                </li>
-                <li class="{{ Route::is('jadwal.*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('jadwal.index') }}">Management Jadwal</a>
-                </li>
-                <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
-                </li>
+                {{-- menu untuk admin yayasan --}}
+                @if (auth()->user()->hasRole('admin_yayasan'))
+                    <li class="{{ Route::is('role.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('role.index') }}">Management Peran</a>
+                    </li>
+                    <li class="{{ Route::is('user.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('user.index') }}">Management User</a>
+                    </li>
+                    <li class="{{ Route::is('instansi.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('instansi.index') }}">Management Instansi</a>
+                    </li>
+                    <li class="{{ Route::is('tapel.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('tapel.index') }}">Management Kaldik</a>
+                    </li>
+                    <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
+                    </li>
+                @endif
+
+                {{-- menu untuk operator instansi --}}
+                @if (auth()->user()->hasRole('operator_instansi'))
+                    <li class="{{ Route::is('user.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('user.index') }}">Management User</a>
+                    </li>
+                    <li class="{{ Route::is('jadwal.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('jadwal.index') }}">Management Jadwal</a>
+                    </li>
+                    <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
+                    </li>
+                @endif
+
             </ul>
         </li>
     @endhasrole
@@ -105,25 +119,28 @@
         </ul>
     </li>
 
-    {{-- menu cek izin (operator/admin) --}}
-    <li class="dropdown {{ request()->is('izinIndexOperator') || request()->is('viewIzinVerify') ? 'active' : '' }}">
-        <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
-            <i class="fas fa-user-check"></i> <span>Verifikasi Izin</span>
-        </a>
-        <ul class="dropdown-menu">
-            <li class="{{ request()->routeIs('izinIndexOperator') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('izinIndexOperator') }}">Daftar Izin</a>
-            </li>
-        </ul>
-    </li>
+    @hasanyrole('admin_yayasan|operator_instansi')
+        {{-- menu cek izin (operator/admin) --}}
+        <li class="dropdown {{ request()->is('izinIndexOperator') || request()->is('viewIzinVerify') ? 'active' : '' }}">
+            <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+                <i class="fas fa-user-check"></i> <span>Verifikasi Izin</span>
+            </a>
+            <ul class="dropdown-menu">
+                <li class="{{ request()->routeIs('izinIndexOperator') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('izinIndexOperator') }}">Daftar Izin</a>
+                </li>
+            </ul>
+        </li>
+
+    @endhasrole
 
 
-     @hasanyrole('admin_yayasan|operator_instansi')
-    <li class="menu-header">RECAP</li>
+    @hasanyrole('admin_yayasan|operator_instansi')
+        <li class="menu-header">RECAP</li>
 
-    <li class="">
-        <a href="{{ route('rekap_absensi.index') }}" class="nav-link"><i class="fa fa-file"></i><span>Laporan
-                Absensi</span></a>
-    </li>
+        <li class="">
+            <a href="{{ route('rekap_absensi.index') }}" class="nav-link"><i class="fa fa-file"></i><span>Laporan
+                    Absensi</span></a>
+        </li>
 
     @endhasrole

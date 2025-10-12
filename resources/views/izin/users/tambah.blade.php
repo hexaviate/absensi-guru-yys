@@ -41,7 +41,7 @@
                                         @endif
 
                                         <label class="selectgroup-item">
-                                            <input type="radio" name="instansi_id[]" value="{{ $item->id }}"
+                                            <input type="checkbox" name="instansi_id[]" value="{{ $item->id }}"
                                                 class="selectgroup-input"
                                                 {{ old('instansi_id') == $item->id ? 'checked' : '' }}
                                                 {{ count($instansi) == 1 ? 'checked' : '' }}>

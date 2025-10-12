@@ -4,7 +4,7 @@
         <div class="section-header">
             <h1>Edit Absensi (Dummy)</h1>
             <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item active"><a href="#">Absensi</a></div>
+                <div class="breadcrumb-item active"><a href="#">Jadwal</a></div>
                 <div class="breadcrumb-item">Dashboard</div>
             </div>
         </div>
@@ -24,7 +24,7 @@
         <div class="section-body">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Form Edit Absensi</h5>
+                    <h5 class="mb-0">Form Edit Jadwal</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('jadwal.update', $jadwal->id) }}" method="POST">

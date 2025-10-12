@@ -12,7 +12,7 @@
 
         <div class="section-body">
             <div class="shadow pb-2">
-                <a href="{{ route('jadwal.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Instansi</a>
+                <a href="{{ route('jadwal.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Jadwal</a>
             </div>
 
             <div class="row">
@@ -59,7 +59,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center">Data Instansi Kosong</td>
+                                                <td colspan="7" class="text-center">Data Jadwal Kosong</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
