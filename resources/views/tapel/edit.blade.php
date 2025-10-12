@@ -27,8 +27,8 @@
                             <div class="col-md-4 mb-3">
                                 <label for="status" class="form-label">Status</label>
                                 <select class="form-control" id="status" name="status">
-                                    <option value="aktif" {{ $jadwal->hari == 'sabtu' ? 'aktif' : '' }}>Aktif</option>
-                                    <option value="tidak_aktif" {{ $jadwal->hari == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                                    <option value="aktif" {{ $tapel->hari == 'sabtu' ? 'aktif' : '' }}>Aktif</option>
+                                    <option value="tidak_aktif" {{ $tapel->hari == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif</option>
                                 </select>
                             </div>
                         </div>
