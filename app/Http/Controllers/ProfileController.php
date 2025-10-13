@@ -23,7 +23,7 @@ class ProfileController extends Controller
         // $ = $user->instansi()->get();
 
 
-        return view('profile.index', compact('user','instansiName','role'));
+        return view('profile.index', compact('user', 'instansiName', 'role'));
     }
 
     public function viewEditProfile(string $id)
@@ -67,7 +67,7 @@ class ProfileController extends Controller
             "foto" => $imageName
         ]);
 
-          return redirect()->route('viewProfile');
+        return redirect()->route('viewProfile');
     }
 
     public function viewJadwalMingguIni()
