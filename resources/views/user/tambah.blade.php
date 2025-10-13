@@ -12,7 +12,7 @@
         <div class="section-body">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Tambah User</h5>
+                    <h5 class="mb-0">Form Tambah User</h5>
                 </div>
                 <ul>
                     @foreach ($errors->all() as $error)
@@ -103,11 +103,11 @@
                                 </div>
                             </div>
 
-
-
-                            <div class="text-end">
-                                <button type="submit" class="btn btn-primary px-4">Simpan</button>
-                                <button class="btn btn-danger" type="reset">Reset</button>
+                            <div class="col-md-12 mb-3">
+                                <div class="d-flex justify-content-end" style="gap: 10px;">
+                                    <button type="submit" class="btn btn-primary px-4">Simpan</button>
+                                    <a href="{{ route('user.index') }}" class="btn btn-secondary">Batal</a>
+                                </div>
                             </div>
                     </form>
                 </div>

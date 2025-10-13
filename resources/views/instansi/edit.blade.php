@@ -17,8 +17,8 @@
 
         <div class="section-body">
             <div class="card shadow-sm">
-                <div class="card-header bg-warning text-white">
-                    <h5 class="mb-0">Edit Instansi</h5>
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Form Edit Instansi</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('instansi.update', $instansi->id) }}" method="POST">
@@ -77,8 +77,8 @@
                             </div>
                         </div>
 
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-warning px-4">Update</button>
+                        <div class="d-flex justify-content-end" style="gap: 10px;">
+                            <button type="submit" class="btn btn-primary px-4">Update</button>
                             <a href="{{ route('instansi.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
                     </form>

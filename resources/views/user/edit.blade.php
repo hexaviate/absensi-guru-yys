@@ -12,7 +12,7 @@
         <div class="section-body">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Edit User</h5>
+                    <h5 class="mb-0">Form Edit User</h5>
                 </div>
                 <ul>
                     @foreach ($errors->all() as $error)
@@ -124,10 +124,11 @@
                             </div>
                         </div>
 
-                        <div class="text-end">
+                        <div class="d-flex justify-content-end" style="gap: 10px;">
                             <button type="submit" class="btn btn-primary px-4">Update</button>
                             <a href="{{ route('user.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
+
                     </form>
                 </div>
 
