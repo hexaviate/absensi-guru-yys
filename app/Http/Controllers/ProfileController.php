@@ -70,18 +70,39 @@ class ProfileController extends Controller
         return redirect()->route('viewProfile');
     }
 
-    public function viewJadwalMingguIni()
+    public function viewJadwalMingguIni(Request $request)
     {
         $user = auth()->user();
         if (!$user->can('view self jadwal')) {
             return redirect()->back();
         }
+        $instansiList = $user->instansi()->get();
 
-        $tapelAktif = Tapel::where('status', "aktif")->first();
-
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
         $jadwal = Jadwal::where('user_id', $user->id)->where('tapel_id', $tapelAktif->id)->get();
 
-        return view('jadwalUser.index', compact('jadwal')); //view nanti diganti
+        // get filter inputs (nullable)
+        $filterHari = $request->input('filter_hari');           // e.g. 'senin', 'selasa', etc.
+        $filterInstansi = $request->input('filter_instansi'); // e.g. 3
+
+        // Base query: jadwal for this user + active tapel
+        $query = Jadwal::where('user_id', $user->id)
+            ->where('tapel_id', $tapelAktif->id);
+
+        // Apply day filter if provided
+        $query->when($filterHari, function ($q, $hari) {
+            return $q->where('hari', $hari);
+        });
+
+        // Apply instansi filter if provided
+        $query->when($filterInstansi, function ($q, $instansiId) {
+            return $q->where('instansi_id', $instansiId);
+        });
+
+        // Optionally eager load instansi relationship for display
+        $jadwal = $query->with('instansi')->get();
+
+        return view('jadwalUser.index', compact('jadwal', 'instansiList')); //view nanti diganti
     }
 
     public function viewRiwayatAbsensi()

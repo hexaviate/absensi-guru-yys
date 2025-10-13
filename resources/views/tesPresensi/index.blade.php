@@ -282,24 +282,24 @@
                     </button>
                 </div>
                 <div class="col-12 col-md-4">
-    @hasrole('admin_yayasan')
-        <a href="{{ route('adminYysDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
-            <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
-        </a>
-    @else
-        @hasrole('operator_instansi')
-            <a href="{{ route('operatorDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
-                <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
-            </a>
-        @else
-            @hasanyrole('tenaga_pendidik|tenaga_kependidikan')
-                <a href="{{ route('userDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
-                    <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
-                </a>
-            @endhasrole
-        @endhasrole
-    @endhasrole
-</div>
+                    @hasrole('admin_yayasan')
+                        <a href="{{ route('adminYysDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
+                            <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
+                        </a>
+                    @else
+                        @hasrole('operator_instansi')
+                            <a href="{{ route('operatorDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
+                                <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
+                            </a>
+                        @else
+                            @hasanyrole('tenaga_pendidik|tenaga_kependidikan')
+                                <a href="{{ route('userDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
+                                    <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
+                                </a>
+                            @endhasrole
+                        @endhasrole
+                    @endhasrole
+                </div>
 
 
 

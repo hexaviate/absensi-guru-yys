@@ -19,20 +19,21 @@
                         </div>
                         <div class="card-body">
                             <!-- Filter Section -->
-                            <form method="GET" action="{{ url()->current() }}" class="mb-4">
+                            <form method="GET" action="{{ route('jadwalUser') }}" class="mb-4">
+                                @csrf
                                 <div class="row">
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="filter_instansi">Filter Instansi</label>
                                             <select name="filter_instansi" id="filter_instansi" class="form-control">
                                                 <option value="">-- Semua Instansi --</option>
-                                                {{-- @foreach ($instansiList as $instansi) --}}
-                                                    <option>
-                                                        smk
-                                                        {{-- {{ request('filter_instansi') == $instansi->id ? 'selected' : '' }}>
-                                                        {{ $instansi->nama_instansi }} --}}
-                                                    {{-- </option> --}}
-                                                {{-- @endforeach --}}
+                                                @foreach ($instansiList as $instansi)
+                                                    <option value="{{ $instansi->id }}">
+                                                        {{ request('filter_instansi') == $instansi->id ? 'selected' : '' }}
+                                                        {{ $instansi->nama_instansi }}
+
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -41,13 +42,27 @@
                                             <label for="filter_hari">Filter Hari</label>
                                             <select name="filter_hari" id="filter_hari" class="form-control">
                                                 <option value="">-- Semua Hari --</option>
-                                                <option value="Senin" {{ request('filter_hari') == 'Senin' ? 'selected' : '' }}>Senin</option>
-                                                <option value="Selasa" {{ request('filter_hari') == 'Selasa' ? 'selected' : '' }}>Selasa</option>
-                                                <option value="Rabu" {{ request('filter_hari') == 'Rabu' ? 'selected' : '' }}>Rabu</option>
-                                                <option value="Kamis" {{ request('filter_hari') == 'Kamis' ? 'selected' : '' }}>Kamis</option>
-                                                <option value="Jumat" {{ request('filter_hari') == 'Jumat' ? 'selected' : '' }}>Jumat</option>
-                                                <option value="Sabtu" {{ request('filter_hari') == 'Sabtu' ? 'selected' : '' }}>Sabtu</option>
-                                                <option value="Minggu" {{ request('filter_hari') == 'Minggu' ? 'selected' : '' }}>Minggu</option>
+                                                <option value="Senin"
+                                                    {{ request('filter_hari') == 'Senin' ? 'selected' : '' }}>Senin
+                                                </option>
+                                                <option value="Selasa"
+                                                    {{ request('filter_hari') == 'Selasa' ? 'selected' : '' }}>Selasa
+                                                </option>
+                                                <option value="Rabu"
+                                                    {{ request('filter_hari') == 'Rabu' ? 'selected' : '' }}>Rabu
+                                                </option>
+                                                <option value="Kamis"
+                                                    {{ request('filter_hari') == 'Kamis' ? 'selected' : '' }}>Kamis
+                                                </option>
+                                                <option value="Jumat"
+                                                    {{ request('filter_hari') == 'Jumat' ? 'selected' : '' }}>Jumat
+                                                </option>
+                                                <option value="Sabtu"
+                                                    {{ request('filter_hari') == 'Sabtu' ? 'selected' : '' }}>Sabtu
+                                                </option>
+                                                <option value="Minggu"
+                                                    {{ request('filter_hari') == 'Minggu' ? 'selected' : '' }}>Minggu
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
@@ -60,7 +75,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                @if(request('filter_instansi') || request('filter_hari'))
+                                @if (request('filter_instansi') || request('filter_hari'))
                                     <div class="row">
                                         <div class="col-12">
                                             <a href="{{ url()->current() }}" class="btn btn-sm btn-secondary">
@@ -74,7 +89,7 @@
                             @if ($jadwal->isEmpty())
                                 <div class="alert alert-info">
                                     <i class="fas fa-info-circle"></i> Tidak ada jadwal praktik ditemukan
-                                    @if(request('filter_instansi') || request('filter_hari'))
+                                    @if (request('filter_instansi') || request('filter_hari'))
                                         dengan filter yang dipilih.
                                     @else
                                         untuk minggu ini.
