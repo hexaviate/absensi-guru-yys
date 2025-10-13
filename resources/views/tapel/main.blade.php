@@ -27,6 +27,7 @@
                                         <tr>
                                             <th>No</th>
                                             <th>Tahun</th>
+                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -36,6 +37,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $item->kode }}</td>
+                                                <td>{{ $item->status }}</td>
                                                 <td class="d-flex">
                                                     <a href="{{ route('tapel.edit', $item->id) }}"
                                                         class="btn btn-warning">Edit</a>

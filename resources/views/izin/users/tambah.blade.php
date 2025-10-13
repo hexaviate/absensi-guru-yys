@@ -2,7 +2,7 @@
 @section('main')
     <section class="section">
         <div class="section-header" style="">
-            <h1>Tambah User</h1>
+            <h1>HAlaman Izin</h1>
             <div class="section-header-breadcrumb">
                 <div class="breadcrumb-item active"><a href="#">User</a></div>
                 <div class="breadcrumb-item">Dashboard</div>
@@ -12,7 +12,7 @@
         <div class="section-body">
             <div class="card shadow-sm" style="">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Tambah User</h5>
+                    <h5 class="mb-0">Buat Izin</h5>
                 </div>
                 @if ($errors->any())
                     <div class="alert alert-danger">
