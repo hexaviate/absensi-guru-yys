@@ -14,7 +14,7 @@ class JadwalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         if (!$user->hasAnyPermission(['view all instansi', 'manage jadwal'])) {
@@ -22,8 +22,32 @@ class JadwalController extends Controller
         }
 
         $jadwal = Jadwal::where('instansi_id', $user->instansi()->first()->id);
+
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
+
+        // get filter inputs (nullable)
+        $filterHari = $request->input('hari');           // e.g. 'senin', 'selasa', etc.
+        $filterInstansi = $request->input('instansi_id'); // e.g. 3
+
+        // Base query: jadwal for this user + active tapel
+        $query = Jadwal::where('user_id', $user->id)
+            ->where('tapel_id', $tapelAktif->id);
+
+        // Apply day filter if provided
+        $query->when($filterHari, function ($q, $hari) {
+            return $q->where('hari', $hari);
+        });
+
+        // Apply instansi filter if provided
+        $query->when($filterInstansi, function ($q, $instansiId) {
+            return $q->where('instansi_id', $instansiId);
+        });
+
+        // Optionally eager load instansi relationship for display
+        $jadwal = $query->with('instansi')->get();
         $semuaJadwal = Jadwal::all();
-        return view('jadwal.main', compact('jadwal', 'semuaJadwal'));
+
+        return view('jadwal.main', compact('jadwal', 'semuaJadwal', 'filterHari', 'filterInstansi'));
     }
 
     /**
