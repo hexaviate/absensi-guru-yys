@@ -12,7 +12,7 @@
         <div class="section-body">
             <div class="card shadow-sm" style="">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Edit Tapel</h5>
+                    <h5 class="mb-0">Form Edit Tapel</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('tapel.update', $tapel->id) }}" method="POST">
@@ -35,9 +35,9 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="text-end">
+                        <div class="d-flex justify-content-end" style="gap: 10px;">
                             <button type="submit" class="btn btn-primary px-4">Simpan</button>
-                            <button class="btn btn-danger" type="reset">Reset</button>
+                            <a href="{{ route('tapel.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
                     </form>
                 </div>

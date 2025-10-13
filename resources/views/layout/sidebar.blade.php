@@ -80,7 +80,7 @@
                     <li class="{{ Route::is('user.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('user.index') }}">Management User</a>
                     </li>
-                      <li class="{{ Route::is('jadwal.*') ? 'active' : '' }}">
+                    <li class="{{ Route::is('jadwal.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('jadwal.index') }}">Management Jadwal</a>
                     </li>
                     <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
@@ -94,7 +94,7 @@
 
     <li class="menu-header">PRESENSI</li>
 
- @hasanyrole(['operator_instansi', 'tenaga_pendidik', 'tenaga_kependidikan'])
+    @hasanyrole(['operator_instansi', 'tenaga_pendidik', 'tenaga_kependidikan'])
         <li>
             <a href="{{ route('jadwalUser') }}" class="nav-link">
                 <i class="fas fa-calendar-alt"></i>
@@ -110,20 +110,32 @@
         </a>
     </li>
 
-    {{-- menu izin (user) --}}
-    <li class="dropdown {{ request()->is('izinIndexUser') || request()->is('viewIzinCreate') ? 'active' : '' }}">
-        <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
-            <i class="fas fa-file-signature"></i> <span>Izin</span>
-        </a>
-        <ul class="dropdown-menu">
-            <li class="{{ request()->routeIs('izinIndexUser') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('izinIndexUser') }}">Daftar Izin</a>
-            </li>
-            <li class="{{ request()->routeIs('viewIzinCreate') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('viewIzinCreate') }}">Buat Izin</a>
-            </li>
-        </ul>
-    </li>
+    {{-- @php
+        $user = auth()->user();
+        $instansis = $user->instansi ?? collect();
+        $jumlahInstansi = $instansi->count();
+        $punyaSMK = $instansi->contains(function ($instansi) {
+            return stripos($instansi->nama_instansi, 'SMK') !== false;
+        });
+    @endphp --}}
+
+    {{-- tampilkan menu izin jika BUKAN kasus "1 instansi dan SMK" --}}
+    {{-- @if ($jumlahInstansi > 1 || !$punyaSMK) --}}
+        <li class="dropdown {{ request()->is('izinIndexUser') || request()->is('viewIzinCreate') ? 'active' : '' }}">
+            <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+                <i class="fas fa-file-signature"></i> <span>Izin</span>
+            </a>
+            <ul class="dropdown-menu">
+                <li class="{{ request()->routeIs('izinIndexUser') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('izinIndexUser') }}">Daftar Izin</a>
+                </li>
+                <li class="{{ request()->routeIs('viewIzinCreate') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('viewIzinCreate') }}">Buat Izin</a>
+                </li>
+            </ul>
+        </li>
+    {{-- @endif --}}
+
 
     @hasanyrole('admin_yayasan|operator_instansi')
         {{-- menu cek izin (operator/admin) --}}

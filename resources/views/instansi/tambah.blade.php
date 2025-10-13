@@ -18,7 +18,7 @@
         <div class="section-body">
             <div class="card shadow-sm" style="">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Tambah Instansi</h5>
+                    <h5 class="mb-0">Form Tambah Instansi</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('instansi.store') }}" method="POST">
@@ -47,7 +47,7 @@
                                     placeholder="Masukkan Kepala Instansi">
                             </div>
                         </div>
-                         <div class="row">
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="latitude" class="form-label">Latitude Instansi</label>
                                 <input type="text" class="form-control" id="latitude" name="latitude"
@@ -59,11 +59,12 @@
                                     placeholder="Masukkan Longtitude">
                             </div>
                         </div>
+                        <div class="d-flex justify-content-end" style="gap: 10px;">
+                            <button type="submit" class="btn btn-primary px-4">Simpan</button>
+                            <a href="{{ route('instansi.index') }}" class="btn btn-secondary">Batal</a>
+                        </div>
                 </div>
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary px-4">Simpan</button>
-                    <button class="btn btn-danger" type="reset">Reset</button>
-                </div>
+
                 </form>
             </div>
         </div>

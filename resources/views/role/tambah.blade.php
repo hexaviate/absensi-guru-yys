@@ -12,7 +12,7 @@
         <div class="section-body">
             <div class="card shadow-sm" style="">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Tambah Peran</h5>
+                    <h5 class="mb-0">Form Tambah Peran</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('role.store') }}" method="POST">
@@ -22,6 +22,7 @@
                             <input type="text" class="form-control" id="name" name="name"
                                 placeholder="Masukkan nama">
                         </div>
+
                         @foreach ($permission as $item)
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" name="permissions[]"
@@ -30,9 +31,10 @@
                                 <label class="form-check-label">{{ $item->name }}</label>
                             </div>
                         @endforeach
-                        <div class="text-end">
+
+                        <div class="d-flex justify-content-end" style="gap: 10px;">
                             <button type="submit" class="btn btn-primary px-4">Simpan</button>
-                            <button class="btn btn-danger" type="reset">Reset</button>
+                            <a href="{{ route('role.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
                     </form>
                 </div>
