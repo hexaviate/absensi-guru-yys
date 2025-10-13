@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/weather-icon/css/weather-icons.min.css') }}">
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/weather-icon/css/weather-icons-wind.min.css') }}">
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/summernote/summernote-bs4.css') }}">
-{{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <!-- Template CSS -->
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/css/style.css') }}">
 <link rel="stylesheet" href="{{ asset('asset/dist/assets/modules/ionicons/css/ionicons.min.css') }}">

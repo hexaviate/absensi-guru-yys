@@ -9,11 +9,41 @@
             <div class="col-lg-8 col-md-12">
                 <!-- Stats Cards -->
                 <div class="row">
+                    @php
+                        // Mapping data guru per instansi
+                        $statsData = [
+                            'TK' => 0,
+                            'MI' => 0,
+                            'MTs' => 0,
+                            'MA' => 0,
+                            'SMK' => 0,
+                            'PATTA' => 0,
+                        ];
+
+                        foreach ($totalGuruPerInstansi as $instansi) {
+                            $namaInstansi = strtoupper($instansi->nama_instansi);
+
+                            if (str_contains($namaInstansi, 'TK')) {
+                                $statsData['TK'] += $instansi->user_count;
+                            } elseif (str_contains($namaInstansi, 'MI')) {
+                                $statsData['MI'] += $instansi->user_count;
+                            } elseif (str_contains($namaInstansi, 'MTS') || str_contains($namaInstansi, 'TSANAWIYAH')) {
+                                $statsData['MTs'] += $instansi->user_count;
+                            } elseif (str_contains($namaInstansi, 'MA') || str_contains($namaInstansi, 'ALIYAH')) {
+                                $statsData['MA'] += $instansi->user_count;
+                            } elseif (str_contains($namaInstansi, 'SMK')) {
+                                $statsData['SMK'] += $instansi->user_count;
+                            } elseif (str_contains($namaInstansi, 'PATTA')) {
+                                $statsData['PATTA'] += $instansi->user_count;
+                            }
+                        }
+                    @endphp
+
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">125</h2>
-                                <p class="stats-label">GURU PAUD</p>
+                                <h2 class="stats-number">{{ $statsData['TK'] }}</h2>
+                                <p class="stats-label">GURU TK</p>
                             </div>
                         </div>
                     </div>
@@ -21,7 +51,7 @@
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">89</h2>
+                                <h2 class="stats-number">{{ $statsData['MI'] }}</h2>
                                 <p class="stats-label">GURU MI</p>
                             </div>
                         </div>
@@ -30,7 +60,7 @@
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">156</h2>
+                                <h2 class="stats-number">{{ $statsData['MTs'] }}</h2>
                                 <p class="stats-label">GURU MTs</p>
                             </div>
                         </div>
@@ -39,7 +69,7 @@
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">78</h2>
+                                <h2 class="stats-number">{{ $statsData['MA'] }}</h2>
                                 <p class="stats-label">GURU MA</p>
                             </div>
                         </div>
@@ -48,7 +78,7 @@
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">234</h2>
+                                <h2 class="stats-number">{{ $statsData['SMK'] }}</h2>
                                 <p class="stats-label">GURU SMK</p>
                             </div>
                         </div>
@@ -57,7 +87,7 @@
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">67</h2>
+                                <h2 class="stats-number">{{ $statsData['PATTA'] }}</h2>
                                 <p class="stats-label">GURU PATTA</p>
                             </div>
                         </div>
@@ -88,7 +118,7 @@
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Jumlah Instansi</h6>
-                                <h3 class="mb-0 text-primary">{{ $instansi->count() }}</h3>
+                                <h3 class="mb-0 text-primary">{{ $totalGuruPerInstansi->count() }}</h3>
                             </div>
                         </div>
                         <div>
@@ -229,82 +259,97 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <script>
-        // ==================== CHART GURU (REALTIME) ====================
-        // Inisialisasi data global
-        window.hadirData = window.hadirData || [];
-        window.izinData = window.izinData || [];
-        window.alphaData = window.alphaData || [];
-        window.lastDate = window.lastDate || Date.now() - (60 * 86400000); // Mulai dari 60 hari lalu
-        window.XAXISRANGE = window.XAXISRANGE || 5184000000; // 60 hari dalam milliseconds
+        // ==================== CHART GURU (UPDATE PER RELOAD) ====================
+        // Data dari controller
+        const totalGuruYayasan = {{ $totalSemuaGuru }};
+        const guruHadirHariIni = {{ $guruHadirHariIni->count() }};
+        const guruIzinHariIni = {{ $totalGuruIzin ?? 0 }};
+        const guruAlphaHariIni = totalGuruYayasan - guruHadirHariIni - guruIzinHariIni;
 
-        // Fungsi untuk generate data baru (simulasi)
-        function getNewSeries(baseval) {
-            var newDate = baseval + 86400000; // Tambah 1 hari
-            window.lastDate = newDate;
+        // Inisialisasi data untuk 14 hari terakhir
+        let hadirData = [];
+        let izinData = [];
+        let alphaData = [];
 
-            // Simulasi data dengan range lebih lebar (ganti dengan data real dari database)
-            var totalGuru = 749;
-            var alpha = Math.floor(Math.random() * 150) + 50; // Alpha 50-200
-            var izin = Math.floor(Math.random() * 200) + 100; // Izin 100-300
-            var hadir = totalGuru - alpha - izin; // Sisanya hadir
+        // Generate data untuk 14 hari (setiap reload akan generate data baru)
+        function generateChartData() {
+            hadirData = [];
+            izinData = [];
+            alphaData = [];
 
-            // Pastikan tidak minus
-            if (hadir < 0) {
-                hadir = Math.floor(Math.random() * 200) + 400; // Hadir 400-600
-                izin = Math.floor(Math.random() * 100) + 50; // Izin 50-150
-                alpha = totalGuru - hadir - izin; // Sisanya alpha
-            }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set ke midnight untuk konsistensi tanggal
 
-            window.hadirData.push({
-                x: newDate,
-                y: hadir
-            });
-            window.izinData.push({
-                x: newDate,
-                y: izin
-            });
-            window.alphaData.push({
-                x: newDate,
-                y: alpha
-            });
+            // Loop 14 hari ke belakang
+            for (let i = 13; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i); // Mundur i hari dari hari ini
+                const timestamp = date.getTime();
 
-            // Batasi data hanya 60 hari
-            if (window.hadirData.length > 60) {
-                window.hadirData.shift();
-                window.izinData.shift();
-                window.alphaData.shift();
+                let hadir, izin, alpha;
+
+                // Untuk hari ini, gunakan data real dari controller
+                if (i === 0) {
+                    hadir = guruHadirHariIni;
+                    izin = guruIzinHariIni;
+                    alpha = guruAlphaHariIni;
+                } else {
+                    // Simulasi data random untuk hari-hari sebelumnya
+                    const totalGuru = totalGuruYayasan;
+
+                    // Generate persentase yang realistis
+                    const hadirPercent = 0.6 + (Math.random() * 0.25); // 60-85% hadir
+                    const izinPercent = 0.05 + (Math.random() * 0.15); // 5-20% izin
+
+                    hadir = Math.floor(totalGuru * hadirPercent);
+                    izin = Math.floor(totalGuru * izinPercent);
+                    alpha = totalGuru - hadir - izin;
+
+                    // Pastikan tidak ada nilai negatif
+                    if (alpha < 0) alpha = 0;
+                }
+
+                hadirData.push({
+                    x: timestamp,
+                    y: hadir
+                });
+                izinData.push({
+                    x: timestamp,
+                    y: izin
+                });
+                alphaData.push({
+                    x: timestamp,
+                    y: alpha
+                });
             }
         }
 
-        // Isi data awal untuk 60 hari
-        for (var i = 0; i < 60; i++) {
-            getNewSeries(window.lastDate);
-        }
+        // Generate data saat halaman pertama kali load
+        generateChartData();
 
         // Konfigurasi chart
         var options = {
             series: [{
                     name: 'Hadir',
-                    data: window.hadirData.slice()
+                    data: hadirData
                 },
                 {
                     name: 'Izin',
-                    data: window.izinData.slice()
+                    data: izinData
                 },
                 {
                     name: 'Alpha',
-                    data: window.alphaData.slice()
+                    data: alphaData
                 }
             ],
             chart: {
-                id: 'realtime',
+                id: 'chartGuru',
                 height: 350,
                 type: 'line',
                 animations: {
                     enabled: true,
-                    dynamicAnimation: {
-                        speed: 1000
-                    }
+                    easing: 'easeinout',
+                    speed: 800
                 },
                 toolbar: {
                     show: true,
@@ -336,7 +381,7 @@
             },
             yaxis: {
                 min: 0,
-                max: 700,
+                max: totalGuruYayasan,
                 tickAmount: 7,
                 labels: {
                     formatter: function(value) {
@@ -361,7 +406,16 @@
             tooltip: {
                 x: {
                     format: 'dd MMM yyyy'
+                },
+                y: {
+                    formatter: function(value) {
+                        return value + ' guru';
+                    }
                 }
+            },
+            grid: {
+                borderColor: '#e7e7e7',
+                strokeDashArray: 5
             }
         };
 
@@ -371,13 +425,13 @@
         // Fungsi untuk update tanggal di card
         function updateDateDisplay() {
             var today = new Date();
-            var options = {
+            var dateOptions = {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             };
-            var dateString = today.toLocaleDateString('id-ID', options);
+            var dateString = today.toLocaleDateString('id-ID', dateOptions);
 
             var cardBody = document.querySelector("#chart").closest('.card-body');
             var dateElement = cardBody.querySelector('.chart-date');
@@ -394,24 +448,6 @@
         }
 
         updateDateDisplay();
-
-        setInterval(function() {
-            getNewSeries(window.lastDate);
-            chart.updateSeries([{
-                    name: 'Hadir',
-                    data: window.hadirData
-                },
-                {
-                    name: 'Izin',
-                    data: window.izinData
-                },
-                {
-                    name: 'Alpha',
-                    data: window.alphaData
-                }
-            ]);
-            updateDateDisplay();
-        }, 86400000);
     </script>
 @endpush
 
