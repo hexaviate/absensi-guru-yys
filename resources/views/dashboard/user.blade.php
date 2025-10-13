@@ -9,7 +9,7 @@
         </div>
 
         <!-- Notifikasi Penting -->
-        <div class="alert alert-warning alert-has-icon alert-dismissible show fade">
+        {{-- <div class="alert alert-warning alert-has-icon alert-dismissible show fade">
             <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div class="alert-body">
                 <div class="alert-title">Perhatian!</div>
@@ -18,7 +18,7 @@
             <button class="close" data-dismiss="alert">
                 <span>&times;</span>
             </button>
-        </div>
+        </div> --}}
 
         <!-- Card Status Kehadiran Hari Ini -->
         <div class="row">
@@ -47,10 +47,15 @@
                                                 </div>
 
                                                 @if ($presensi->jam_pulang)
-                                                    <span class="badge badge-success badge-lg">✅ Hadir</span>
+                                                    <span class="badge badge-success badge-lg">
+                                                        <i class="fa-solid fa-check"></i> Hadir
+                                                    </span>
                                                 @else
-                                                    <span class="badge badge-warning badge-lg">⏳ Belum Pulang</span>
+                                                    <span class="badge badge-warning badge-lg">
+                                                        <i class="fa-solid fa-hourglass-half"></i> Belum Pulang
+                                                    </span>
                                                 @endif
+
                                             </div>
 
                                             <div class="attendance-time-row">
@@ -59,7 +64,7 @@
                                                     <div class="time-detail">
                                                         <small class="text-muted d-block">Jam Datang</small>
                                                         <strong class="text-dark">
-                                                            {{ $presensi->datang ? \Carbon\Carbon::parse($presensi->datanng)->format('H:i') . ' WIB' : '-- : --' }}
+                                                            {{ $presensi->datang ? \Carbon\Carbon::parse($presensi->datang)->format(format: 'H:i') . ' WIB' : '-- : --' }}
                                                         </strong>
                                                     </div>
                                                 </div>
@@ -91,7 +96,7 @@
             </div>
         </div>
 
-        <div class="row">
+        {{-- <div class="row">
             <div class="col-12">
                 <h6 class="mb-3 font-weight-bold text-dark">Jadwal Hari Ini</h6>
             </div>
@@ -138,7 +143,7 @@
             @endforelse
 
 
-        </div>
+        </div> --}}
 
 
         <!-- Riwayat Absensi & Rekap Bulanan -->
@@ -148,7 +153,7 @@
                 <div class="card card-custom shadow-sm">
                     <div class="card-header">
                         <h6 class="font-weight-bold text-dark mb-0">
-                            <i class="fa-solid fa-clock-rotate-left text-primary"></i> Riwayat Absensi
+                            Riwayat Absensi
                         </h6>
                     </div>
                     <div class="card-body">
@@ -216,7 +221,7 @@
                 <div class="card card-custom shadow-sm card-recap-monthly">
                     <div class="card-header border-0">
                         <h6 class="font-weight-bold text-dark mb-0">
-                            <i class="fa-solid fa-calendar-days text-primary"></i> Rekap Bulan Ini
+                            Rekap Bulan Ini
                         </h6>
                     </div>
                     <div class="card-body">
@@ -626,5 +631,3 @@
 
 @push('script')
 @endpush
-
-{{-- INI USER --}}

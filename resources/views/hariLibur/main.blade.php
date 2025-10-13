@@ -21,47 +21,96 @@
                         <div class="card-header">
                             <h4>Data Hari Libur</h4>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="example" class="table table-striped table-bordered table-md">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Tahun Pelajaran</th>
-                                            <th>Nama Instansi</th>
-                                            <th>keterangan Libur</th>
-                                            <th>Tanggal Libur</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($hariLibur as $item)
+
+
+                        @hasanyrole('admin_yayasan')
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="example" class="table table-striped table-bordered table-md">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $item->tapel->kode }}</td>
-                                                <td>{{ $item->instansi->nama_instansi }}</td>
-                                                <td>{{ $item->keterangan }}</td>
-                                                <td>{{ $item->tanggal }}</td>
-                                                <td class="d-flex">
-                                                    <a href="{{ route('hariLibur.edit', $item->id) }}"
-                                                        class="btn btn-warning mx-2">Edit</a>
-                                                    <form action="{{ route('hariLibur.destroy', $item->id) }}" method="POST"
-                                                        onsubmit="return confirm('Yakin ingin menghapus?')">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button type="submit" class="btn btn-danger">Hapus</button>
-                                                    </form>
-                                                </td>
+                                                <th>No</th>
+                                                <th>Tahun Pelajaran</th>
+                                                <th>Nama Instansi</th>
+                                                <th>keterangan Libur</th>
+                                                <th>Tanggal Libur</th>
+                                                <th>Aksi</th>
                                             </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="7" class="text-center">Data HAri Libur Kosong</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($semuaHariLibur as $item)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $item->tapel->kode }}</td>
+                                                    <td>{{ $item->instansi->nama_instansi }}</td>
+                                                    <td>{{ $item->keterangan }}</td>
+                                                    <td>{{ $item->tanggal }}</td>
+                                                    <td class="d-flex">
+                                                        <a href="{{ route('hariLibur.edit', $item->id) }}"
+                                                            class="btn btn-warning mx-2">Edit</a>
+                                                        <form action="{{ route('hariLibur.destroy', $item->id) }}"
+                                                            method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">
+                                                            @csrf
+                                                            @method('delete')
+                                                            <button type="submit" class="btn btn-danger">Hapus</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="7" class="text-center">Data HAri Libur Kosong</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
+                        @endhasanyrole
+
+
+                        @hasanyrole('operator_instansi')
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="example" class="table table-striped table-bordered table-md">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Tahun Pelajaran</th>
+                                                <th>Nama Instansi</th>
+                                                <th>keterangan Libur</th>
+                                                <th>Tanggal Libur</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($operatorHariLibur as $item)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $item->tapel->kode }}</td>
+                                                    <td>{{ $item->instansi->nama_instansi }}</td>
+                                                    <td>{{ $item->keterangan }}</td>
+                                                    <td>{{ $item->tanggal }}</td>
+                                                    <td class="d-flex">
+                                                        <a href="{{ route('hariLibur.edit', $item->id) }}"
+                                                            class="btn btn-warning mx-2">Edit</a>
+                                                        <form action="{{ route('hariLibur.destroy', $item->id) }}"
+                                                            method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">
+                                                            @csrf
+                                                            @method('delete')
+                                                            <button type="submit" class="btn btn-danger">Hapus</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="7" class="text-center">Data HAri Libur Kosong</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        @endhasanyrole
                     </div>
                 </div>
             </div>
@@ -92,5 +141,3 @@
 @push('style')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 @endpush
-
-

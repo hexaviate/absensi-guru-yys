@@ -97,7 +97,7 @@
                 <!-- Card Guru Chart -->
                 <div class="card custom-card">
                     <div class="card-header">
-                        <h4>Guru</h4>
+                        <h4>Statistik Absensi</h4>
                     </div>
                     <div class="card-body">
                         <div id="chart"></div>
@@ -258,197 +258,255 @@
 @push('script')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-    <script>
-        // ==================== CHART GURU (UPDATE PER RELOAD) ====================
-        // Data dari controller
-        const totalGuruYayasan = {{ $totalSemuaGuru }};
-        const guruHadirHariIni = {{ $guruHadirHariIni->count() }};
-        const guruIzinHariIni = {{ $totalGuruIzin ?? 0 }};
-        const guruAlphaHariIni = totalGuruYayasan - guruHadirHariIni - guruIzinHariIni;
 
-        // Inisialisasi data untuk 14 hari terakhir
-        let hadirData = [];
-        let izinData = [];
-        let alphaData = [];
-
-        // Generate data untuk 14 hari (setiap reload akan generate data baru)
-        function generateChartData() {
-            hadirData = [];
-            izinData = [];
-            alphaData = [];
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Set ke midnight untuk konsistensi tanggal
-
-            // Loop 14 hari ke belakang
-            for (let i = 13; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - i); // Mundur i hari dari hari ini
-                const timestamp = date.getTime();
-
-                let hadir, izin, alpha;
-
-                // Untuk hari ini, gunakan data real dari controller
-                if (i === 0) {
-                    hadir = guruHadirHariIni;
-                    izin = guruIzinHariIni;
-                    alpha = guruAlphaHariIni;
-                } else {
-                    // Simulasi data random untuk hari-hari sebelumnya
-                    const totalGuru = totalGuruYayasan;
-
-                    // Generate persentase yang realistis
-                    const hadirPercent = 0.6 + (Math.random() * 0.25); // 60-85% hadir
-                    const izinPercent = 0.05 + (Math.random() * 0.15); // 5-20% izin
-
-                    hadir = Math.floor(totalGuru * hadirPercent);
-                    izin = Math.floor(totalGuru * izinPercent);
-                    alpha = totalGuru - hadir - izin;
-
-                    // Pastikan tidak ada nilai negatif
-                    if (alpha < 0) alpha = 0;
-                }
-
-                hadirData.push({
-                    x: timestamp,
-                    y: hadir
-                });
-                izinData.push({
-                    x: timestamp,
-                    y: izin
-                });
-                alphaData.push({
-                    x: timestamp,
-                    y: alpha
-                });
-            }
-        }
-
-        // Generate data saat halaman pertama kali load
-        generateChartData();
-
-        // Konfigurasi chart
-        var options = {
-            series: [{
-                    name: 'Hadir',
-                    data: hadirData
-                },
-                {
-                    name: 'Izin',
-                    data: izinData
-                },
-                {
-                    name: 'Alpha',
-                    data: alphaData
-                }
-            ],
-            chart: {
-                id: 'chartGuru',
-                height: 350,
-                type: 'line',
-                animations: {
-                    enabled: true,
-                    easing: 'easeinout',
-                    speed: 800
-                },
-                toolbar: {
-                    show: true,
-                    tools: {
-                        download: true,
-                        selection: true,
-                        zoom: true,
-                        zoomin: true,
-                        zoomout: true,
-                        pan: true,
-                        reset: true
-                    }
-                },
-                zoom: {
-                    enabled: true,
-                    type: 'x',
-                    autoScaleYaxis: false
-                }
-            },
-            colors: ['#28a745', '#ffc107', '#dc3545'],
-            xaxis: {
-                type: 'datetime',
-                labels: {
-                    format: 'dd MMM',
-                    style: {
-                        fontSize: '12px'
-                    }
-                }
-            },
-            yaxis: {
-                min: 0,
-                max: totalGuruYayasan,
-                tickAmount: 7,
-                labels: {
-                    formatter: function(value) {
-                        return Math.round(value);
-                    }
-                }
-            },
-            markers: {
-                size: 0
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 3
-            },
-            legend: {
-                show: true,
-                position: 'top'
-            },
-            tooltip: {
-                x: {
-                    format: 'dd MMM yyyy'
-                },
-                y: {
-                    formatter: function(value) {
-                        return value + ' guru';
-                    }
-                }
-            },
-            grid: {
-                borderColor: '#e7e7e7',
-                strokeDashArray: 5
-            }
-        };
-
-        var chart = new ApexCharts(document.querySelector("#chart"), options);
-        chart.render();
-
-        // Fungsi untuk update tanggal di card
-        function updateDateDisplay() {
-            var today = new Date();
-            var dateOptions = {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            };
-            var dateString = today.toLocaleDateString('id-ID', dateOptions);
-
-            var cardBody = document.querySelector("#chart").closest('.card-body');
-            var dateElement = cardBody.querySelector('.chart-date');
-
-            if (!dateElement) {
-                dateElement = document.createElement('div');
-                dateElement.className = 'chart-date text-center mt-3';
-                dateElement.style.color = '#6c757d';
-                dateElement.style.fontSize = '14px';
-                cardBody.appendChild(dateElement);
-            }
-
-            dateElement.innerHTML = '<strong>Terakhir update:</strong> ' + dateString;
-        }
-
-        updateDateDisplay();
     </script>
+    <script>
+    // ==================== CHART GURU (DATA REAL DARI DATABASE) ====================
+
+    // Data dari controller
+    const totalGuruYayasan = {{ $totalSemuaGuru }};
+    const guruHadirHariIni = {{ $guruHadirHariIni->count() }};
+    const guruIzinHariIni = {{ $totalGuruIzin ?? 0 }};
+
+    console.log('Total Guru:', totalGuruYayasan);
+    console.log('Hadir Hari Ini:', guruHadirHariIni);
+    console.log('Izin Hari Ini:', guruIzinHariIni);
+
+    // Ambil data presensi 14 hari terakhir dari database
+    let hadirData = [];
+    let izinData = [];
+
+    @php
+        use Carbon\Carbon;
+        use App\Models\Presensi;
+        use App\Models\User;
+
+        $chartData = [];
+        $user = auth()->user();
+
+        // Ambil semua instansi_id yang terkait dengan user (many-to-many)
+        $instansiIds = [];
+
+        try {
+            // Ambil semua instansi yang terkait dengan user
+            if (method_exists($user, 'instansi')) {
+                // Jika relasi bernama 'instansi' (singular)
+                $instansiIds = $user->instansi()->pluck('instansi_id')->toArray();
+
+                // Jika tidak ada, coba ambil kolom 'id'
+                if (empty($instansiIds)) {
+                    $instansiIds = $user->instansi()->pluck('id')->toArray();
+                }
+            } elseif (method_exists($user, 'instansis')) {
+                // Jika relasi bernama 'instansis' (plural)
+                $instansiIds = $user->instansis()->pluck('instansi_id')->toArray();
+
+                if (empty($instansiIds)) {
+                    $instansiIds = $user->instansis()->pluck('id')->toArray();
+                }
+            }
+
+            // Jika masih kosong, ambil dari presensi terakhir
+            if (empty($instansiIds)) {
+                $lastPresensi = Presensi::where('user_id', $user->id)->latest()->first();
+                if ($lastPresensi) {
+                    $instansiIds = [$lastPresensi->instansi_id];
+                }
+            }
+        } catch (\Exception $e) {
+            // Jika error, set kosong (akan ambil semua data)
+            $instansiIds = [];
+        }
+
+        // Hitung total guru
+        $totalGuru = $totalSemuaGuru ?? 0;
+
+        for ($i = 13; $i >= 0; $i--) {
+            $tanggal = Carbon::now()->subDays($i);
+
+            // Query dasar
+            $queryHadir = Presensi::whereDate('tanggal', $tanggal->toDateString())
+                ->where('status', 'hadir');
+
+            $queryIzin = Presensi::whereDate('tanggal', $tanggal->toDateString())
+                ->where('status', 'izin');
+
+            // Filter dengan whereIn untuk many-to-many
+            if (!empty($instansiIds) && count($instansiIds) > 0) {
+                $queryHadir->whereIn('instansi_id', $instansiIds);
+                $queryIzin->whereIn('instansi_id', $instansiIds);
+            }
+
+            // Hitung hadir (yang ada datang ATAU pulang)
+            $hadir = $queryHadir->where(function($query) {
+                    $query->whereNotNull('datang')
+                          ->orWhereNotNull('pulang');
+                })
+                ->distinct('user_id')
+                ->count('user_id');
+
+            // Hitung izin
+            $izin = $queryIzin->distinct('user_id')
+                ->count('user_id');
+
+            $chartData[] = [
+                'timestamp' => $tanggal->timestamp * 1000,
+                'tanggal' => $tanggal->format('Y-m-d'),
+                'hadir' => $hadir,
+                'izin' => $izin,
+            ];
+        }
+    @endphp
+
+    // Populate data dari PHP ke JavaScript
+    const dataFromDB = @json($chartData);
+
+    console.log('Data Chart:', dataFromDB);
+
+    dataFromDB.forEach(function(item) {
+        hadirData.push({
+            x: item.timestamp,
+            y: item.hadir
+        });
+        izinData.push({
+            x: item.timestamp,
+            y: item.izin
+        });
+    });
+
+    console.log('Hadir Data:', hadirData);
+    console.log('Izin Data:', izinData);
+
+    // Konfigurasi chart
+    var options = {
+        series: [{
+                name: 'Hadir',
+                data: hadirData
+            },
+            {
+                name: 'Izin',
+                data: izinData
+            }
+        ],
+        chart: {
+            id: 'chartGuru',
+            height: 350,
+            type: 'line',
+            animations: {
+                enabled: true,
+                easing: 'easeinout',
+                speed: 800
+            },
+            toolbar: {
+                show: true,
+                tools: {
+                    download: true,
+                    selection: true,
+                    zoom: true,
+                    zoomin: true,
+                    zoomout: true,
+                    pan: true,
+                    reset: true
+                }
+            },
+            zoom: {
+                enabled: true,
+                type: 'x',
+                autoScaleYaxis: false
+            }
+        },
+        colors: ['#28a745', '#ffc107', '#dc3545'],
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                format: 'dd MMM',
+                style: {
+                    fontSize: '12px'
+                }
+            }
+        },
+        yaxis: {
+            min: 0,
+            max: Math.max(totalGuruYayasan, 10), // Minimal 10 untuk tampilan
+            tickAmount: 7,
+            labels: {
+                formatter: function(value) {
+                    return Math.round(value);
+                }
+            }
+        },
+        markers: {
+            size: 4,
+            hover: {
+                size: 6
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+        legend: {
+            show: true,
+            position: 'top',
+            horizontalAlign: 'center'
+        },
+        tooltip: {
+            x: {
+                format: 'dd MMM yyyy'
+            },
+            y: {
+                formatter: function(value) {
+                    return value + ' guru';
+                }
+            }
+        },
+        grid: {
+            borderColor: '#e7e7e7',
+            strokeDashArray: 5
+        },
+        noData: {
+            text: 'Belum ada data presensi',
+            align: 'center',
+            verticalAlign: 'middle',
+            style: {
+                fontSize: '16px'
+            }
+        }
+    };
+
+    var chart = new ApexCharts(document.querySelector("#chart"), options);
+    chart.render();
+
+    // Fungsi untuk update tanggal di card
+    function updateDateDisplay() {
+        var today = new Date();
+        var dateOptions = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
+        var dateString = today.toLocaleDateString('id-ID', dateOptions);
+
+        var cardBody = document.querySelector("#chart").closest('.card-body');
+        var dateElement = cardBody.querySelector('.chart-date');
+
+        if (!dateElement) {
+            dateElement = document.createElement('div');
+            dateElement.className = 'chart-date text-center mt-3';
+            dateElement.style.color = '#6c757d';
+            dateElement.style.fontSize = '14px';
+            cardBody.appendChild(dateElement);
+        }
+
+        dateElement.innerHTML = '<strong>Terakhir update:</strong> ' + dateString;
+    }
+
+    updateDateDisplay();
+</script>
 @endpush
 
 {{-- INI YSS --}}
