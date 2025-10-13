@@ -22,7 +22,8 @@ class JadwalController extends Controller
         }
 
         $jadwal = Jadwal::where('instansi_id', $user->instansi()->first()->id);
-        return view('jadwal.main', compact('jadwal'));
+        $semuaJadwal = Jadwal::all();
+        return view('jadwal.main', compact('jadwal', 'semuaJadwal'));
     }
 
     /**
