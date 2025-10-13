@@ -63,7 +63,7 @@ class DashboardController extends Controller
         //total guru yang izin hari ini
         $totalGuruIzin = Izin::where('status', 'diterima')->whereDate('created_at', today())->count();
 
-        return view('dashboard.yys', compact('guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruPerInstansi', 'totalSemuaGuru'));
+        return view('dashboard.yys', compact('guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruPerInstansi', 'totalSemuaGuru', 'instansi'));
     }
 
     public function userDashboard()
@@ -82,8 +82,10 @@ class DashboardController extends Controller
             Carbon::now()->startOfWeek(),
             Carbon::now()->endOfWeek()
         ])->get();
+        $presensiBulanIni = $user->presensi()->whereMonth('created_at', now()->month)->count();
+        $tidakHadirBulanIni = $user->tidak_hadir()->whereMonth('created_at', now()->month)->count();
         $instansi = $user->instansi()->get();
 
-        return view('dashboard.user', compact('presensiHariIni', 'jadwalHariIni', 'instansi', 'izinBulanIni', 'presensiMingguIni'));
+        return view('dashboard.user', compact('presensiHariIni', 'jadwalHariIni', 'instansi', 'izinBulanIni', 'presensiMingguIni', 'presensiBulanIni', 'tidakHadirBulanIni'));
     }
 }

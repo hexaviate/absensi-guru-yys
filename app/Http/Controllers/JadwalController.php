@@ -18,11 +18,12 @@ class JadwalController extends Controller
     {
         $user = auth()->user();
         if (!$user->hasAnyPermission(['view all instansi', 'manage jadwal'])) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak punya permission');
         }
 
-        $jadwal = Jadwal::all();
-        return view('jadwal.main', compact('jadwal'));
+        $jadwal = Jadwal::where('instansi_id', $user->instansi()->first()->id);
+        $semuaJadwal = Jadwal::all();
+        return view('jadwal.main', compact('jadwal', 'semuaJadwal'));
     }
 
     /**

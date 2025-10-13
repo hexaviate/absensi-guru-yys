@@ -21,13 +21,15 @@ class UsersController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $instansi = $user->instansi()->first();
         if (!$user->hasAnyPermission(['view all users', 'manage users'])) {
             return redirect()->intended('dashboard');
         }
-        $user = User::all();
-        $role = Role::all();
+        $semuaUser = User::all();
+        $semuaRole = Role::all();
+        $semuaInstansi = Instansi::all();
 
-        $instansi = Instansi::all();
+        $user = $instansi->user;
         return view('user.main', compact('user', 'role', 'instansi'));
     }
 

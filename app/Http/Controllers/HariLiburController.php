@@ -20,9 +20,11 @@ class HariLiburController extends Controller
 
         if ($user->hasAnyPermission(['view all hari_libur', 'manage hari_libur'])) {
             $tapel = Tapel::all();
-            $hariLibur = HariLibur::all();
-            $instansi = $user->instansi; //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
-            return view('hariLibur.main', compact('user', 'tapel', 'instansi', 'hariLibur'));
+            $semuaHariLibur = HariLibur::all();
+
+            $instansi = $user->instansi()->first(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
+            $operatorHariLibur = HariLibur::where('instansi_id', $instansi->id)->get();
+            return view('hariLibur.main', compact('user', 'tapel', 'instansi', 'semuaHariLibur', 'operatorHariLibur'));
         } else {
             return redirect()->route('login')->with('error', 'Anda tidak punya Permission');
         }

@@ -56,7 +56,23 @@ class RolePermissionSeeder extends Seeder
         $kependidikan = Role::create(['name' => 'tenaga_kependidikan']);
 
         $admin->syncPermissions($permission);
-        $operator->givePermissionTo(['rekap presensi', 'manage presensi', 'manage jadwal', 'manage hari_libur', 'view all users', 'melakukan presensi', 'manage izin']);
+        $operator->givePermissionTo([
+            'rekap presensi',
+            'manage presensi',
+            'manage jadwal',
+            'manage hari_libur',
+            'view all users',
+            'melakukan presensi',
+            'manage izin',
+            'view all jadwal',
+            'view all instansi',
+            'view all hari_libur',
+            'view self profile',
+            'view self riwayat absen',
+            'melakukan presensi',
+            'view self jadwal',
+            'view self izin'
+        ]);
         $pendidik->givePermissionTo(['view self jadwal', 'view self riwayat absen', 'melakukan presensi', 'view self izin']);
         $kependidikan->givePermissionTo(['view self riwayat absen', 'melakukan presensi', 'view self izin']);
 
