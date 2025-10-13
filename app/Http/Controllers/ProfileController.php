@@ -44,12 +44,12 @@ class ProfileController extends Controller
 
         $validate = Validator::make($request->all(), [
             'telp' => "required|numeric|sometimes",
-            'username' => "required|min:5|sometimes",
+            'username' => "required|sometimes",
             "foto_profil" => "required|sometimes"
         ]);
 
         if ($validate->fails()) {
-            return redirect()->route('hariLibur.create')->withErrors($validate)->withInput();
+            return redirect()->back()->withErrors($validate);
         }
 
         $imageName = time() . '.' . $request->foto_profil->extension();
@@ -66,13 +66,15 @@ class ProfileController extends Controller
             "username" => $request->username,
             "foto" => $imageName
         ]);
+
+          return redirect()->route('viewProfile');
     }
 
     public function viewJadwalMingguIni()
     {
         $user = auth()->user();
         if (!$user->can('view self jadwal')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back();
         }
 
         $tapelAktif = Tapel::where('status', "aktif")->first();
@@ -86,7 +88,8 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('view self riwayat absen')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back();
+
         }
 
         $presensi = Presensi::where('user_id', $user->id)->get();
@@ -98,7 +101,8 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('view self jadwal')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back();
+
         }
 
         $tapelAktif = Tapel::where('status', "aktif")->first();

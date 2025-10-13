@@ -38,7 +38,7 @@ class HariLiburController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage hari_libur')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back();
         }
 
         $instansiId = $user->instansi()->first()->id;
