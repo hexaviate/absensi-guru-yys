@@ -33,30 +33,6 @@ class UsersController extends Controller
         return view('user.main', compact('user', 'instansi', 'semuaUser', 'semuaRole', 'semuaInstansi', 'userInstansi'));
     }
 
-
-    public function getUsers()
-    {
-        try {
-            $query = User::with(['roles', 'instansi'])->select('users.*');
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->addColumn('role', function ($row) {
-                    return $row->roles ? $row->roles->pluck('name')->join(', ') : '-';
-                })
-                ->addColumn('instansi', function ($row) {
-                    return $row->instansi ? $row->instansi->nama_instansi : '-';
-                })
-                ->addColumn('action', function ($row) {
-                    return '<a href="' . route('users.edit', $row->id) . '" class="btn btn-sm btn-primary">Edit</a>';
-                })
-                ->rawColumns(['action'])
-                ->make(true);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()]);
-        }
-    }
-
-
     /**
      * Show the form for creating a new resource.
      */

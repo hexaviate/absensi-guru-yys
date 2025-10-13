@@ -40,7 +40,6 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::resource('user', UsersController::class);
-    Route::get('/users/data', [UsersController::class, 'getUsers'])->name('users.data');
     Route::resource('role', RoleController::class);
     Route::resource('instansi', InstansiController::class);
     Route::resource('tapel', TapelController::class);

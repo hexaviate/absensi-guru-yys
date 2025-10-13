@@ -92,12 +92,14 @@
 
     <li class="menu-header">PRESENSI</li>
 
-    <li>
-        <a href="{{ route('jadwalUser') }}" class="nav-link">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Halaman Jadwal</span>
-        </a>
-    </li>
+ @hasanyrole(['operator_instansi', 'tenaga_pendidik', 'tenaga_kependidikan'])
+        <li>
+            <a href="{{ route('jadwalUser') }}" class="nav-link">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Halaman Jadwal</span>
+            </a>
+        </li>
+    @endhasallroles
 
     <li class="">
         <a href="{{ route('presensi') }}" class="nav-link">
