@@ -71,7 +71,7 @@
                                 <div class="selectgroup selectgroup-pills">
                                     @forelse ($role as $item)
                                         <label class="selectgroup-item">
-                                            <input type="radio" name="role_id" value="{{ $item->id }}"
+                                            <input type="radio" name="role_id[]" value="{{ $item->id }}"
                                                 data-role-name="{{ $item->name }}" class="selectgroup-input role-radio"
                                                 {{ old('role_id') == $item->id ? 'checked' : '' }}>
                                             <span class="selectgroup-button">{{ $item->name }}</span>

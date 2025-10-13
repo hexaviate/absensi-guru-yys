@@ -179,7 +179,7 @@ class UsersController extends Controller
             "password" => "nullable|min:6",
             "foto_presensi" => "nullable|image|mimes:jpeg,png,jpg|max:2048",
             "jarak_tempuh" => "nullable|numeric|min:0",
-            "role_id" => "required|array|min:1",
+            "role_id" => "required|min:1",
             "instansi_id" => "required|array|min:1"
         ];
 
