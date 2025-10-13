@@ -282,7 +282,7 @@
                     </button>
                 </div>
                 <div class="col-12 col-md-4">
-                    <a href="{{ route('dashboard') }}" class="btn btn-custom btn-danger-custom w-100">
+                    <a href="#" class="btn btn-custom btn-danger-custom w-100">
                         <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
                     </a>
                 </div>

@@ -21,12 +21,13 @@ class JadwalController extends Controller
             return redirect()->back()->with('error', 'Anda tidak punya permission');
         }
 
+
         $jadwal = Jadwal::where('instansi_id', $user->instansi()->first()->id);
 
         $tapelAktif = Tapel::where('status', 'aktif')->first();
 
         // get filter inputs (nullable)
-        $filterHari = $request->input('hari');           // e.g. 'senin', 'selasa', etc.
+        $filterHari = $request->input('filter_hari');           // e.g. 'senin', 'selasa', etc.
         $filterInstansi = $request->input('instansi_id'); // e.g. 3
 
         // Base query: jadwal for this user + active tapel
@@ -47,7 +48,7 @@ class JadwalController extends Controller
         $jadwal = $query->with('instansi')->get();
         $semuaJadwal = Jadwal::all();
 
-        return view('jadwal.main', compact('jadwal', 'semuaJadwal', 'filterHari', 'filterInstansi'));
+        return view('jadwal.main', compact('jadwal', 'semuaJadwal', 'filterHari', 'filterInstansi', 'instansi'));
     }
 
     /**
