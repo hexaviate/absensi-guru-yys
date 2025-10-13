@@ -67,11 +67,11 @@
                     <li class="{{ Route::is('tapel.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('tapel.index') }}">Management Kaldik</a>
                     </li>
-                    <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
-                    </li>
                     <li class="{{ Route::is('jadwal.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('jadwal.index') }}">Management Jadwal</a>
+                    </li>
+                    <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
                     </li>
                 @endif
 
@@ -80,7 +80,9 @@
                     <li class="{{ Route::is('user.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('user.index') }}">Management User</a>
                     </li>
-
+                      <li class="{{ Route::is('jadwal.*') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('jadwal.index') }}">Management Jadwal</a>
+                    </li>
                     <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
                     </li>

@@ -129,7 +129,7 @@
 
                 // Reset semua instansi
                 $('.instansi-item').show();
-                $('.instansi-checkbox').prop('disabled', false);
+                $('.instansi-checkbox').prop('disabled', false).off('change'); // Hapus event listener lama
                 $('#instansi-helper').text('');
 
                 if (!roleName) {
@@ -163,7 +163,7 @@
                     validateMaxInstansi(1);
                 }
 
-                // ROLE: Tenaga Pendidik - Semua kecuali Puspela
+                // ROLE: Tenaga Pendidik - Semua kecuali Puspela (BISA BANYAK)
                 else if (roleName === 'tenaga_pendidik' || roleName === 'tenaga pendidik') {
                     // Sembunyikan Puspela
                     $('.instansi-item').each(function() {
@@ -174,8 +174,10 @@
                         }
                     });
 
-                    $('#instansi-helper').text('Pilih instansi (kecuali Puspela)').removeClass('text-warning')
+                    $('#instansi-helper').text('Pilih instansi yang diperlukan (kecuali Puspela)').removeClass(
+                            'text-warning')
                         .addClass('text-info');
+                    // TIDAK ada batasan jumlah
                 }
 
                 // ROLE: Tenaga Kependidikan - Maksimal 1, kecuali Puspela
@@ -202,7 +204,7 @@
 
             // Fungsi validasi maksimal instansi
             function validateMaxInstansi(maxCount) {
-                $('.instansi-checkbox').on('change', function() {
+                $('.instansi-checkbox:visible').on('change', function() {
                     var checkedCount = $('.instansi-checkbox:checked:visible').length;
 
                     if (checkedCount >= maxCount) {

@@ -40,7 +40,7 @@
                                         </thead>
                                         <tbody>
 
-                                            @forelse ($user as $item)
+                                            @forelse ($semuaUser as $item)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $item->name }}</td>
@@ -98,7 +98,7 @@
                                         </thead>
                                         <tbody>
 
-                                            @forelse ($user as $item)
+                                            @forelse ($userInstansi as $item)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $item->name }}</td>

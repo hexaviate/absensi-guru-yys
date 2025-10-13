@@ -96,7 +96,7 @@
             </div>
         </div>
 
-        {{-- <div class="row">
+        <div class="row">
             <div class="col-12">
                 <h6 class="mb-3 font-weight-bold text-dark">Jadwal Hari Ini</h6>
             </div>
@@ -136,14 +136,14 @@
                 </div>
             @empty
                 <div class="col-12 mb-3">
-                    <div class="alert alert-info">
+                    <div class="alert alert-primary">
                         <i class="fa-solid fa-calendar-xmark"></i> Tidak ada jadwal untuk hari ini
                     </div>
                 </div>
             @endforelse
 
 
-        </div> --}}
+        </div>
 
 
         <!-- Riwayat Absensi & Rekap Bulanan -->

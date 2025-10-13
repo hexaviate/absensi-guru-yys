@@ -58,7 +58,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="7" class="text-center">Data HAri Libur Kosong</td>
+                                                    <td colspan="7" class="text-center">Data Hari Libur Kosong</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>

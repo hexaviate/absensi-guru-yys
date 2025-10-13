@@ -158,6 +158,25 @@
 
 
     <script>
+        // Preview foto presensi
+        document.getElementById('foto_presensi').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('preview_foto');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                preview.classList.add('d-none');
+            }
+        });
+
+        // Validasi instansi berdasarkan role
         $(document).ready(function() {
 
             // Fungsi untuk filter dan validasi instansi berdasarkan role
@@ -165,9 +184,15 @@
                 var selectedRole = $('.role-radio:checked').data('role-name');
                 var roleName = selectedRole ? selectedRole.toLowerCase() : '';
 
-                // Reset semua instansi
+                // Simpan instansi yang sudah dicentang (untuk preserve data existing)
+                var previouslyChecked = [];
+                $('.instansi-checkbox:checked').each(function() {
+                    previouslyChecked.push($(this).val());
+                });
+
+                // Reset display dan event listener
                 $('.instansi-item').show();
-                $('.instansi-checkbox').prop('disabled', false);
+                $('.instansi-checkbox').prop('disabled', false).off('change.maxValidation');
 
                 if (!roleName) {
                     // Jika belum pilih role, disable semua instansi
@@ -177,58 +202,77 @@
 
                 // ROLE: Admin Yayasan - Tampil semua instansi
                 if (roleName === 'admin_yayasan' || roleName === 'admin yayasan') {
-                    // Tampilkan semua
+                    // Tampilkan semua, tidak ada batasan
+                    restoreChecked(previouslyChecked);
                 }
 
                 // ROLE: Operator Instansi - Maksimal 1 instansi, kecuali Puspela
                 else if (roleName === 'operator_instansi' || roleName === 'operator instansi') {
                     // Sembunyikan Puspela
-                    $('.instansi-item').each(function() {
-                        var instansiName = $(this).data('instansi-name');
-                        if (instansiName.includes('puspela')) {
-                            $(this).hide();
-                            $(this).find('.instansi-checkbox').prop('checked', false);
-                        }
-                    });
+                    hidePuspela();
+
+                    // Restore checked yang valid (maksimal 1)
+                    restoreChecked(previouslyChecked, 1);
 
                     // Validasi maksimal 1 checkbox
                     validateMaxInstansi(1);
                 }
 
-                // ROLE: Tenaga Pendidik - Semua kecuali Puspela
+                // ROLE: Tenaga Pendidik - Semua kecuali Puspela (BISA BANYAK)
                 else if (roleName === 'tenaga_pendidik' || roleName === 'tenaga pendidik') {
                     // Sembunyikan Puspela
-                    $('.instansi-item').each(function() {
-                        var instansiName = $(this).data('instansi-name');
-                        if (instansiName.includes('puspela')) {
-                            $(this).hide();
-                            $(this).find('.instansi-checkbox').prop('checked', false);
-                        }
-                    });
+                    hidePuspela();
+
+                    // Restore semua checked yang valid (tidak ada batasan)
+                    restoreChecked(previouslyChecked);
                 }
 
                 // ROLE: Tenaga Kependidikan - Maksimal 1, kecuali Puspela
                 else if (roleName === 'tenaga_kependidikan' || roleName === 'tenaga kependidikan') {
                     // Sembunyikan Puspela
-                    $('.instansi-item').each(function() {
-                        var instansiName = $(this).data('instansi-name');
-                        if (instansiName.includes('puspela')) {
-                            $(this).hide();
-                            $(this).find('.instansi-checkbox').prop('checked', false);
-                        }
-                    });
+                    hidePuspela();
+
+                    // Restore checked yang valid (maksimal 1)
+                    restoreChecked(previouslyChecked, 1);
 
                     // Validasi maksimal 1 checkbox
                     validateMaxInstansi(1);
                 }
             }
 
+            // Fungsi helper: sembunyikan Puspela
+            function hidePuspela() {
+                $('.instansi-item').each(function() {
+                    var instansiName = $(this).data('instansi-name');
+                    if (instansiName.includes('puspela')) {
+                        $(this).hide();
+                        $(this).find('.instansi-checkbox').prop('checked', false);
+                    }
+                });
+            }
+
+            // Fungsi helper: restore checkbox yang masih valid
+            function restoreChecked(checkedIds, maxCount = null) {
+                // Uncheck semua dulu
+                $('.instansi-checkbox').prop('checked', false);
+
+                var count = 0;
+                checkedIds.forEach(function(id) {
+                    var checkbox = $('.instansi-checkbox[value="' + id + '"]');
+                    // Hanya restore yang masih visible
+                    if (checkbox.is(':visible')) {
+                        if (maxCount === null || count < maxCount) {
+                            checkbox.prop('checked', true);
+                            count++;
+                        }
+                    }
+                });
+            }
+
             // Fungsi validasi maksimal instansi
             function validateMaxInstansi(maxCount) {
-                // Unbind dulu untuk avoid multiple binding
-                $('.instansi-checkbox').off('change.maxValidation');
-
-                $('.instansi-checkbox').on('change.maxValidation', function() {
+                // Event listener dengan namespace untuk avoid multiple binding
+                $('.instansi-checkbox:visible').on('change.maxValidation', function() {
                     var checkedCount = $('.instansi-checkbox:checked:visible').length;
 
                     if (checkedCount >= maxCount) {
@@ -240,16 +284,17 @@
                     }
                 });
 
-                // Trigger validation saat pertama load
-                $('.instansi-checkbox').trigger('change.maxValidation');
+                // Trigger validation pertama kali
+                var checkedCount = $('.instansi-checkbox:checked:visible').length;
+                if (checkedCount >= maxCount) {
+                    $('.instansi-checkbox:not(:checked):visible').prop('disabled', true);
+                }
             }
 
-            // Event ketika role dipilih
+            // Event ketika role dipilih/diubah
             $('.role-radio').on('change', function() {
-                // Uncheck semua instansi saat ganti role
-                $('.instansi-checkbox').prop('checked', false);
-
-                // Filter instansi berdasarkan role
+                // PENTING: TIDAK uncheck semua instansi
+                // filterInstansiByRole() akan handle preserve data yang masih valid
                 filterInstansiByRole();
             });
 
