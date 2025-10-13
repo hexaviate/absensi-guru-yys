@@ -97,7 +97,7 @@
                 <!-- Card Guru Chart -->
                 <div class="card custom-card">
                     <div class="card-header">
-                        <h4>Guru</h4>
+                        <h4>Statistik Absensi</h4>
                     </div>
                     <div class="card-body">
                         <div id="chart"></div>

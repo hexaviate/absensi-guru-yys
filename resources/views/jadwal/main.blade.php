@@ -11,9 +11,13 @@
         </div>
 
         <div class="section-body">
-            <div class="shadow pb-2">
-                <a href="{{ route('jadwal.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Jadwal</a>
-            </div>
+
+            @hasanyrole('operator_instansi')
+                <div class="shadow pb-2">
+                    <a href="{{ route('jadwal.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Jadwal</a>
+                </div>
+            @endhasanyrole
+
 
             <div class="row">
                 <div class="col-12">
@@ -37,7 +41,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse ($jadwal as $item)
+                                        @forelse ($semuaJadwal as $item)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $item->tapel->kode }}</td>
@@ -59,7 +63,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center">Data Jadwal Kosong</td>
+                                                <td colspan="8" class="text-center">Data Jadwal Kosong</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -72,6 +76,11 @@
         </div>
     </section>
 @endsection
+
+
+@push('style')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+@endpush
 
 @push('script')
     {{-- <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> --}}
@@ -92,9 +101,3 @@
         });
     </script>
 @endpush
-
-@push('style')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-@endpush
-
-
