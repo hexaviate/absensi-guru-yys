@@ -29,8 +29,8 @@ class UsersController extends Controller
         $semuaRole = Role::all();
         $semuaInstansi = Instansi::all();
 
-        $user = $instansi->user;
-        return view('user.main', compact('user', 'role', 'instansi'));
+        $userInstansi = $instansi->user()->get();
+        return view('user.main', compact('user', 'instansi', 'semuaUser', 'semuaRole', 'semuaInstansi', 'userInstansi'));
     }
 
 
