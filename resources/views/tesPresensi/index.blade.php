@@ -282,23 +282,26 @@
                     </button>
                 </div>
                 <div class="col-12 col-md-4">
-                    @hasrole('admin_yayasan')
-                        <a href="{{ route('adminYysDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
-                            <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
-                        </a>
-                        @elserole('operator_instansi')
-                        <a href="{{ route('operatorDashboard') }}" class="btn btn-custom btn-warning-custom w-100">
-                            <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
-                        </a>
-                        @hasanyrole('tenaga_pendidik|tenaga_kependidikan')
-                            <a href="{{ route('userDashboard') }}" class="btn btn-custom btn-info-custom w-100">
-                                <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
-                            </a>
-                        @endhasrole
-                    </div>
+    @hasrole('admin_yayasan')
+        <a href="{{ route('adminYysDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
+            <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
+        </a>
+    @else
+        @hasrole('operator_instansi')
+            <a href="{{ route('operatorDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
+                <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
+            </a>
+        @else
+            @hasanyrole('tenaga_pendidik|tenaga_kependidikan')
+                <a href="{{ route('userDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
+                    <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
+                </a>
+            @endhasrole
+        @endhasrole
+    @endhasrole
+</div>
 
 
-                </div>
 
                 {{-- Status Presensi yang Muncul Setelah Berhasil --}}
                 {{-- Status Container Lengkap yang Muncul Setelah Presensi --}}
@@ -306,8 +309,8 @@
                     <div class="row">
                         <div class="col-12">
                             <!-- Status Message Alert - BARU DITAMBAHKAN -->
-                            <div class="alert alert-success text-center fw-semibold mb-3" role="alert" id="status-message"
-                                style="display:none;">
+                            <div class="alert alert-success text-center fw-semibold mb-3" role="alert"
+                                id="status-message" style="display:none;">
                                 Status akan muncul di sini
                             </div>
 
@@ -349,7 +352,8 @@
         </div>
 
         <!-- Modal Tutorial -->
-        <div class="modal fade" id="tutorialModal" tabindex="-1" aria-labelledby="tutorialModalLabel" aria-hidden="true">
+        <div class="modal fade" id="tutorialModal" tabindex="-1" aria-labelledby="tutorialModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -365,7 +369,8 @@
                                 <span class="step-number p-3">1</span>
                                 <div>
                                     <h6 class="mb-1 fw-bold">Posisikan kamera</h6>
-                                    <p class="mb-0 text-muted">Pastikan kamera perangkat dalam keadaan bersih dan aplikasi
+                                    <p class="mb-0 text-muted">Pastikan kamera perangkat dalam keadaan bersih dan
+                                        aplikasi
                                         memiliki izin akses kamera.</p>
                                 </div>
                             </div>
@@ -376,7 +381,8 @@
                                 <span class="step-number p-3">2</span>
                                 <div>
                                     <h6 class="mb-1 fw-bold">Tempatkan wajah</h6>
-                                    <p class="mb-0 text-muted">Tempatkan wajah Anda di area yang cukup terang, lalu arahkan
+                                    <p class="mb-0 text-muted">Tempatkan wajah Anda di area yang cukup terang, lalu
+                                        arahkan
                                         ke kamera dan posisikan di tengah layar.</p>
                                 </div>
                             </div>
@@ -387,7 +393,8 @@
                                 <span class="step-number p-3">3</span>
                                 <div>
                                     <h6 class="mb-1 fw-bold">Ambil Absensi</h6>
-                                    <p class="mb-0 text-muted">Tahan posisi beberapa saat hingga proses verifikasi selesai,
+                                    <p class="mb-0 text-muted">Tahan posisi beberapa saat hingga proses verifikasi
+                                        selesai,
                                         jangan menggerakkan perangkat terlalu banyak.</p>
                                 </div>
                             </div>
@@ -410,7 +417,8 @@
                                 <span class="step-number p-3">5</span>
                                 <div>
                                     <h6 class="mb-1 fw-bold">Berhasil</h6>
-                                    <p class="mb-0 text-muted">Setelah verifikasi berhasil, sistem akan menampilkan lokasi,
+                                    <p class="mb-0 text-muted">Setelah verifikasi berhasil, sistem akan menampilkan
+                                        lokasi,
                                         perangkat, waktu, serta status absensi Anda.</p>
                                 </div>
                             </div>
@@ -430,7 +438,8 @@
 
                         <div class="alert alert-info mt-4">
                             <i class="fas fa-lightbulb me-2"></i>
-                            <strong>Tips:</strong> Gunakan pencahayaan yang cukup dan pastikan tidak ada bayangan menutupi
+                            <strong>Tips:</strong> Gunakan pencahayaan yang cukup dan pastikan tidak ada bayangan
+                            menutupi
                             wajah untuk hasil terbaik.
                         </div>
                     </div>
@@ -921,6 +930,6 @@
             });
         </script>
 
-    </body>
+</body>
 
-    </html>
+</html>
