@@ -39,9 +39,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('prosesPresensi', 'prosesPresensi')->name('prosesPresensi');
     });
 
-    Route::get('/dashboard', function () {
-        return view('dashboard.main');
-    })->name('dashboard');
+    // Route::get('/dashboard', function () {
+    //     return view('dashboard.main');
+    // })->name('dashboard');
 
     Route::resource('user', UsersController::class);
     Route::resource('role', RoleController::class);

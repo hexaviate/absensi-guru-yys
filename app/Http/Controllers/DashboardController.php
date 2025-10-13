@@ -63,7 +63,7 @@ class DashboardController extends Controller
         //total guru yang izin hari ini
         $totalGuruIzin = Izin::where('status', 'diterima')->whereDate('created_at', today())->count();
 
-        return view('dashboard.yys', compact('guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruPerInstansi', 'totalSemuaGuru'));
+        return view('dashboard.yys', compact('guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruPerInstansi', 'totalSemuaGuru', 'instansi'));
     }
 
     public function userDashboard()

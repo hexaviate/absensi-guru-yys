@@ -88,13 +88,13 @@
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Jumlah Instansi</h6>
-                                <h3 class="mb-0 text-primary">12</h3>
+                                <h3 class="mb-0 text-primary">{{ $instansi->count() }}</h3>
                             </div>
                         </div>
                         <div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Total Guru Yayasan</h6>
-                                <h3 class="mb-0 text-success">{{ $totalGuruInstansi }}</h3>
+                                <h3 class="mb-0 text-success">{{ $totalSemuaGuru }}</h3>
                             </div>
                         </div>
                     </div>
@@ -412,7 +412,6 @@
             ]);
             updateDateDisplay();
         }, 86400000);
-
     </script>
 @endpush
 
