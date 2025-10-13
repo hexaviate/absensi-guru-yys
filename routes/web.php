@@ -79,6 +79,16 @@ Route::middleware(['auth'])->group(function () {
 
         //?---------------------------------------------------------{Operator/Admin}-----------------------------------------------------------------------//
 
+        Route::get('/izin/operator/create', [IzinController::class, 'viewIzinCreateOperator'])
+            ->name('viewIzinCreateOperator');
+
+        // Store izin yang dibuat operator
+        Route::post('/izin/operator/store', [IzinController::class, 'izinCreateOperator'])
+            ->name('izinCreateOperator');
+
+        // Search users untuk dropdown (AJAX)
+        Route::get('/izin/search-users', [IzinController::class, 'searchUsers'])
+            ->name('izin.searchUsers');
 
     });
 });

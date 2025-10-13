@@ -116,9 +116,9 @@
                             </div>
                         </div>
 
-                        <div class="text-end">
+                        <div class="d-flex justify-content-end" style="gap: 10px;">
                             <button type="submit" class="btn btn-primary px-4">Update</button>
-                            <a href="{{ route('jadwal.index') }}" class="btn btn-secondary">Kembali</a>
+                            <a href="{{ route('jadwal.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
                     </form>
                 </div>

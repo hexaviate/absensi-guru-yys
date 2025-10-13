@@ -20,12 +20,13 @@
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Tambah Hari Libur</h5>
                 </div>
+
                 <div class="card-body">
                     <form action="{{ route('hariLibur.store') }}" method="POST">
                         @csrf
                         <div class="row">
                             {{-- Tahun Pelajaran --}}
-                           <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label for="tapel" class="form-label">Tahun Pelajaran</label>
                                 <input type="text" class="form-control"
                                     value="{{ $tapel ? $tapel->kode : 'Tidak ada tapel aktif' }}" readonly>
@@ -33,7 +34,7 @@
                             </div>
 
                             {{-- Instansi --}}
-                             <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Instansi</label>
                                 <div class="selectgroup selectgroup-pills">
                                     @forelse ($instansi as $item)
@@ -41,7 +42,7 @@
                                             <input type="checkbox" name="instansi_id" value="{{ $item->id }}"
                                                 class="selectgroup-input"
                                                 {{ old('instansi_id') == $item->id ? 'checked' : '' }}
-                                                {{ count(value: $instansi) == 1 ? 'checked' : '' }}>
+                                                {{ count($instansi) == 1 ? 'checked' : '' }}>
                                             <span class="selectgroup-button">{{ $item->nama_instansi }}</span>
                                         </label>
                                     @empty
@@ -68,17 +69,16 @@
                         </div>
 
                         <div class="row">
+                            {{-- Waktu --}}
                             <div class="col-md-6 mb-3">
                                 <label for="waktu" class="form-label">Waktu</label>
                                 <input type="time" id="waktu" name="waktu" class="form-control">
                             </div>
-                            </div>
-
                         </div>
 
-                        <div class="text-end">
+                        <div class="d-flex justify-content-end" style="gap: 10px;">
                             <button type="submit" class="btn btn-primary px-4">Simpan</button>
-                            <button class="btn btn-danger" type="reset">Reset</button>
+                            <a href="{{ route('hariLibur.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
                     </form>
                 </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Izin;
+use App\Models\User;
 use App\Models\Presensi;
 use Carbon\Carbon;
 use File;
@@ -336,5 +337,252 @@ class IzinController extends Controller
 
     //?---------------------------------------------------------{Operator/Admin}-----------------------------------------------------------------------//
 
+    // Tambahkan method-method ini ke IzinController yang sudah ada
+
+    /**
+     * Show form untuk operator membuat izin untuk user
+     */
+    public function viewIzinCreateOperator()
+    {
+        $user = auth()->user();
+
+        if (!$user->hasAnyPermission(['manage izin'])) {
+            return redirect()->intended('dashboard')->with('error', 'Anda tidak punya permission');
+        }
+
+        // Ambil instansi pertama dari operator (sesuaikan jika operator bisa punya multiple instansi)
+        $instansi = $user->instansi()->first();
+
+        if (!$instansi) {
+            return redirect()->route('izinIndexOperator')
+                ->with('error', 'Anda tidak memiliki akses ke instansi manapun');
+        }
+
+        return view('izin.admin.tambah', compact('instansi'));
+    }
+
+    /**
+     * Store izin yang dibuat oleh operator untuk user
+     */
+    public function izinCreateOperator(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user->hasAnyPermission(['manage izin'])) {
+            return redirect()->intended('dashboard')->with('error', 'Anda tidak punya permission');
+        }
+
+        // Validasi input
+        $validate = Validator::make($request->all(), [
+            'instansi_id' => 'required|exists:instansis,id',
+            'user_id' => 'required|exists:users,id',
+            'tanggal' => 'required|date',
+            'keterangan' => 'required|string|max:500',
+            'bukti_izin' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:2048',
+        ], [
+            'instansi_id.required' => 'Instansi harus dipilih',
+            'instansi_id.exists' => 'Instansi tidak valid',
+            'user_id.required' => 'User harus dipilih',
+            'user_id.exists' => 'User tidak valid',
+            'tanggal.required' => 'Tanggal harus diisi',
+            'tanggal.date' => 'Format tanggal tidak valid',
+            'keterangan.required' => 'Keterangan harus diisi',
+            'keterangan.max' => 'Keterangan maksimal 500 karakter',
+            'bukti_izin.file' => 'Bukti izin harus berupa file',
+            'bukti_izin.mimes' => 'Bukti izin harus berformat: jpeg, jpg, png, atau pdf',
+            'bukti_izin.max' => 'Ukuran bukti izin maksimal 2MB',
+        ]);
+
+        if ($validate->fails()) {
+            return redirect()->route('viewIzinCreateOperator')->withErrors($validate)->withInput();
+        }
+
+        try {
+            // Cek apakah operator punya akses ke instansi ini
+            $operatorHasInstansi = $user->instansi()->where('instansi_id', $request->instansi_id)->exists();
+
+            if (!$operatorHasInstansi) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Anda tidak memiliki akses ke instansi ini');
+            }
+
+            // Cek apakah user terdaftar di instansi yang dipilih
+            $userInInstansi = User::find($request->user_id)
+                ->instansi()
+                ->where('instansi_id', $request->instansi_id)
+                ->exists();
+
+            if (!$userInInstansi) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'User tidak terdaftar di instansi yang dipilih');
+            }
+
+            // Cek apakah user sudah punya izin di tanggal yang sama untuk instansi ini
+            $existingIzin = Izin::where('user_id', $request->user_id)
+                ->where('instansi_id', $request->instansi_id)
+                ->where('tanggal', $request->tanggal)
+                ->exists();
+
+            if ($existingIzin) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'User sudah memiliki izin pada tanggal yang sama di instansi ini');
+            }
+
+            // Handle upload bukti izin (opsional)
+            $buktiIzinPath = null;
+
+            if ($request->hasFile('bukti_izin')) {
+                $file = $request->file('bukti_izin');
+
+                if ($file->extension() == "pdf") {
+                    // Upload PDF langsung
+                    $fileName = time() . '_' . $request->instansi_id . '.' . $file->extension();
+                    $file->move(public_path('bukti_izin/'), $fileName);
+                    $buktiIzinPath = $fileName;
+
+                } else {
+                    // Upload dan compress gambar menggunakan Intervention Image
+                    $fileName = time() . '_' . $request->instansi_id . '.' . $file->extension();
+
+                    $manager = ImageManager::withDriver(new Driver());
+                    $image = $manager->read($file);
+                    $image->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $fileName));
+
+                    $buktiIzinPath = $fileName;
+                }
+            }
+
+            // Simpan data izin dengan status diterima (karena dibuat oleh operator)
+            $izin = Izin::create([
+                'user_id' => $request->user_id,
+                'instansi_id' => $request->instansi_id,
+                'bukti_izin' => $buktiIzinPath,
+                'tanggal' => $request->tanggal,
+                'keterangan' => $request->keterangan,
+                'status' => 'diterima', // Auto approve karena dibuat operator
+            ]);
+
+            // Buat presensi izin otomatis
+            Presensi::create([
+                'instansi_id' => $request->instansi_id,
+                'user_id' => $request->user_id,
+                'izin_id' => $izin->id,
+                'status' => 'izin',
+                'tanggal' => $request->tanggal,
+            ]);
+
+            return redirect()->route('izinIndexOperator')
+                ->with('success', 'Data izin berhasil ditambahkan');
+
+        } catch (\Exception $e) {
+            \Log::error('Error saat menyimpan izin operator:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Search users berdasarkan instansi (untuk AJAX dropdown)
+     */
+    public function searchUsers(Request $request)
+    {
+        try {
+            // Log untuk debugging
+            \Log::info('Search Users Request:', [
+                'instansi' => $request->get('instansi'),
+                'search' => $request->get('search'),
+                'all_params' => $request->all()
+            ]);
+
+            // Ambil parameter
+            $instansiId = $request->get('instansi');
+            $searchTerm = $request->get('search');
+
+            // Validasi parameter
+            if (empty($instansiId)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Parameter instansi tidak ditemukan'
+                ], 400);
+            }
+
+            if (empty($searchTerm) || strlen($searchTerm) < 2) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kata kunci pencarian minimal 2 karakter'
+                ], 400);
+            }
+
+            // Query dasar dengan join ke tabel user_has_instansi
+            $query = User::select('users.id', 'users.name', 'users.username', 'users.telp')
+                ->join('user_has_instansi', 'users.id', '=', 'user_has_instansi.user_id')
+                ->where('user_has_instansi.instansi_id', $instansiId);
+
+            // Filter berdasarkan nama, username, atau telp
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('users.name', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('users.username', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('users.telp', 'LIKE', '%' . $searchTerm . '%');
+            });
+
+            // Batasi hasil dan urutkan
+            $users = $query->limit(15)
+                ->orderBy('users.name', 'asc')
+                ->get();
+
+            // Log hasil query
+            \Log::info('Search Users Result:', [
+                'count' => $users->count(),
+                'users' => $users->toArray()
+            ]);
+
+            // Format hasil untuk dropdown
+            $formattedUsers = $users->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'telp' => $user->telp,
+                    'display' => $user->name . ' (' . $user->username . ')'
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'users' => $formattedUsers
+            ]);
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Error database spesifik
+            \Log::error('Database Error in searchUsers:', [
+                'message' => $e->getMessage(),
+                'sql' => $e->getSql() ?? 'N/A',
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error database: ' . (config('app.debug') ? $e->getMessage() : 'Terjadi kesalahan query')
+            ], 500);
+
+        } catch (\Exception $e) {
+            \Log::error('General Error in searchUsers:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . (config('app.debug') ? $e->getMessage() : 'Internal server error')
+            ], 500);
+        }
+    }
 
 }

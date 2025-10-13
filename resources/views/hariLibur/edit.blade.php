@@ -18,7 +18,7 @@
         <div class="section-body">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Edit Libur</h5>
+                    <h5 class="mb-0">Form Edit Libur</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('hariLibur.update', $hariLibur->id) }}" method="POST">
@@ -73,7 +73,7 @@
                             </div>
                         </div>
 
-                        <div class="text-end">
+                        <div class="d-flex justify-content-end" style="gap: 10px;">
                             <button type="submit" class="btn btn-primary px-4">Update</button>
                             <a href="{{ route('hariLibur.index') }}" class="btn btn-secondary">Batal</a>
                         </div>
