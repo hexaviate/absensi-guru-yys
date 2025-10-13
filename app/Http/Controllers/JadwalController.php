@@ -48,7 +48,7 @@ class JadwalController extends Controller
         $jadwal = $query->with('instansi')->get();
         $semuaJadwal = Jadwal::all();
 
-        return view('jadwal.main', compact('jadwal', 'semuaJadwal', 'filterHari', 'filterInstansi', 'instansi'));
+        return view('jadwal.main', compact('jadwal', 'semuaJadwal', 'filterHari', 'filterInstansi'));
     }
 
     /**
