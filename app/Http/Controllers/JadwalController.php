@@ -21,9 +21,9 @@ class JadwalController extends Controller
         }
 
 
-        $jadwal = Jadwal::where('instansi_id', $user->instansi()->first()->id);
 
         $tapelAktif = Tapel::where('status', 'aktif')->first();
+        $jadwal = Jadwal::where('instansi_id', $user->instansi()->first()->id)->where('tapel_id', $tapelAktif->id);
 
         // get filter inputs (nullable)
         $filterHari = $request->input('filter_hari');           // e.g. 'senin', 'selasa', etc.
@@ -66,9 +66,9 @@ class JadwalController extends Controller
         }
 
         $tapel = Tapel::where('status', "aktif")->first();
-        $userList = $user->instansi()->get();
+        $userList = $user->instansi()->get(); //! masih prlu tindak lanjut
         $instansi = $user->instansi()->get();
-        return view('jadwal.tambah', compact('tapel', 'instansi', 'userList', 'instansiId'))->with('success','Berhasil Menambah Jadwal');
+        return view('jadwal.tambah', compact('tapel', 'instansi', 'userList', 'instansiId'))->with('success', 'Berhasil Menambah Jadwal');
     }
 
     /**
@@ -204,7 +204,7 @@ class JadwalController extends Controller
 
         $target = Jadwal::find($id);
         $target->delete();
-        return redirect()->route('jadwal.index')->with('success','Berhasil Hapus Jadwal');
+        return redirect()->route('jadwal.index')->with('success', 'Berhasil Hapus Jadwal');
     }
 
     public function searchUsers(Request $request)

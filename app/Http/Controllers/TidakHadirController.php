@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 class TidakHadirController extends Controller
 {
+    //TODO mengembangkan view tidak hadir kedepannya
     public function operatorViewTidakHadir()
     {
         $user = auth()->user();

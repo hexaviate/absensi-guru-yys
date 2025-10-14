@@ -70,7 +70,7 @@ class InstansiController extends Controller
 
         // $instansi->user()->attach($request->user_id);
 
-        return redirect()->route('instansi.index')->with('success','Berhaasil Mewnambah Instansi');
+        return redirect()->route('instansi.index')->with('success', 'Berhaasil Mewnambah Instansi');
 
     }
 
@@ -109,9 +109,11 @@ class InstansiController extends Controller
             "kepala_instansi" => "required",
             "alamat_instansi" => "required",
             "telp_instansi" => "required|numeric",
+            "latitude" => "required",
+            "longitude" => "required",
             // "user_id" => "exist:user,id|required",
-            "user_id" => "required|unique:user_has_instansi,user_id",
-            "user_id.*" => "exists:users,id"
+            // "user_id" => "required|unique:user_has_instansi,user_id",
+            // "user_id.*" => "exists:users,id"
         ]);
 
         if ($validate->fails()) {
@@ -123,11 +125,13 @@ class InstansiController extends Controller
             "kepala_instansi" => $request->kepala_instansi,
             "alamat_instansi" => $request->alamat_instansi,
             "telp_instansi" => $request->telp_instansi,
+            "latitude" => $request->latitude,
+            "longitude" => $request->longitude
         ]);
 
         $target->user()->sync($request->user_id);
 
-        return redirect()->route('instansi.index')->with('success','Berhasil Edit Instansi');
+        return redirect()->route('instansi.index')->with('success', 'Berhasil Edit Instansi');
     }
 
     /**
@@ -142,6 +146,6 @@ class InstansiController extends Controller
 
         $target = Instansi::find($id);
         $target->delete();
-        return redirect()->route('instansi.index')->with('success','Berhasil Hapus Instansi');
+        return redirect()->route('instansi.index')->with('success', 'Berhasil Hapus Instansi');
     }
 }

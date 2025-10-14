@@ -20,11 +20,12 @@ class HariLiburController extends Controller
         $user = auth()->user();
 
         if ($user->hasAnyPermission(['view all hari_libur', 'manage hari_libur'])) {
-            $tapel = Tapel::all();
-            $semuaHariLibur = HariLibur::all();
+            $tapel = Tapel::where('status', 'aktif')->get();
+            $tapelAktif = Tapel::where('status', 'aktif')->first();
+            $semuaHariLibur = HariLibur::tapel()->where('status', 'aktif')->get();
 
             $instansi = $user->instansi()->first(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
-            $operatorHariLibur = HariLibur::where('instansi_id', $instansi->id)->get();
+            $operatorHariLibur = HariLibur::where('instansi_id', $instansi->id)->where('tapel_id', $tapelAktif->id)->get();
             return view('hariLibur.main', compact('user', 'tapel', 'instansi', 'semuaHariLibur', 'operatorHariLibur'));
         } else {
             return redirect()->route('login')->with('error', 'Anda tidak punya Permission');
@@ -109,7 +110,7 @@ class HariLiburController extends Controller
         }
 
         $hariLibur = HariLibur::findOrFail($id);
-        $tapel = Tapel::all();
+        $tapel = Tapel::where('status', 'aktif')->get();
         $instansi = Instansi::where('id', $user->instansi()->first()->id)->get(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
         $instansiId = $user->instansi()->first()->id;
 
@@ -166,6 +167,6 @@ class HariLiburController extends Controller
 
         $target = HariLibur::find($id);
         $target->delete();
-        return redirect()->route('hariLibur.index')->with('success','Berhasil Menghapus Hari Libur');
+        return redirect()->route('hariLibur.index')->with('success', 'Berhasil Menghapus Hari Libur');
     }
 }

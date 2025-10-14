@@ -31,7 +31,7 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         if ($id != $user->id) {
-            return redirect()->intended('login');
+            return redirect()->back()->with('error', 'anda tidak mempunyai permission');
         }
 
         return view('profile.editProfile', compact('user'));
@@ -67,7 +67,7 @@ class ProfileController extends Controller
             "foto" => $imageName
         ]);
 
-        return redirect()->route('viewProfile')->with('success','Berhasil Update Profil');
+        return redirect()->route('viewProfile')->with('success', 'Berhasil Update Profil');
     }
 
     public function viewJadwalMingguIni(Request $request)
@@ -112,8 +112,9 @@ class ProfileController extends Controller
             return redirect()->back();
 
         }
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
 
-        $presensi = Presensi::where('user_id', $user->id)->get();
+        $presensi = $user->presensi()->where('tapel_id', $tapelAktif->id)->get();
 
         return view('riwayatAbsen', compact('presensi'));// view nanti diganti
     }
@@ -129,7 +130,7 @@ class ProfileController extends Controller
         $tapelAktif = Tapel::where('status', "aktif")->first();
         $hariIni = Carbon::now()->isoFormat('dddd');
 
-
+        //! cek buku
         $jadwal = Jadwal::where('user_id', $user->id)->where('hari', $hariIni)->where('tapel_id', $tapelAktif->id)->first();
 
         return view('jadwalHariIni', compact('jadwal'));// view nanti diganti

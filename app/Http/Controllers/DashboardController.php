@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Instansi;
 use App\Models\Izin;
 use App\Models\Presensi;
+use App\Models\Tapel;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -75,7 +76,7 @@ class DashboardController extends Controller
             return redirect()->route('login')->with('error', "anda belum login");
         }
         $presensiHariIni = Presensi::where('user_id', $user->id)->whereDate('tanggal', today()->toDateString())->get();
-        $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->get();
+        $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->where('tapel_id', Tapel::where('status', 'aktif')->first()->id)->get();
 
         $izinBulanIni = $user->izin()->whereMonth('created_at', now()->month)->count();
         $presensiMingguIni = $user->presensi()->whereBetween('created_at', [

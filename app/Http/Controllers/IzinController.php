@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Instansi;
 use App\Models\Izin;
+use App\Models\Tapel;
 use App\Models\User;
 use App\Models\Presensi;
 use Carbon\Carbon;
@@ -23,8 +24,10 @@ class IzinController extends Controller
         // dd();
 
         if ($user->hasAnyPermission(['view self izin', 'manage izin'])) {
+            $tapelAktif = Tapel::where('status', 'aktif')->first();
+
             // $instansi = $user->instansi; //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
-            $izin = Izin::where('user_id', $user->id)->get();
+            $izin = Izin::where('user_id', $user->id)->where('tapel_id', $tapelAktif->id)->get();
             return view('izin.users.index', compact('izin'));
         } else {
             return redirect()->route('login')->with('error', 'Anda tidak punya Permission');
@@ -60,6 +63,7 @@ class IzinController extends Controller
 
 
         $validate = Validator::make($request->all(), [
+            'tapel_id' => 'required',
             'bukti_izin' => 'required',
             'instansi_id' => 'required|exists:instansis,id',
             'keterangan' => 'required',
@@ -72,7 +76,7 @@ class IzinController extends Controller
 
         foreach ($request->instansi_id as $instansi) {
 
-            if ($instansi == Instansi::where('nama_instansi', 'SMK')->first()->id && $user->hasAnyRole(['tenaga_pendidik', 'tenaga_pendidikan'])) {
+            if ($instansi == Instansi::where('nama_instansi', 'SMK')->first()->id) {
                 return redirect()->back()->with('error', 'Anda tidak bisa izin di instansi ini');
             }
 
@@ -123,13 +127,7 @@ class IzinController extends Controller
 
             }
 
-
         }
-
-
-
-        // dd($created);
-
         return redirect()->route("izinIndexUser")->with('success', value: 'anda berhasil membuat izin');
     }
 
@@ -141,7 +139,7 @@ class IzinController extends Controller
         }
 
         $izin = Izin::find($id);
-        $instansi = $user->instansi;
+        $instansi = $user->instansi->get();
         $instansiId = $user->instansi()->first()->id;
 
 
@@ -176,6 +174,7 @@ class IzinController extends Controller
 
         $validate = Validator::make($request->all(), [
             'instansi_id' => 'required|sometimes',
+            'tapel_id' => 'required',
             'bukti_izin' => 'required|sometimes',
             'tanggal' => 'required|sometimes',
             'keterangan' => 'required|sometimes'
