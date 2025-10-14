@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Exports;
+
 use App\Models\Presensi;
 use App\Models\Instansi;
 use Maatwebsite\Excel\Concerns\FromArray;
@@ -10,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Font;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use Illuminate\Support\Facades\Auth;
 
 class RekapHarianExport implements FromArray, WithStyles, WithTitle
 {
@@ -25,14 +27,31 @@ class RekapHarianExport implements FromArray, WithStyles, WithTitle
 
     private function loadData()
     {
+        $user = Auth::user();
         $query = Presensi::with(['user', 'instansi']);
+
+        // Filter untuk operator instansi
+        $isOperatorInstansi = $user->hasRole('operator instansi');
+        if ($isOperatorInstansi) {
+            $userInstansiIds = $user->instansi()->pluck('instansi.id')->toArray();
+            if (!empty($userInstansiIds)) {
+                $query->whereIn('instansi_id', $userInstansiIds);
+            }
+        }
 
         if ($this->request->filled('status')) {
             $query->where('status', $this->request->status);
         }
 
         if ($this->request->filled('instansi')) {
-            $query->where('instansi_id', $this->request->instansi);
+            if ($isOperatorInstansi) {
+                $userInstansiIds = $user->instansi()->pluck('instansi.id')->toArray();
+                if (in_array($this->request->instansi, $userInstansiIds)) {
+                    $query->where('instansi_id', $this->request->instansi);
+                }
+            } else {
+                $query->where('instansi_id', $this->request->instansi);
+            }
         }
 
         if ($this->request->filled('tanggal')) {
@@ -43,7 +62,11 @@ class RekapHarianExport implements FromArray, WithStyles, WithTitle
 
         // Ambil nama instansi untuk header
         $namaInstansi = 'Semua';
-        if ($this->request->filled('instansi')) {
+        if ($isOperatorInstansi) {
+            // Untuk operator instansi, tampilkan nama instansi mereka
+            $instansiOperator = $user->instansi()->first();
+            $namaInstansi = $instansiOperator ? $instansiOperator->nama_instansi : 'Semua';
+        } elseif ($this->request->filled('instansi')) {
             $instansi = Instansi::find($this->request->instansi);
             $namaInstansi = $instansi ? $instansi->nama_instansi : 'Semua';
         }
@@ -91,30 +114,9 @@ class RekapHarianExport implements FromArray, WithStyles, WithTitle
         $data[] = ['', '', '', '', '', '', ''];
         $data[] = ['Total Data: ' . $this->presensi->count() . ' record', '', '', '', '', '', ''];
         $data[] = ['Dicetak pada: ' . now()->format('d F Y, H:i:s'), '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', 'Mengetahui,', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '_________________________', ''];
-        // $data[] = ['', '', '', '', '', 'Kepala Sekolah/Pimpinan', ''];
 
         return $data;
     }
-
-    // Remove headings method karena sudah dimasukkan ke array data
-    // public function headings(): array
-    // {
-    //     return [
-    //         'No',
-    //         'Tanggal',
-    //         'Nama Guru/Karyawan',
-    //         'Instansi',
-    //         'Jam Datang',
-    //         'Jam Pulang',
-    //         'Status'
-    //     ];
-    // }
 
     public function styles(Worksheet $sheet)
     {

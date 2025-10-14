@@ -12,11 +12,13 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Font;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Illuminate\Support\Facades\Auth;
 
 class RekapTahunanExport implements FromArray, WithStyles, WithTitle
 {
     protected $request;
-    protected $presensi;
+    protected $rekapData;
     protected $filter;
 
     public function __construct($request)
@@ -27,100 +29,175 @@ class RekapTahunanExport implements FromArray, WithStyles, WithTitle
 
     private function loadData()
     {
-        $query = Presensi::with(['user', 'instansi']);
+        try {
+            $user = Auth::user();
 
-        // Filter tahunan
-        if ($this->request->filled('status')) {
-            $query->where('status', $this->request->status);
-        }
+            if (!$user) {
+                $this->rekapData = collect([]);
+                $this->filter = [
+                    'status' => 'Semua',
+                    'instansi' => 'Semua',
+                    'tahun_ajaran' => 'Semua Tahun Ajaran'
+                ];
+                return;
+            }
 
-        if ($this->request->filled('instansi')) {
-            $query->where('instansi_id', $this->request->instansi);
-        }
+            $isOperatorInstansi = $user->hasRole('operator_instansi');
 
-        if ($this->request->filled('tahun_ajaran')) {
-            $tapel = Tapel::find($this->request->tahun_ajaran);
-            if ($tapel) {
-                $dateRange = $tapel->getDateRange();
-                if ($dateRange) {
-                    $query->whereBetween('tanggal', [$dateRange['start'], $dateRange['end']]);
+            // Query untuk mendapatkan presensi
+            $query = Presensi::with(['user', 'instansi']);
+
+            // Filter untuk operator instansi
+            if ($isOperatorInstansi) {
+                $instansiOperator = $user->instansi()->first();
+                if ($instansiOperator) {
+                    $query->where('instansi_id', $instansiOperator->id);
+                }
+            } elseif ($this->request->filled('instansi')) {
+                $query->where('instansi_id', $this->request->instansi);
+            }
+
+            // Filter status
+            if ($this->request->filled('status')) {
+                $query->where('status', $this->request->status);
+            }
+
+            // Filter tahun ajaran
+            if ($this->request->filled('tahun_ajaran')) {
+                $tapel = Tapel::find($this->request->tahun_ajaran);
+                if ($tapel) {
+                    $dateRange = $tapel->getDateRange();
+                    if ($dateRange && isset($dateRange['start']) && isset($dateRange['end'])) {
+                        $query->whereBetween('tanggal', [$dateRange['start'], $dateRange['end']]);
+                    }
                 }
             }
+
+            $presensiData = $query->get();
+
+            // Hitung rekap per user
+            $grouped = $presensiData->groupBy('user_id');
+
+            $this->rekapData = $grouped->map(function ($items, $userId) {
+                $firstItem = $items->first();
+
+                // Safety check untuk relasi
+                if (!$firstItem || !$firstItem->user || !$firstItem->instansi) {
+                    return null;
+                }
+
+                return [
+                    'user_id' => $userId,
+                    'nama' => $firstItem->user->name ?? 'N/A',
+                    'instansi' => $firstItem->instansi->nama_instansi ?? 'N/A',
+                    'instansi_id' => $firstItem->instansi->id ?? 0,
+                    'hadir' => $items->where('status', 'hadir')->count(),
+                    'izin' => $items->where('status', 'izin')->count(),
+                    'alpa' => $items->where('status', 'alpa')->count(),
+                    'tanpa_ket' => $items->where('status', 'tanpa_keterangan')->count(),
+                ];
+            })->filter() // Hapus null values
+            ->values();
+
+            // Urutkan berdasarkan instansi (PAUD → MI → MTS → MA → SMK → PATTA)
+            $urutanInstansi = ['PAUD', 'MI', 'MTS', 'MA', 'SMK', 'PATTA'];
+
+            $this->rekapData = $this->rekapData->sort(function ($a, $b) use ($urutanInstansi) {
+                $instansiA = strtoupper($a['instansi'] ?? '');
+                $instansiB = strtoupper($b['instansi'] ?? '');
+
+                $indexA = array_search($instansiA, $urutanInstansi);
+                $indexB = array_search($instansiB, $urutanInstansi);
+
+                $indexA = $indexA === false ? 999 : $indexA;
+                $indexB = $indexB === false ? 999 : $indexB;
+
+                if ($indexA === $indexB) {
+                    return strcmp($a['nama'], $b['nama']);
+                }
+
+                return $indexA - $indexB;
+            })->values();
+
+            // Ambil nama instansi untuk header
+            $namaInstansi = 'Semua';
+            if ($isOperatorInstansi) {
+                $instansiOperator = $user->instansi()->first();
+                $namaInstansi = $instansiOperator ? $instansiOperator->nama_instansi : 'Semua';
+            } elseif ($this->request->filled('instansi')) {
+                $instansi = Instansi::find($this->request->instansi);
+                $namaInstansi = $instansi ? $instansi->nama_instansi : 'Semua';
+            }
+
+            // Ambil tahun ajaran
+            $tahunAjaran = 'Semua Tahun Ajaran';
+            if ($this->request->filled('tahun_ajaran')) {
+                $tapel = Tapel::find($this->request->tahun_ajaran);
+                $tahunAjaran = $tapel ? $tapel->kode : 'Semua Tahun Ajaran';
+            }
+
+            $this->filter = [
+                'status' => $this->request->status ?: 'Semua',
+                'instansi' => $namaInstansi,
+                'tahun_ajaran' => $tahunAjaran
+            ];
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('RekapTahunanExport LoadData Error: ' . $e->getMessage());
+            $this->rekapData = collect([]);
+            $this->filter = [
+                'status' => 'Semua',
+                'instansi' => 'Semua',
+                'tahun_ajaran' => 'Semua Tahun Ajaran'
+            ];
         }
-
-        $this->presensi = $query->orderBy('tanggal', 'desc')->get();
-
-        // Ambil nama instansi untuk header
-        $namaInstansi = 'Semua';
-        if ($this->request->filled('instansi')) {
-            $instansi = Instansi::find($this->request->instansi);
-            $namaInstansi = $instansi ? $instansi->nama_instansi : 'Semua';
-        }
-
-        // Ambil tahun ajaran
-        $tahunAjaran = 'Semua Tahun Ajaran';
-        if ($this->request->filled('tahun_ajaran')) {
-            $tapel = Tapel::find($this->request->tahun_ajaran);
-            $tahunAjaran = $tapel ? $tapel->kode : 'Semua Tahun Ajaran';
-        }
-
-        $this->filter = [
-            'status' => $this->request->status ?: 'Semua',
-            'instansi' => $namaInstansi,
-            'tahun_ajaran' => $tahunAjaran
-        ];
     }
 
     public function array(): array
     {
         $data = [];
 
-        // Header utama (baris 1-2)
+        // Header utama
         $data[] = ['REKAP TAHUNAN ABSENSI GURU & KARYAWAN', '', '', '', '', '', ''];
-        $data[] = ['Yayasan Salafiyah Kajen', '', '', '', '', '', ''];
+        $data[] = ['Yayasan Pendidikan Salafiyah', '', '', '', '', '', ''];
         $data[] = ['', '', '', '', '', '', ''];
 
-        // Informasi Laporan (baris 4-7)
+        // Informasi Laporan
         $data[] = ['Informasi Laporan:', '', '', '', '', '', ''];
-        $data[] = ['', 'Status', ': ' . $this->filter['status'], '', '', '', '', ''];
-        $data[] = ['', 'Instansi', ': ' . $this->filter['instansi'], '', '', '', '', ''];
-        $data[] = ['', 'Tahun Ajaran', ': ' . $this->filter['tahun_ajaran'], '', '', '', '', ''];
+        $data[] = ['', 'Status', ': ' . $this->filter['status'], '', '', '', ''];
+        $data[] = ['', 'Instansi', ': ' . $this->filter['instansi'], '', '', '', ''];
+        $data[] = ['', 'Tahun Ajaran', ': ' . $this->filter['tahun_ajaran'], '', '', '', ''];
         $data[] = ['', '', '', '', '', '', ''];
 
-        // Header tabel (baris 9)
-        $data[] = ['No', 'Tanggal', 'Nama Guru/Karyawan', 'Instansi', 'Datang', 'Pulang', 'Status'];
+        // Header tabel
+        $data[] = ['No', 'Nama Guru/Karyawan', 'Instansi', 'Hadir', 'Izin', 'Alpa', 'Tanpa Ket'];
 
         // Data rows
-        foreach ($this->presensi as $index => $item) {
-            $data[] = [
-                $index + 1,
-                \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y'),
-                $item->user->name ?? 'N/A',
-                $item->instansi->nama_instansi ?? 'N/A',
-                $item->datang ?? '-',
-                $item->pulang ?? '-',
-                ucfirst($item->status)
-            ];
+        if ($this->rekapData && count($this->rekapData) > 0) {
+            foreach ($this->rekapData as $index => $item) {
+                $data[] = [
+                    $index + 1,
+                    $item['nama'] ?? 'N/A',
+                    $item['instansi'] ?? 'N/A',
+                    $item['hadir'] ?? 0,
+                    $item['izin'] ?? 0,
+                    $item['alpa'] ?? 0,
+                    $item['tanpa_ket'] ?? 0
+                ];
+            }
+        } else {
+            $data[] = ['', 'Tidak ada data', '', '', '', '', ''];
         }
 
         // Footer
         $data[] = ['', '', '', '', '', '', ''];
-        $data[] = ['Total Data: ' . $this->presensi->count() . ' record', '', '', '', '', '', ''];
+        $data[] = ['Total Data: ' . ($this->rekapData ? count($this->rekapData) : 0) . ' record', '', '', '', '', '', ''];
         $data[] = ['Dicetak pada: ' . now()->format('d F Y, H:i:s'), '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', 'Mengetahui,', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '_________________________', ''];
-        // $data[] = ['', '', '', '', '', 'Kepala Sekolah/Pimpinan', ''];
 
         return $data;
     }
 
     public function styles(Worksheet $sheet)
     {
-        // Style yang sama dengan bulanan, hanya ganti beberapa label
         $sheet->mergeCells('A1:G1');
         $sheet->mergeCells('A2:G2');
         $sheet->mergeCells('A4:G4');
@@ -135,7 +212,7 @@ class RekapTahunanExport implements FromArray, WithStyles, WithTitle
         ]);
 
         $sheet->getStyle('A4:G7')->applyFromArray([
-            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F5F5F5']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F5F5F5']],
             'borders' => ['outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '999999']]]
         ]);
 
@@ -145,13 +222,15 @@ class RekapTahunanExport implements FromArray, WithStyles, WithTitle
         $headerRow = 9;
         $sheet->getStyle("A{$headerRow}:G{$headerRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 10, 'color' => ['rgb' => '000000']],
-            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E8E8E8']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E8E8E8']],
             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '666666']]],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER]
         ]);
 
-        $lastDataRow = 9 + count($this->presensi);
-        if ($lastDataRow > 9) {
+        $dataRowCount = $this->rekapData ? count($this->rekapData) : 0;
+        $lastDataRow = 9 + $dataRowCount;
+
+        if ($dataRowCount > 0) {
             $sheet->getStyle("A10:G{$lastDataRow}")->applyFromArray([
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '999999']]],
                 'alignment' => ['vertical' => Alignment::VERTICAL_CENTER],
@@ -159,33 +238,17 @@ class RekapTahunanExport implements FromArray, WithStyles, WithTitle
             ]);
 
             $sheet->getStyle("A10:A{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle("B10:B{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle("E10:E{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle("F10:F{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle("G10:G{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("D10:G{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         }
-
-        $footerStartRow = $lastDataRow + 2;
-        $footerEndRow = $footerStartRow + 1;
-        $signatureRow = $footerEndRow + 2;
-
-        $sheet->getStyle("A{$footerStartRow}:A{$footerEndRow}")->applyFromArray([
-            'font' => ['bold' => true, 'size' => 10]
-        ]);
-
-        $sheet->getStyle("F{$signatureRow}")->applyFromArray([
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-            'font' => ['size' => 10]
-        ]);
 
         // Set column widths
         $sheet->getColumnDimension('A')->setWidth(5);
-        $sheet->getColumnDimension('B')->setWidth(12);
-        $sheet->getColumnDimension('C')->setWidth(28);
-        $sheet->getColumnDimension('D')->setWidth(18);
+        $sheet->getColumnDimension('B')->setWidth(30);
+        $sheet->getColumnDimension('C')->setWidth(18);
+        $sheet->getColumnDimension('D')->setWidth(10);
         $sheet->getColumnDimension('E')->setWidth(10);
         $sheet->getColumnDimension('F')->setWidth(10);
-        $sheet->getColumnDimension('G')->setWidth(10);
+        $sheet->getColumnDimension('G')->setWidth(12);
 
         $sheet->getRowDimension(1)->setRowHeight(20);
         $sheet->getRowDimension(2)->setRowHeight(16);

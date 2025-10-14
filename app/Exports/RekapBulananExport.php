@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\Presensi;
 use App\Models\Instansi;
+use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -11,11 +12,13 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Font;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RekapBulananExport implements FromArray, WithStyles, WithTitle
 {
     protected $request;
-    protected $presensi;
+    protected $rekapData;
     protected $filter;
 
     public function __construct($request)
@@ -26,26 +29,78 @@ class RekapBulananExport implements FromArray, WithStyles, WithTitle
 
     private function loadData()
     {
+        $user = Auth::user();
+        $isOperatorInstansi = $user->hasRole('operator_instansi');
+
+        // Query untuk mendapatkan presensi
         $query = Presensi::with(['user', 'instansi']);
 
-        // Filter bulanan
+        // Filter untuk operator instansi
+        if ($isOperatorInstansi) {
+            $instansiOperator = $user->instansi()->first();
+            if ($instansiOperator) {
+                $query->where('instansi_id', $instansiOperator->id);
+            }
+        } elseif ($this->request->filled('instansi')) {
+            $query->where('instansi_id', $this->request->instansi);
+        }
+
+        // Filter status
         if ($this->request->filled('status')) {
             $query->where('status', $this->request->status);
         }
 
-        if ($this->request->filled('instansi')) {
-            $query->where('instansi_id', $this->request->instansi);
-        }
-
+        // Filter range tanggal
         if ($this->request->filled('dari_tanggal') && $this->request->filled('sampai_tanggal')) {
             $query->whereBetween('tanggal', [$this->request->dari_tanggal, $this->request->sampai_tanggal]);
         }
 
-        $this->presensi = $query->orderBy('tanggal', 'desc')->get();
+        $presensiData = $query->get();
+
+        // Hitung rekap per user
+        $grouped = $presensiData->groupBy('user_id');
+
+        $this->rekapData = $grouped->map(function ($items, $userId) {
+            $user = $items->first()->user;
+            $instansi = $items->first()->instansi;
+
+            return [
+                'user_id' => $userId,
+                'nama' => $user->name ?? 'N/A',
+                'instansi' => $instansi->nama_instansi ?? 'N/A',
+                'instansi_id' => $instansi->id ?? 0,
+                'hadir' => $items->where('status', 'hadir')->count(),
+                'izin' => $items->where('status', 'izin')->count(),
+                'alpa' => $items->where('status', 'alpa')->count(),
+                'tanpa_ket' => $items->where('status', 'tanpa_keterangan')->count(),
+            ];
+        })->values();
+
+        // Urutkan berdasarkan instansi (PAUD → MI → MTS → MA → SMK → PATTA)
+        $urutanInstansi = ['PAUD', 'MI', 'MTS', 'MA', 'SMK', 'PATTA'];
+
+        $this->rekapData = $this->rekapData->sort(function ($a, $b) use ($urutanInstansi) {
+            $indexA = array_search(strtoupper($a['instansi']), $urutanInstansi);
+            $indexB = array_search(strtoupper($b['instansi']), $urutanInstansi);
+
+            // Jika tidak ditemukan di array, taruh di akhir
+            $indexA = $indexA === false ? 999 : $indexA;
+            $indexB = $indexB === false ? 999 : $indexB;
+
+            if ($indexA === $indexB) {
+                // Jika instansi sama, urutkan berdasarkan nama
+                return strcmp($a['nama'], $b['nama']);
+            }
+
+            return $indexA - $indexB;
+        })->values();
 
         // Ambil nama instansi untuk header
         $namaInstansi = 'Semua';
-        if ($this->request->filled('instansi')) {
+        if ($isOperatorInstansi) {
+            $instansiOperator = $user->instansi()->first();
+            $namaInstansi = $instansiOperator ? $instansiOperator->nama_instansi : 'Semua';
+        } elseif ($this->request->filled('instansi')) {
             $instansi = Instansi::find($this->request->instansi);
             $namaInstansi = $instansi ? $instansi->nama_instansi : 'Semua';
         }
@@ -71,194 +126,101 @@ class RekapBulananExport implements FromArray, WithStyles, WithTitle
     {
         $data = [];
 
-        // Header utama (baris 1-2)
+        // Header utama
         $data[] = ['REKAP BULANAN ABSENSI GURU & KARYAWAN', '', '', '', '', '', ''];
-        $data[] = ['Yayasan Salafiyah Kajen', '', '', '', '', '', ''];
+        $data[] = ['Yayasan Pendidikan Salafiyah', '', '', '', '', '', ''];
         $data[] = ['', '', '', '', '', '', ''];
 
-        // Informasi Laporan (baris 4-7)
+        // Informasi Laporan
         $data[] = ['Informasi Laporan:', '', '', '', '', '', ''];
-        $data[] = ['','Status', ': ' . $this->filter['status'], '', '', '', '', ''];
-        $data[] = ['','Instansi', ': ' . $this->filter['instansi'], '', '', '', '', ''];
-        $data[] = ['','Periode', ': ' . $this->filter['periode'], '', '', '', '', ''];
+        $data[] = ['', 'Status', ': ' . $this->filter['status'], '', '', '', ''];
+        $data[] = ['', 'Instansi', ': ' . $this->filter['instansi'], '', '', '', ''];
+        $data[] = ['', 'Periode', ': ' . $this->filter['periode'], '', '', '', ''];
         $data[] = ['', '', '', '', '', '', ''];
 
-        // Header tabel (baris 9)
-        $data[] = ['No', 'Tanggal', 'Nama Guru/Karyawan', 'Instansi', 'Datang', 'Pulang', 'Status'];
+        // Header tabel
+        $data[] = ['No', 'Nama Guru/Karyawan', 'Instansi', 'Hadir', 'Izin', 'Alpa', 'Tanpa Ket'];
 
         // Data rows
-        foreach ($this->presensi as $index => $item) {
+        foreach ($this->rekapData as $index => $item) {
             $data[] = [
                 $index + 1,
-                \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y'),
-                $item->user->name ?? 'N/A',
-                $item->instansi->nama_instansi ?? 'N/A',
-                $item->datang ?? '-',
-                $item->pulang ?? '-',
-                ucfirst($item->status)
+                $item['nama'],
+                $item['instansi'],
+                $item['hadir'],
+                $item['izin'],
+                $item['alpa'],
+                $item['tanpa_ket']
             ];
         }
 
         // Footer
         $data[] = ['', '', '', '', '', '', ''];
-        $data[] = ['Total Data: ' . $this->presensi->count() . ' record', '', '', '', '', '', ''];
+        $data[] = ['Total Data: ' . $this->rekapData->count() . ' record', '', '', '', '', '', ''];
         $data[] = ['Dicetak pada: ' . now()->format('d F Y, H:i:s'), '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', 'Mengetahui,', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '', ''];
-        // $data[] = ['', '', '', '', '', '_________________________', ''];
-        // $data[] = ['', '', '', '', '', 'Kepala Sekolah/Pimpinan', ''];
 
         return $data;
     }
 
     public function styles(Worksheet $sheet)
     {
-        // Merge cells untuk header
-        $sheet->mergeCells('A1:G1'); // Header utama
-        $sheet->mergeCells('A2:G2'); // Yayasan
-        $sheet->mergeCells('A4:G4'); // Informasi Laporan
+        $sheet->mergeCells('A1:G1');
+        $sheet->mergeCells('A2:G2');
+        $sheet->mergeCells('A4:G4');
 
-        // Style header utama
         $sheet->getStyle('A1:A2')->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'size' => 14,
-                'color' => ['rgb' => '000000']
-            ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER
-            ]
+            'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '000000']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER]
         ]);
 
-        // Border bawah untuk header utama
         $sheet->getStyle('A3:G3')->applyFromArray([
-            'borders' => [
-                'bottom' => [
-                    'borderStyle' => Border::BORDER_THICK,
-                    'color' => ['rgb' => '000000']
-                ]
-            ]
+            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THICK, 'color' => ['rgb' => '000000']]]
         ]);
 
-        // Style box informasi laporan (baris 4-7)
         $sheet->getStyle('A4:G7')->applyFromArray([
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'F5F5F5']
-            ],
-            'borders' => [
-                'outline' => [
-                    'borderStyle' => Border::BORDER_THIN,
-                    'color' => ['rgb' => '999999']
-                ]
-            ]
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F5F5F5']],
+            'borders' => ['outline' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '999999']]]
         ]);
 
-        // Style label informasi (kolom A, baris 4-7)
-        $sheet->getStyle('A4')->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'size' => 11
-            ]
-        ]);
+        $sheet->getStyle('A4')->applyFromArray(['font' => ['bold' => true, 'size' => 11]]);
+        $sheet->getStyle('A5:A7')->applyFromArray(['font' => ['size' => 10]]);
 
-        $sheet->getStyle('A5:A7')->applyFromArray([
-            'font' => [
-                'size' => 10
-            ]
-        ]);
-
-        // Style header tabel (baris 9)
         $headerRow = 9;
         $sheet->getStyle("A{$headerRow}:G{$headerRow}")->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'size' => 10,
-                'color' => ['rgb' => '000000']
-            ],
-            'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['rgb' => 'E8E8E8'] // Abu-abu muda
-            ],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => Border::BORDER_THIN, // Border tipis
-                    'color' => ['rgb' => '666666']
-                ]
-            ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER
-            ]
+            'font' => ['bold' => true, 'size' => 10, 'color' => ['rgb' => '000000']],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E8E8E8']],
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '666666']]],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER]
         ]);
 
-        // Style data rows (mulai dari baris 10)
-        $lastDataRow = 9 + count($this->presensi);
+        $lastDataRow = 9 + count($this->rekapData);
         if ($lastDataRow > 9) {
             $sheet->getStyle("A10:G{$lastDataRow}")->applyFromArray([
-                'borders' => [
-                    'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['rgb' => '999999']
-                    ]
-                ],
-                'alignment' => [
-                    'vertical' => Alignment::VERTICAL_CENTER
-                ],
-                'font' => [
-                    'size' => 10
-                ]
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '999999']]],
+                'alignment' => ['vertical' => Alignment::VERTICAL_CENTER],
+                'font' => ['size' => 10]
             ]);
 
-            // Center align untuk kolom No, Tanggal, Jam Datang, Jam Pulang, Status
-            $sheet->getStyle("A10:A{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // No
-            $sheet->getStyle("B10:B{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Tanggal
-            $sheet->getStyle("E10:E{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Datang
-            $sheet->getStyle("F10:F{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Pulang
-            $sheet->getStyle("G10:G{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Status
+            $sheet->getStyle("A10:A{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("D10:G{$lastDataRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         }
 
-        // Style footer
         $footerStartRow = $lastDataRow + 2;
-        $footerEndRow = $footerStartRow + 1;
-        $signatureRow = $footerEndRow + 2;
+        $sheet->getStyle("A{$footerStartRow}")->applyFromArray(['font' => ['bold' => true, 'size' => 10]]);
 
-        $sheet->getStyle("A{$footerStartRow}:A{$footerEndRow}")->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'size' => 10
-            ]
-        ]);
+        // Set column widths
+        $sheet->getColumnDimension('A')->setWidth(5);
+        $sheet->getColumnDimension('B')->setWidth(30);
+        $sheet->getColumnDimension('C')->setWidth(18);
+        $sheet->getColumnDimension('D')->setWidth(10);
+        $sheet->getColumnDimension('E')->setWidth(10);
+        $sheet->getColumnDimension('F')->setWidth(10);
+        $sheet->getColumnDimension('G')->setWidth(12);
 
-        // Style signature area
-        $sheet->getStyle("F{$signatureRow}")->applyFromArray([
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER
-            ],
-            'font' => [
-                'size' => 10
-            ]
-        ]);
+        $sheet->getRowDimension(1)->setRowHeight(20);
+        $sheet->getRowDimension(2)->setRowHeight(16);
+        $sheet->getRowDimension(9)->setRowHeight(18);
 
-        // Set column widths yang lebih proporsional
-        $sheet->getColumnDimension('A')->setWidth(5);   // No
-        $sheet->getColumnDimension('B')->setWidth(12);  // Tanggal
-        $sheet->getColumnDimension('C')->setWidth(28);  // Nama
-        $sheet->getColumnDimension('D')->setWidth(18);  // Instansi
-        $sheet->getColumnDimension('E')->setWidth(10);  // Datang
-        $sheet->getColumnDimension('F')->setWidth(10);  // Pulang
-        $sheet->getColumnDimension('G')->setWidth(10);  // Status
-
-        // Set row heights
-        $sheet->getRowDimension(1)->setRowHeight(20); // Header utama
-        $sheet->getRowDimension(2)->setRowHeight(16); // Sub header
-        $sheet->getRowDimension(9)->setRowHeight(18); // Header tabel
-
-        // Padding untuk row data
         for ($row = 10; $row <= $lastDataRow; $row++) {
             $sheet->getRowDimension($row)->setRowHeight(16);
         }
