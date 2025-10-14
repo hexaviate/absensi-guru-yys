@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Instansi;
 use App\Models\Jadwal;
 use App\Models\Tapel;
 use App\Models\User;
@@ -48,7 +47,7 @@ class JadwalController extends Controller
         $jadwal = $query->with('instansi')->get();
         $semuaJadwal = Jadwal::all();
 
-        return view('jadwal.main', compact('jadwal', 'semuaJadwal', 'filterHari', 'filterInstansi', 'instansi'));
+        return view('jadwal.main', compact('jadwal', 'semuaJadwal', 'filterHari', 'filterInstansi', ));
     }
 
     /**

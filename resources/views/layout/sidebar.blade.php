@@ -148,6 +148,11 @@
                     <a class="nav-link" href="{{ route('izinIndexOperator') }}">Daftar Izin</a>
                 </li>
             </ul>
+            <ul class="dropdown-menu">
+                <li class="{{ request()->routeIs('viewIzinCreateOperator') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('viewIzinCreateOperator') }}">Buat Izin</a>
+                </li>
+            </ul>
         </li>
 
     @endhasrole

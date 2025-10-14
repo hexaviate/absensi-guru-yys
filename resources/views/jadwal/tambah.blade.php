@@ -21,12 +21,19 @@
             </div>
         @endif
 
+
+
         <div class="section-body">
+
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Form Tambah Absensi</h5>
+                    <h5 class="mb-0">Form Tambah Jadwal</h5>
                 </div>
+
+
                 <div class="card-body">
+
+
                     <form action="{{ route('jadwal.store') }}" method="POST">
                         @csrf
                         <div class="row">
