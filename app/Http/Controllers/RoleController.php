@@ -57,7 +57,7 @@ class RoleController extends Controller
         ]);
 
         $role->givePermissionTo($request->permissions);
-        return redirect()->route('role.index');
+        return redirect()->route('role.index')->with('success','Berhasil Tambah Role');
 
     }
 
@@ -112,7 +112,7 @@ class RoleController extends Controller
         $permissions = Permission::whereIn('id', $request->permissions)->get();
         $target->syncPermissions($permissions);
 
-        return redirect()->route('role.index');
+        return redirect()->route('role.index')->with('success','Berhasil Update Role');
         // $target->syncPermissions($request->permissions);
         // return redirect()->route('role.index');
 
@@ -125,6 +125,6 @@ class RoleController extends Controller
     {
         $target = Role::find($id);
         $target->delete();
-        return redirect()->route('role.index');
+        return redirect()->route('role.index')->with('success','Berhasil Hapus Role');
     }
 }

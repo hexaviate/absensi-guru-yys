@@ -10,18 +10,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="alert alert-success" id="alertMessage">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger" id="alertMessage">
-                {{ session('error') }}
-            </div>
-        @endif
-
         <div class="section-body">
             <div class="row">
                 <div class="col-12">

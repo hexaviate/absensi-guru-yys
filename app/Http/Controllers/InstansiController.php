@@ -70,7 +70,7 @@ class InstansiController extends Controller
 
         // $instansi->user()->attach($request->user_id);
 
-        return redirect()->route('instansi.index');
+        return redirect()->route('instansi.index')->with('success','Berhaasil Mewnambah Instansi');
 
     }
 
@@ -127,7 +127,7 @@ class InstansiController extends Controller
 
         $target->user()->sync($request->user_id);
 
-        return redirect()->route('instansi.index');
+        return redirect()->route('instansi.index')->with('success','Berhasil Edit Instansi');
     }
 
     /**
@@ -142,6 +142,6 @@ class InstansiController extends Controller
 
         $target = Instansi::find($id);
         $target->delete();
-        return redirect()->route('instansi.index');
+        return redirect()->route('instansi.index')->with('success','Berhasil Hapus Instansi');
     }
 }

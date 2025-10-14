@@ -37,7 +37,7 @@ class IzinController extends Controller
         }
         $instansiId = $user->instansi()->first()->id;
 
-        $instansi = $user->instansi;
+        $instansi = $user->instansi->get;
         return view('izin.users.tambah', compact('instansi', 'instansiId'));
 
     }

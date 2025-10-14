@@ -64,7 +64,7 @@ class TapelController extends Controller
             "status" => "aktif"
         ]);
 
-        return redirect()->route('tapel.index');
+        return redirect()->route('tapel.index')->with('success','Berhasil Tambah Tapel');
     }
 
     /**
@@ -116,7 +116,7 @@ class TapelController extends Controller
             "status" => $request->status
         ]);
 
-        return redirect()->route('tapel.index');
+        return redirect()->route('tapel.index')->with('success','Berhasil Update Tahun Pelajaran');
     }
 
     /**
@@ -131,6 +131,6 @@ class TapelController extends Controller
 
         $target = Tapel::find($id);
         $target->delete();
-        return redirect()->route('tapel.index');
+        return redirect()->route('tapel.index')->with('success','Berhasil Hapus Tapel');
     }
 }

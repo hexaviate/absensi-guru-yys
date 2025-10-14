@@ -64,7 +64,7 @@ class JadwalController extends Controller
         $tapel = Tapel::where('status', "aktif")->first();
         $userList = $user->instansi()->get();
         $instansi = $user->instansi()->get();
-        return view('jadwal.tambah', compact('tapel', 'instansi', 'userList', 'instansiId'));
+        return view('jadwal.tambah', compact('tapel', 'instansi', 'userList', 'instansiId'))->with('success','Berhasil Menambah Jadwal');
     }
 
     /**
@@ -200,7 +200,7 @@ class JadwalController extends Controller
 
         $target = Jadwal::find($id);
         $target->delete();
-        return redirect()->route('jadwal.index');
+        return redirect()->route('jadwal.index')->with('success','Berhasil Hapus Jadwal');
     }
 
     public function searchUsers(Request $request)
