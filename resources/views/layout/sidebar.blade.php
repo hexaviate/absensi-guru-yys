@@ -121,19 +121,29 @@
 
     {{-- tampilkan menu izin jika BUKAN kasus "1 instansi dan SMK" --}}
     {{-- @if ($jumlahInstansi > 1 || !$punyaSMK) --}}
-        <li class="dropdown {{ request()->is('izinIndexUser') || request()->is('viewIzinCreate') ? 'active' : '' }}">
-            <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
-                <i class="fas fa-file-signature"></i> <span>Izin</span>
-            </a>
-            <ul class="dropdown-menu">
-                <li class="{{ request()->routeIs('izinIndexUser') ? 'active' : '' }}">
-                    <a class="nav-link" href="{{ route('izinIndexUser') }}">Daftar Izin</a>
-                </li>
+    <li class="dropdown {{ request()->is('izinIndexUser') || request()->is('viewIzinCreate') ? 'active' : '' }}">
+        <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+            <i class="fas fa-file-signature"></i> <span>Izin</span>
+        </a>
+        <ul class="dropdown-menu">
+            <li class="{{ request()->routeIs('izinIndexUser') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('izinIndexUser') }}">Daftar Izin</a>
+            </li>
+
+            @php
+                $isOnlySMK =
+                    $user->instansi()->count() == 1 && $user->instansi()->where('nama_Instansi', 'SMK')->exists();
+            @endphp
+
+            @if ($isOnlySMK)
+                {{-- kosong --}}
+            @else
                 <li class="{{ request()->routeIs('viewIzinCreate') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ route('viewIzinCreate') }}">Buat Izin</a>
                 </li>
-            </ul>
-        </li>
+            @endif
+        </ul>
+    </li>
     {{-- @endif --}}
 
 

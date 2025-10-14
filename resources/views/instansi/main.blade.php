@@ -49,7 +49,7 @@
                                                         onsubmit="return confirm('Yakin ingin menghapus?')">
                                                         @csrf
                                                         @method('delete')
-                                                        <button type="submit" class="btn btn-danger">Hapus</button>
+                                                        <button type="submit" class="btn btn-danger delete-btn">Hapus</button>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -70,11 +70,59 @@
 @endsection
 
 @push('script')
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#example').DataTable({
-                responsive: true
+                "pagingType": "full_numbers", // biar ada prev, next, first, last
+                "language": {
+                    "paginate": {
+                        "first": "<i class='fas fa-angle-double-left'></i>",
+                        "last": "<i class='fas fa-angle-double-right'></i>",
+                        "next": "<i class='fas fa-chevron-right'></i>",
+                        "previous": "<i class='fas fa-chevron-left'></i>"
+                    }
+                }
             });
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.delete-btn').on('click', function(e) {
+                e.preventDefault();
+                const form = $(this).closest('form');
+
+                swal({
+                    title: 'Yakin ingin menghapus?',
+                    text: 'Data yang dihapus tidak bisa dikembalikan!',
+                    icon: 'warning',
+                    buttons: {
+                        cancel: {
+                            text: 'Batal',
+                            visible: true,
+                            className: 'btn btn-danger',
+                            closeModal: true,
+                        },
+                        confirm: {
+                            text: 'Ya, hapus!',
+                            visible: true,
+                            className: 'btn btn-primary',
+                            closeModal: true,
+                        }
+                    },
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+@endpush
+
+
+@push('style')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 @endpush

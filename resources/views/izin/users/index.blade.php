@@ -119,58 +119,63 @@
                                 </div>
                             </div>
                             <div class="card-body">
-    <div class="mb-2">
-        <i class="fas fa-calendar-alt text-primary mr-2"></i>
-        <small>{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}</small>
-    </div>
-    <div class="mb-2">
-        <i class="fas fa-info-circle text-primary mr-2"></i>
-        <small>{{ Str::limit($item->keterangan, 60) }}</small>
-    </div>
+                                <div class="mb-2">
+                                    <i class="fas fa-calendar-alt text-primary mr-2"></i>
+                                    <small>{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}</small>
+                                </div>
+                                <div class="mb-2">
+                                    <i class="fas fa-info-circle text-primary mr-2"></i>
+                                    <small>{{ Str::limit($item->keterangan, 60) }}</small>
+                                </div>
 
-    <!-- Link Lihat Bukti -->
-    <div class="mb-3">
-        @php
-            $fileExtension = strtolower(pathinfo($item->bukti_izin, PATHINFO_EXTENSION));
-        @endphp
+                                <!-- Link Lihat Bukti -->
+                                <div class="mb-3">
+                                    @php
+                                        $fileExtension = strtolower(pathinfo($item->bukti_izin, PATHINFO_EXTENSION));
+                                    @endphp
 
-        @if ($fileExtension === 'pdf')
-            <small>
-                <a href="{{ asset('bukti_izin/' . $item->bukti_izin) }}" target="_blank" class="text-primary">
-                    <i class="fas fa-file-pdf mr-1"></i>Lihat Bukti PDF
-                </a>
-            </small>
-        @else
-            <small>
-                <a href="#" class="text-primary" data-toggle="modal" data-target="#modal-bukti-{{ $item->id }}">
-                    <i class="fas fa-eye mr-1"></i>Lihat Bukti
-                </a>
-            </small>
-        @endif
-    </div>
+                                    @if ($fileExtension === 'pdf')
+                                        <small>
+                                            <a href="{{ asset('bukti_izin/' . $item->bukti_izin) }}" target="_blank"
+                                                class="text-primary">
+                                                <i class="fas fa-file-pdf mr-1"></i>Lihat Bukti PDF
+                                            </a>
+                                        </small>
+                                    @else
+                                        <small>
+                                            <a href="#" class="text-primary" data-toggle="modal"
+                                                data-target="#modal-bukti-{{ $item->id }}">
+                                                <i class="fas fa-eye mr-1"></i>Lihat Bukti
+                                            </a>
+                                        </small>
+                                    @endif
+                                </div>
 
-    <!-- Tombol berdasarkan status -->
-    @if ($item->status == 'belum_diverifikasi')
-        <!-- Jika belum diverifikasi: tampilkan tombol Edit dan Hapus -->
-        <div class="row">
-            <div class="col-6">
-                <a href="{{ route('viewIzinEdit', $item->id) }}" class="btn btn-warning btn-sm btn-block">
-                    <i class="fas fa-edit mr-1"></i>Edit
-                </a>
-            </div>
-            <div class="col-6">
-                <button class="btn btn-danger btn-sm btn-block" onclick="confirmDelete({{ $item->id }})">
-                    <i class="fas fa-trash mr-1"></i>Hapus
-                </button>
-            </div>
-        </div>
-    @elseif ($item->status == 'diterima' || $item->status == 'tidak_diterima')
-        <!-- Jika sudah diverifikasi (diterima/ditolak): hanya tampilkan tombol Detail -->
-        <button class="btn btn-outline-primary btn-sm btn-block" data-toggle="modal" data-target="#modal-detail-{{ $item->id }}">
-            <i class="fas fa-info-circle mr-1"></i>Detail Izin
-        </button>
-    @endif
-</div>
+                                <!-- Tombol berdasarkan status -->
+                                @if ($item->status == 'belum_diverifikasi')
+                                    <!-- Jika belum diverifikasi: tampilkan tombol Edit dan Hapus -->
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <a href="{{ route('viewIzinEdit', $item->id) }}"
+                                                class="btn btn-warning btn-sm btn-block">
+                                                <i class="fas fa-edit mr-1"></i>Edit
+                                            </a>
+                                        </div>
+                                        <div class="col-6">
+                                            <button class="btn btn-danger btn-sm btn-block"
+                                                onclick="confirmDelete({{ $item->id }})">
+                                                <i class="fas fa-trash mr-1"></i>Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                @elseif ($item->status == 'diterima' || $item->status == 'tidak_diterima')
+                                    <!-- Jika sudah diverifikasi (diterima/ditolak): hanya tampilkan tombol Detail -->
+                                    <button class="btn btn-outline-primary btn-sm btn-block" data-toggle="modal"
+                                        data-target="#modal-detail-{{ $item->id }}">
+                                        <i class="fas fa-info-circle mr-1"></i>Detail Izin
+                                    </button>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @empty

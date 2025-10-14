@@ -44,7 +44,7 @@
                                                     <form action="{{ route('tapel.destroy', $item->id) }}" method="POST">
                                                         @csrf
                                                         @method('delete')
-                                                        <button type="submit" class="btn btn-danger mx-2">Hapus</button>
+                                                        <button type="submit" class="btn btn-danger mx-2 delete-btn">Hapus</button>
                                                     </form>
                                                 </td>
 
@@ -82,6 +82,40 @@
                         "previous": "<i class='fas fa-chevron-left'></i>"
                     }
                 }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.delete-btn').on('click', function(e) {
+                e.preventDefault();
+                const form = $(this).closest('form');
+
+                swal({
+                    title: 'Yakin ingin menghapus?',
+                    text: 'Data yang dihapus tidak bisa dikembalikan!',
+                    icon: 'warning',
+                    buttons: {
+                        cancel: {
+                            text: 'Batal',
+                            visible: true,
+                            className: 'btn btn-danger',
+                            closeModal: true,
+                        },
+                        confirm: {
+                            text: 'Ya, hapus!',
+                            visible: true,
+                            className: 'btn btn-primary',
+                            closeModal: true,
+                        }
+                    },
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        form.submit();
+                    }
+                });
             });
         });
     </script>

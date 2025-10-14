@@ -29,6 +29,10 @@
 <!-- Font Awesome -->
 {{-- <script src="https://kit.fontawesome.com/40f5c7c2d3.js" crossorigin="anonymous"></script> --}}
 
+{{-- sweet alert js --}}
+
+<script src="{{asset('asset/dist/assets/modules/sweetalert/sweetalert.min.js')}}"></script>
+
 <script>
     document.addEventListener("+", function() {
         const alert = document.getElementById("alertMessage");

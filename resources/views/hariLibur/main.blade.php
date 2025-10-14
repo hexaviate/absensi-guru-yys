@@ -49,10 +49,11 @@
                                                         <a href="{{ route('hariLibur.edit', $item->id) }}"
                                                             class="btn btn-warning mx-2">Edit</a>
                                                         <form action="{{ route('hariLibur.destroy', $item->id) }}"
-                                                            method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">
+                                                            method="POST">
                                                             @csrf
                                                             @method('delete')
-                                                            <button type="submit" class="btn btn-danger">Hapus</button>
+                                                            <button type="submit"
+                                                                class="btn btn-danger delete-btn">Hapus</button>
                                                         </form>
                                                     </td>
                                                 </tr>
@@ -133,6 +134,40 @@
                         "previous": "<i class='fas fa-chevron-left'></i>"
                     }
                 }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.delete-btn').on('click', function(e) {
+                e.preventDefault();
+                const form = $(this).closest('form');
+
+                swal({
+                    title: 'Yakin ingin menghapus?',
+                    text: 'Data yang dihapus tidak bisa dikembalikan!',
+                    icon: 'warning',
+                    buttons: {
+                        cancel: {
+                            text: 'Batal',
+                            visible: true,
+                            className: 'btn btn-danger',
+                            closeModal: true,
+                        },
+                        confirm: {
+                            text: 'Ya, hapus!',
+                            visible: true,
+                            className: 'btn btn-primary',
+                            closeModal: true,
+                        }
+                    },
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        form.submit();
+                    }
+                });
             });
         });
     </script>

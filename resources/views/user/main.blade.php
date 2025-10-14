@@ -54,7 +54,7 @@
                                                         <form action="{{ route('user.destroy', $item->id) }}" method="POST">
                                                             @csrf
                                                             @method('delete')
-                                                            <button class="btn btn-danger mx-1">Hapus</button>
+                                                            <button class="btn btn-danger mx-1 delete-btn">Hapus</button>
                                                         </form>
                                                     </td>
                                                 </tr>
@@ -109,10 +109,10 @@
                                                     <td class="d-flex">
                                                         <a class="btn btn-warning mx-1"
                                                             href="{{ route('user.edit', $item->id) }}">Edit</a>
-                                                        <form action="{{ route('user.destroy', $item->id) }}" method="POST">
+                                                        <form action="{{ route('user.destroy', $item->id) }}" method="POST" class="delete-form d-inline">
                                                             @csrf
                                                             @method('delete')
-                                                            <button class="btn btn-danger mx-1">Hapus</button>
+                                                            <button type="button" class="btn btn-danger mx-1 delete-btn">Hapus</button>
                                                         </form>
                                                     </td>
                                                 </tr>
@@ -146,6 +146,40 @@
                         "previous": "<i class='fas fa-chevron-left'></i>"
                     }
                 }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.delete-btn').on('click', function(e) {
+                e.preventDefault();
+                const form = $(this).closest('form');
+
+                swal({
+                    title: 'Yakin ingin menghapus?',
+                    text: 'Data yang dihapus tidak bisa dikembalikan!',
+                    icon: 'warning',
+                    buttons: {
+                        cancel: {
+                            text: 'Batal',
+                            visible: true,
+                            className: 'btn btn-danger',
+                            closeModal: true,
+                        },
+                        confirm: {
+                            text: 'Ya, hapus!',
+                            visible: true,
+                            className: 'btn btn-primary',
+                            closeModal: true,
+                        }
+                    },
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        form.submit();
+                    }
+                });
             });
         });
     </script>

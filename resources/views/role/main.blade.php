@@ -37,17 +37,16 @@
                                                 <td class="">{{ $loop->iteration }}</td>
                                                 <td>{{ $item->name }}</td>
                                                 <td class="d-flex">
-                                                    <a href="{{route('role.edit', $item->id )}}" class="btn btn-warning">Edit</a>
-                                                    <form action="{{route('role.destroy', $item->id)}}" method="POST">
+                                                    <a href="{{ route('role.edit', $item->id) }}"
+                                                        class="btn btn-warning">Edit</a>
+                                                    <form action="{{ route('role.destroy', $item->id) }}" method="POST"
+                                                        class="delete-form d-inline">
                                                         @csrf
                                                         @method('delete')
-                                                        <button type="submit" class="btn btn-danger mx-2">Hapus</button>
+                                                        <button type="button"
+                                                            class="btn btn-danger mx-2 delete-btn">Hapus</button>
                                                     </form>
                                                 </td>
-
-                                                {{-- @foreach ($item->tag as $k)
-                                                {{ $k->nama }},
-                                                @endforeach INI CONTOH UNTUK FOREACH --}}
                                             </tr>
                                         @empty
                                             <p>Data Peran Kosong, Perlu di Isi</p>
@@ -78,6 +77,40 @@
                         "previous": "<i class='fas fa-chevron-left'></i>"
                     }
                 }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.delete-btn').on('click', function(e) {
+                e.preventDefault();
+                const form = $(this).closest('form');
+
+                swal({
+                    title: 'Yakin ingin menghapus?',
+                    text: 'Data yang dihapus tidak bisa dikembalikan!',
+                    icon: 'warning',
+                    buttons: {
+                        cancel: {
+                            text: 'Batal',
+                            visible: true,
+                            className: 'btn btn-danger',
+                            closeModal: true,
+                        },
+                        confirm: {
+                            text: 'Ya, hapus!',
+                            visible: true,
+                            className: 'btn btn-primary',
+                            closeModal: true,
+                        }
+                    },
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        form.submit();
+                    }
+                });
             });
         });
     </script>
