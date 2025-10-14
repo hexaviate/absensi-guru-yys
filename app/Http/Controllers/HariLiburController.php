@@ -106,7 +106,7 @@ class HariLiburController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage hari_libur')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $hariLibur = HariLibur::findOrFail($id);
@@ -162,7 +162,7 @@ class HariLiburController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage hari_libur')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $target = HariLibur::find($id);

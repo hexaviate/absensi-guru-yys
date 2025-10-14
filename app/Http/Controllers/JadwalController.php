@@ -62,7 +62,7 @@ class JadwalController extends Controller
         $user = auth()->user();
         $instansiId = $user->instansi()->first()->id;
         if (!$user->can('manage jadwal')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $tapel = Tapel::where('status', "aktif")->first();
@@ -133,7 +133,7 @@ class JadwalController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage jadwal')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $instansiId = $user->instansi()->first()->id;
@@ -199,7 +199,7 @@ class JadwalController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage jadwal')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $target = Jadwal::find($id);

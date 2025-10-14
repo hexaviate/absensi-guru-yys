@@ -17,7 +17,7 @@ class InstansiController extends Controller
     {
         $user = auth()->user();
         if (!$user->hasAnyPermission(['view all instansi', 'manage instansi'])) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $instansi = Instansi::all();
@@ -31,7 +31,7 @@ class InstansiController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage instansi')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $user = User::role('operator_instansi')->get();
@@ -90,7 +90,7 @@ class InstansiController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage instansi')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $instansi = Instansi::find($id);
@@ -141,7 +141,7 @@ class InstansiController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage instansi')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $target = Instansi::find($id);

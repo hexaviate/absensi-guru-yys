@@ -58,7 +58,7 @@ class IzinController extends Controller
 
         $user = auth()->user();
         if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
 
@@ -135,7 +135,7 @@ class IzinController extends Controller
     {
         $user = auth()->user();
         if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $izin = Izin::find($id);
@@ -144,11 +144,11 @@ class IzinController extends Controller
 
 
         if ($izin->status != 'belum_diverifikasi') {
-            return redirect()->intended('dashboard')->with('error', 'izin ini telah diverifikasi');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         if ($izin->user_id != $user->id) {
-            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         return view('izin.users.edit', compact('izin', 'instansi', 'instansiId'));
@@ -161,15 +161,15 @@ class IzinController extends Controller
         $izin = Izin::find($id);
 
         if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
-            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         if ($izin->user_id != $user->id) {
-            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         if ($izin->status != 'belum_diverifikasi') {
-            return redirect()->intended('dashboard')->with('error', 'izin ini telah diverifikasi');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $validate = Validator::make($request->all(), [
@@ -231,15 +231,15 @@ class IzinController extends Controller
         $izin = Izin::find($id);
 
         if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
-            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         if ($izin->user_id != $user->id) {
-            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         if ($izin->status != 'belum_diverifikasi') {
-            return redirect()->intended('dashboard')->with('error', 'izin ini telah diverifikasi');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $izin->delete();
@@ -256,7 +256,7 @@ class IzinController extends Controller
     {
         $user = auth()->user();
         if (!$user->hasAnyPermission(['manage izin'])) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         // $instansi_id = $user->instansi()->id;
@@ -273,12 +273,12 @@ class IzinController extends Controller
     {
         $user = auth()->user();
         if (!$user->hasAnyPermission(['manage izin'])) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $izin = Izin::find($id);
         if ($izin->user_id == $user->id) {
-            return redirect()->intended('dashboard')->with('error', 'anda tidak punya permission');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         return view('izinVerification', compact('izin'));
@@ -288,7 +288,7 @@ class IzinController extends Controller
     {
         $user = auth()->user();
         if (!$user->hasAnyPermission(['manage izin'])) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $izin = Izin::find($id);
@@ -358,7 +358,7 @@ class IzinController extends Controller
         $user = auth()->user();
 
         if (!$user->hasAnyPermission(['manage izin'])) {
-            return redirect()->intended('dashboard')->with('error', 'Anda tidak punya permission');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         // Ambil instansi pertama dari operator (sesuaikan jika operator bisa punya multiple instansi)
@@ -380,7 +380,7 @@ class IzinController extends Controller
         $user = auth()->user();
 
         if (!$user->hasAnyPermission(['manage izin'])) {
-            return redirect()->intended('dashboard')->with('error', 'Anda tidak punya permission');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         // Validasi input

@@ -17,7 +17,7 @@ class TapelController extends Controller
 
         $user = auth()->user();
         if (!$user->hasAnyPermission(['view all tapel', 'manage tapel'])) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
         $tapel = Tapel::all();
 
@@ -33,7 +33,7 @@ class TapelController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage tapel')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
         //! diganti sesuai viewnya. (view ini hanya untuk kebutuhan testing tambah)
         //! jika sudah diganti maka hapus comment ini
@@ -64,7 +64,7 @@ class TapelController extends Controller
             "status" => "aktif"
         ]);
 
-        return redirect()->route('tapel.index')->with('success','Berhasil Tambah Tapel');
+        return redirect()->route('tapel.index')->with('success', 'Berhasil Tambah Tapel');
     }
 
     /**
@@ -82,7 +82,7 @@ class TapelController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage tapel')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
         $tapel = Tapel::find($id);
@@ -117,7 +117,7 @@ class TapelController extends Controller
             "status" => $request->status
         ]);
 
-        return redirect()->route('tapel.index')->with('success','Berhasil Update Tahun Pelajaran');
+        return redirect()->route('tapel.index')->with('success', 'Berhasil Update Tahun Pelajaran');
     }
 
     /**
@@ -127,7 +127,7 @@ class TapelController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage tapel')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
         $target = Tapel::find($id);
 
@@ -136,6 +136,6 @@ class TapelController extends Controller
         }
 
         $target->delete();
-        return redirect()->route('tapel.index')->with('success','Berhasil Hapus Tapel');
+        return redirect()->route('tapel.index')->with('success', 'Berhasil Hapus Tapel');
     }
 }

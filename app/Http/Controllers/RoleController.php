@@ -18,7 +18,7 @@ class RoleController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage role')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
         $role = Role::all();
         return view('role.main', compact('role'));
@@ -31,7 +31,7 @@ class RoleController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage role')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
         $permission = Permission::all();
         return view('role.tambah', compact('permission'));
@@ -57,7 +57,7 @@ class RoleController extends Controller
         ]);
 
         $role->givePermissionTo($request->permissions);
-        return redirect()->route('role.index')->with('success','Berhasil Tambah Role');
+        return redirect()->route('role.index')->with('success', 'Berhasil Tambah Role');
 
     }
 
@@ -79,7 +79,7 @@ class RoleController extends Controller
         // return view('role.edit', compact('role', 'permission'));
         $user = auth()->user();
         if (!$user->can('manage role')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
         $role = Role::find($id);
         $permission = Permission::all();
@@ -112,7 +112,7 @@ class RoleController extends Controller
         $permissions = Permission::whereIn('id', $request->permissions)->get();
         $target->syncPermissions($permissions);
 
-        return redirect()->route('role.index')->with('success','Berhasil Update Role');
+        return redirect()->route('role.index')->with('success', 'Berhasil Update Role');
         // $target->syncPermissions($request->permissions);
         // return redirect()->route('role.index');
 
@@ -125,6 +125,6 @@ class RoleController extends Controller
     {
         $target = Role::find($id);
         $target->delete();
-        return redirect()->route('role.index')->with('success','Berhasil Hapus Role');
+        return redirect()->route('role.index')->with('success', 'Berhasil Hapus Role');
     }
 }

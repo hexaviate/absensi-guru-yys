@@ -42,7 +42,7 @@ class UsersController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage users')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
         //untuk admin yayasan
         $role = Role::all();
@@ -111,7 +111,7 @@ class UsersController extends Controller
         $user->instansi()->attach($request->instansi_id);
         $user->roles()->attach($request->role_id);
 
-        return redirect()->route('user.index')->with('success','Berhasil Tambah User');
+        return redirect()->route('user.index')->with('success', 'Berhasil Tambah User');
 
 
     }
@@ -131,7 +131,7 @@ class UsersController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage users')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
 
@@ -249,10 +249,10 @@ class UsersController extends Controller
     {
         $user = auth()->user();
         if (!$user->can('manage users')) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
         $target = User::find($id);
         $target->delete();
-        return redirect()->route('user.index')->with('success','Berhasil Hapus User');
+        return redirect()->route('user.index')->with('success', 'Berhasil Hapus User');
     }
 }
