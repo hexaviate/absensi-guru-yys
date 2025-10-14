@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('instansi_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('tapel_id')->constrained()->onDelete('cascade');
             $table->foreignId('izin_id')->nullable()->constrained()->onDelete('cascade');
             $table->time('datang')->nullable();
             $table->time('pulang')->nullable();

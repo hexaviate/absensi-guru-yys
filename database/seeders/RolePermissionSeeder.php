@@ -71,7 +71,8 @@ class RolePermissionSeeder extends Seeder
             'view self riwayat absen',
             'melakukan presensi',
             'view self jadwal',
-            'view self izin'
+            'view self izin',
+            'manage users'
         ]);
         $pendidik->givePermissionTo(['view self jadwal', 'view self riwayat absen', 'melakukan presensi', 'view self izin']);
         $kependidikan->givePermissionTo(['view self riwayat absen', 'melakukan presensi', 'view self izin']);

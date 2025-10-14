@@ -100,14 +100,15 @@ class TapelController extends Controller
         $target = Tapel::find($id);
 
         $validate = Validator::make($request->all(), [
-            "kode" => 'required'
+            "kode" => 'required',
+            "status" => 'required'
         ]);
 
         if ($validate->fails()) {
             return redirect()->route('instansi.create', $id)->withErrors($validate)->withInput();
         }
 
-        if ($request->status == "aktif" && Tapel::where('status', "aktif")->exists()) {
+        if ($request->status == "aktif" && Tapel::where('status', "aktif")->where('id', '!=', $id)->exists()) {
             return redirect()->back()->with('error', "Tapel aktif tidak boelh lebih dari satu");
         }
 
@@ -128,8 +129,12 @@ class TapelController extends Controller
         if (!$user->can('manage tapel')) {
             return redirect()->intended('dashboard');
         }
-
         $target = Tapel::find($id);
+
+        if ($target->status == 'aktif') {
+            return redirect()->back()->with('error', 'Anda tidak bisa menghapus tapel aktif');
+        }
+
         $target->delete();
         return redirect()->route('tapel.index');
     }

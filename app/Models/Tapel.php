@@ -13,6 +13,7 @@ class Tapel extends Model
 
     protected $fillable = [
         'kode',
+        'status',
         'created_at',
         'updated_at',
         'deleted_at'
@@ -86,5 +87,20 @@ class Tapel extends Model
     public function hariLibur(): HasMany
     {
         return $this->hasMany(HariLibur::class);
+    }
+
+    public function izin()
+    {
+        return $this->hasMany(Izin::class);
+    }
+
+    public function presensi()
+    {
+        return $this->hasMany(Presensi::class);
+    }
+
+    public function tidakHadir()
+    {
+        return $this->hasMany(TidakHadir::class);
     }
 }

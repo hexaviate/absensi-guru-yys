@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('instansi_id')->constrained()->onDelete('cascade');
+            $table->foreignId('tapel_id')->constrained()->onDelete('cascade');
             $table->string('bukti_izin');
             $table->enum('status', ['diterima', 'tidak_diterima', 'belum_diverifikasi'])->default('belum_diverifikasi');
             $table->text('keterangan_ditolak')->nullable();

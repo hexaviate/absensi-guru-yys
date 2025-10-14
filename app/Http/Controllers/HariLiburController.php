@@ -16,6 +16,7 @@ class HariLiburController extends Controller
      */
     public function index()
     {
+        //! pengecekan bersama front end
         $user = auth()->user();
 
         if ($user->hasAnyPermission(['view all hari_libur', 'manage hari_libur'])) {

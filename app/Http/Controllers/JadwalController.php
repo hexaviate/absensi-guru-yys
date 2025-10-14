@@ -45,8 +45,12 @@ class JadwalController extends Controller
         });
 
         // Optionally eager load instansi relationship for display
-        $jadwal = $query->with('instansi')->get();
+        // $jadwal = $query->with('instansi')->get();
         $semuaJadwal = Jadwal::all();
+
+        //untuk operator
+        $jadwal = Jadwal::where('instansi_id', $user->instansi()->first()->id)->where('tapel_id', Tapel::where('status', 'aktif')->first()->id)->get();
+        // dd($jadwal);
 
         return view('jadwal.main', compact('jadwal', 'semuaJadwal', 'filterHari', 'filterInstansi'));
     }

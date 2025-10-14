@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Instansi;
+use App\Models\Jadwal;
 use App\Models\Presensi;
+use App\Models\Tapel;
 use App\Models\TidakHadir;
 use App\Models\User;
 use Carbon\Carbon;
@@ -15,18 +17,25 @@ Artisan::command('inspire', function () {
 //KURANG WOII KURANG JADWAL :((((((()))))))
 Schedule::call(function () {
     $today = now()->toDateString();
-
+    $tapelAktif = Tapel::where('status', "aktif")->first();
     $users = User::with('instansi')->get();
     foreach ($users as $user) {
         foreach ($user->instansi as $instansi) {
             $presensi = Presensi::where('user_id', $user->id)->where('instansi_id', $instansi->id)->whereDate('tanggal', $today)->exists();
 
             if (!$presensi) {
+                $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->where('instansi_id', $instansi->id)->exists();
+                if (!$jadwalHariIni) {
+                    if ($user->hasRole('tenaga_pendidik')) {
+                        continue;
+                    }
+                }
 
                 $tidakHadir = TidakHadir::where('user_id', $user->id)->where('instansi_id', $instansi->id)->whereDate('tanggal', $today)->exists();
                 if (!$tidakHadir) {
                     TidakHadir::create([
                         "user_id" => $user->id,
+                        "tapel_id" => $tapelAktif->id,
                         "instansi_id" => $instansi->id,
                         "tanggal" => now()->toDateString()
                     ]);

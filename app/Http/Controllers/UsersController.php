@@ -23,14 +23,16 @@ class UsersController extends Controller
         $user = auth()->user();
         $instansi = $user->instansi()->first();
         if (!$user->hasAnyPermission(['view all users', 'manage users'])) {
-            return redirect()->intended('dashboard');
+            return redirect()->back()->with('error', 'anda tidak punya permission');
         }
         $semuaUser = User::all();
         $semuaRole = Role::all();
         $semuaInstansi = Instansi::all();
 
-        $user = $instansi->user()->get();
-        return view('user.main', compact('user', 'instansi', 'semuaUser', 'semuaRole', 'semuaInstansi'));
+        $userInstansi = $instansi->user()->whereDoesntHave('roles', function ($query) {
+            $query->where('name', 'admin_yayasan');
+        })->get(); //untuk operator
+        return view('user.main', compact('userInstansi', 'instansi', 'semuaUser', 'semuaRole', 'semuaInstansi'));
     }
 
     /**
@@ -42,10 +44,17 @@ class UsersController extends Controller
         if (!$user->can('manage users')) {
             return redirect()->intended('dashboard');
         }
+        //untuk admin yayasan
         $role = Role::all();
-        $user = User::all();
+        $semuaUser = User::all();
         $instansi = Instansi::all();
-        return view('user.tambah', compact('role', 'user', 'instansi'));
+
+        //untuk operator
+        $operatorRole = Role::whereIn('name', ['tenaga_pendidik', 'tenaga_kependidikan'])->get();
+        $operatorInstansi = $user->instansi()->first();
+
+
+        return view('user.tambah', compact('role', 'semuaUser', 'instansi', 'operatorRole', 'operatorInstansi'));
     }
 
     /**
@@ -56,35 +65,34 @@ class UsersController extends Controller
         //TODO: jangan lupa tambahkan pengecekan apakah user punya role "admin_yayasan"
         //*sementara untuk keperluan testing
 
-        // $validate = Validator::make($request->all(), [
-        //     "name" => "required|min:5",
-        //     "telp" => "required|numeric",
-        //     "username" => "required",
-        //     "password" => "required",
-        //     "uid_rfid" => "required"
-        // ]);
+        $user = auth()->user();
 
-        // if ($validate->fails()) {
-        //     return redirect()->route('users.create')->withErrors($validate)->withInput();
-        // }
+        $validate = Validator::make($request->all(), [
+            "name" => "required|min:5",
+            "telp" => "required|numeric",
+            "username" => "required",
+            "password" => "required",
+            'jarak_tempuh' => 'required'
+        ]);
+
+        if ($validate->fails()) {
+            return redirect()->back()->withErrors($validate)->withInput();
+        }
+
+        if ($request->role_id == '1' || $request->role_id == '2' && $user->hasRole('operator_instansi')) {
+            return redirect()->back()->with('error', 'anda tidak punya permission');
+        }
+
+        if ($user->hasRole('operator_instansi') && $request->instansi_id != $user->instansi()->first()->id) {
+            return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
+        }
 
         // * Upload untuk Foto Presensi
 
         $imageNamePresensi = time() . '.' . $request->foto_presensi->extension();
-
-        // $request->foto_presensi->move(public_path('foto_presensi/'), $imagePresensi);
-
-        // * Upload untuk Foto Profil
-        // $imageName = time() . '.' . $request->foto->extension();
-
-        // $request->image->move(public_path('images'), $imageName);
-
         //img interevention
         $manager = ImageManager::withDriver(new Driver());
 
-        //read image
-        // $imageProfil = $manager->read($request->file('foto'));
-        // $imageProfil->encode(new AutoEncoder(50))->save(public_path('foto/' . $imageName));
 
         //read image
         $imagePresensi = $manager->read($request->file('foto_presensi'));
@@ -125,6 +133,8 @@ class UsersController extends Controller
         if (!$user->can('manage users')) {
             return redirect()->intended('dashboard');
         }
+
+
         $user = User::find($id);
         $instansi = Instansi::all();
         $role = Role::all();
@@ -132,7 +142,11 @@ class UsersController extends Controller
         $userRoles = $user->roles()->pluck('roles.id')->toArray();
         $userInstansi = $user->instansi()->pluck('instansis.id')->toArray();
 
-        return view('user.edit', compact('user', 'instansi', 'role', 'userRoles', 'userInstansi'));
+        //untuk operator
+        $operatorRole = Role::whereIn('name', ['tenaga_pendidik', 'tenaga_kependidikan'])->get();
+        $operatorInstansi = $user->instansi()->first();
+
+        return view('user.edit', compact('user', 'instansi', 'role', 'userRoles', 'userInstansi', 'operatorRole', 'operatorInstansi'));
 
         // return view('user.edit', compact('user', 'instansi', 'role'));
     }
@@ -145,6 +159,7 @@ class UsersController extends Controller
     public function update(Request $request, $id)
     {
         $target = User::find($id);
+        $user = auth()->user();
 
         if (!$target) {
             return redirect()->route('user.index')->with('error', 'User tidak ditemukan');
@@ -173,6 +188,15 @@ class UsersController extends Controller
 
         if ($validate->fails()) {
             return redirect()->back()->withErrors($validate)->withInput();
+        }
+
+
+        if ($request->role_id == '1' || $request->role_id == '2' && $user->hasRole('operator_instansi')) {
+            return redirect()->back()->with('error', 'anda tidak punya permission');
+        }
+
+        if ($user->hasRole('operator_instansi') && $request->instansi_id != $user->instansi()->first()->id) {
+            return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
         }
 
         // Prepare data untuk update

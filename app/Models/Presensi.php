@@ -30,4 +30,9 @@ class Presensi extends Model
     {
         return $this->belongsTo(Instansi::class, 'instansi_id');
     }
+
+    public function tapel()
+    {
+        return $this->belongsTo(Tapel::class);
+    }
 }

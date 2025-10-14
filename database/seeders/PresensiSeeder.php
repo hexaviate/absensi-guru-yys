@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tapel;
 use Illuminate\Database\Seeder;
 use App\Models\Presensi;
 use App\Models\User;
@@ -25,17 +26,19 @@ class PresensiSeeder extends Seeder
             // jam datang & pulang
             $datang = Carbon::createFromTime(rand(6, 8), rand(0, 59));
             $pulang = (clone $datang)->addHours(rand(4, 6));
+            $tapel = Tapel::where('status', 'aktif')->first();
 
             Presensi::create([
                 'instansi_id' => $instansiId,
-                'user_id'     => $user->id,
-                'datang'      => $datang->format('H:i:s'),
-                'pulang'      => $pulang->format('H:i:s'),
-                'izin_id'     => null,
-                'tanggal'     => $tanggal->toDateString(),
-                'status'      => rand(0, 5) === 1 ? 'izin' : 'hadir',
-                'akurasi'     => $faker->randomFloat(2, 70, 99) . '%',
-                'userAgent'   => $faker->randomElement(['Android', 'iPhone', 'Windows', 'MacBook']),
+                'user_id' => $user->id,
+                "tapel_id" => $tapel->id,
+                'datang' => $datang->format('H:i:s'),
+                'pulang' => $pulang->format('H:i:s'),
+                'izin_id' => null,
+                'tanggal' => $tanggal->toDateString(),
+                'status' => rand(0, 5) === 1 ? 'izin' : 'hadir',
+                'akurasi' => $faker->randomFloat(2, 70, 99) . '%',
+                'userAgent' => $faker->randomElement(['Android', 'iPhone', 'Windows', 'MacBook']),
             ]);
         }
     }

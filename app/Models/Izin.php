@@ -27,4 +27,9 @@ class Izin extends Model
     {
         return $this->belongsTo(Instansi::class);
     }
+
+    public function tapel()
+    {
+        return $this->belongsTo(Tapel::class);
+    }
 }

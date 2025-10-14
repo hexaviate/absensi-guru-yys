@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Instansi;
 use App\Models\Izin;
 use App\Models\User;
 use App\Models\Presensi;
@@ -19,6 +20,7 @@ class IzinController extends Controller
     public function izinIndexUser()
     {
         $user = auth()->user();
+        // dd();
 
         if ($user->hasAnyPermission(['view self izin', 'manage izin'])) {
             // $instansi = $user->instansi; //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
@@ -32,12 +34,18 @@ class IzinController extends Controller
     public function viewIzinCreate()
     {
         $user = auth()->user();
-        if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
-            return redirect()->intended('dashboard');
+
+        if ($user->instansi()->where('nama_Instansi', 'SMK') && $user->instansi()->count() == 1) {
+            return redirect()->back()->with('error', 'Anda tidak bisa Izin di instansi ini');
         }
+
+        if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
+            return redirect()->back();
+        }
+
         $instansiId = $user->instansi()->first()->id;
 
-        $instansi = $user->instansi;
+        $instansi = $user->instansi()->get();
         return view('izin.users.tambah', compact('instansi', 'instansiId'));
 
     }
@@ -51,7 +59,6 @@ class IzinController extends Controller
         }
 
 
-
         $validate = Validator::make($request->all(), [
             'bukti_izin' => 'required',
             'instansi_id' => 'required|exists:instansis,id',
@@ -62,7 +69,12 @@ class IzinController extends Controller
             return redirect()->route('viewIzinCreate')->withErrors($validate)->withInput();
         }
 
+
         foreach ($request->instansi_id as $instansi) {
+
+            if ($instansi == Instansi::where('nama_instansi', 'SMK')->first()->id && $user->hasAnyRole(['tenaga_pendidik', 'tenaga_pendidikan'])) {
+                return redirect()->back()->with('error', 'Anda tidak bisa izin di instansi ini');
+            }
 
             if ($user->izin()->where('tanggal', today()->toDateString())->where('instansi_id', $instansi)->exists()) {
                 return redirect()->back()->with('error', 'anda telah melakukan izin hari ini di instansi' . $instansi);

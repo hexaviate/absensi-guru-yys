@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('tidak_hadirs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('tapel_id')->constrained()->cascadeOnDelete();
             $table->foreignId('instansi_id')->constrained()->cascadeOnDelete();
             $table->date('tanggal');
             $table->timestamps();
