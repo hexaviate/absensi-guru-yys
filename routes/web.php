@@ -90,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/izin/search-users', [IzinController::class, 'searchUsers'])
             ->name('izin.searchUsers');
 
+
     });
 });
 
@@ -110,6 +111,7 @@ Route::get('/search-users', [JadwalController::class, 'searchUsers'])->name('sea
 //      ->name('search.users')
 //      ->middleware('auth'); // sesuaikan middleware yang dipakai
 // routes/web.php (temporary untuk debug)
+
 Route::get('/check-db', [JadwalController::class, 'checkDatabaseStructure']);
 
 // Pindahkan routes export SEBELUM resource route

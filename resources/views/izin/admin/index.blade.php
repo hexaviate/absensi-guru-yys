@@ -9,27 +9,6 @@
                 <div class="breadcrumb-item">Dashboard</div>
             </div>
         </div>
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div class="alert alert-success" id="alertMessage">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger" id="alertMessage">
-                {{ session('error') }}
-            </div>
-        @endif
 
         <div class="section-body">
             <div class="row">

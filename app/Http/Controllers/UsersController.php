@@ -111,7 +111,7 @@ class UsersController extends Controller
         $user->instansi()->attach($request->instansi_id);
         $user->roles()->attach($request->role_id);
 
-        return redirect()->route('user.index');
+        return redirect()->route('user.index')->with('success','Berhasil Tambah User');
 
 
     }
@@ -253,6 +253,6 @@ class UsersController extends Controller
         }
         $target = User::find($id);
         $target->delete();
-        return redirect()->route('user.index');
+        return redirect()->route('user.index')->with('success','Berhasil Hapus User');
     }
 }

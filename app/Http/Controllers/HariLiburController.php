@@ -166,6 +166,6 @@ class HariLiburController extends Controller
 
         $target = HariLibur::find($id);
         $target->delete();
-        return redirect()->route('hariLibur.index');
+        return redirect()->route('hariLibur.index')->with('success','Berhasil Menghapus Hari Libur');
     }
 }

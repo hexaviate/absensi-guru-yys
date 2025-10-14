@@ -9,18 +9,6 @@
             </div>
         </div>
 
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" id="alertMessage">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert" id="alertMessage">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <div class="section-body">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">

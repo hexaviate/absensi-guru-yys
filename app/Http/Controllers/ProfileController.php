@@ -67,7 +67,7 @@ class ProfileController extends Controller
             "foto" => $imageName
         ]);
 
-        return redirect()->route('viewProfile');
+        return redirect()->route('viewProfile')->with('success','Berhasil Update Profil');
     }
 
     public function viewJadwalMingguIni(Request $request)

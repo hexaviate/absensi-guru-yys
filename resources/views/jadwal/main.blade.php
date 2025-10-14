@@ -12,12 +12,14 @@
 
         <div class="section-body">
 
-            @hasanyrole('operator_instansi')
-                <div class="shadow pb-2">
-                    <a href="{{ route('jadwal.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Jadwal</a>
-                </div>
-            @endhasanyrole
-
+            <div class="d-flex justify-content-between mb-3">
+                {{-- Tombol Tambah Jadwal (kiri) --}}
+                @hasanyrole('operator_instansi')
+                    <a href="{{ route('jadwal.create') }}" class="btn btn-primary shadow">
+                        Tambah Data Jadwal
+                    </a>
+                @endhasanyrole
+            </div>
 
             <div class="row">
                 <div class="col-12">
