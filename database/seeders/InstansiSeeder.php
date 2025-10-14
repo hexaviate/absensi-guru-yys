@@ -36,8 +36,8 @@ class InstansiSeeder extends Seeder
             "kepala_instansi" => "Pak Hamdan",
             "alamat_instansi" => "Tunjungrejo",
             "telp_instansi" => "081",
-            "latitude" => "-6.592996353118405",
-            "longitude" => "111.06748580403307"
+            "latitude" => "-6.60795",
+            "longitude" => "111.059405"
         ]);
 
         // 4

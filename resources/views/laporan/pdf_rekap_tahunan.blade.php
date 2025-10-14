@@ -7,155 +7,138 @@
         body {
             font-family: Arial, sans-serif;
             font-size: 11px;
-            margin: 0;
-            padding: 20px;
+            margin: 20px;
         }
-
         .header {
             text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 15px;
-        }
-
-        .header h2 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .header p {
-            margin: 5px 0 0 0;
-            font-size: 12px;
-        }
-
-        .filter-info {
             margin-bottom: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
         }
-
-        table {
+        .header h2 {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .header h3 {
+            margin: 5px 0;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        .info-box {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+        }
+        .info-box table {
+            width: 100%;
+        }
+        .info-box td {
+            padding: 3px 0;
+        }
+        .info-box strong {
+            font-weight: bold;
+        }
+        table.data-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            font-size: 10px;
         }
-
-        th, td {
-            border: 1px solid #333;
-            padding: 6px 4px;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        th {
-            background-color: #e9ecef;
+        table.data-table th {
+            background-color: #e8e8e8;
+            border: 1px solid #666;
+            padding: 8px;
+            text-align: center;
             font-weight: bold;
-            text-align: center;
-            font-size: 9px;
         }
-
-        .center {
-            text-align: center;
+        table.data-table td {
+            border: 1px solid #999;
+            padding: 6px;
         }
-
+        table.data-table td:nth-child(1) {
+            text-align: center;
+            width: 5%;
+        }
+        table.data-table td:nth-child(2) {
+            width: 35%;
+        }
+        table.data-table td:nth-child(3) {
+            width: 25%;
+        }
+        table.data-table td:nth-child(4),
+        table.data-table td:nth-child(5),
+        table.data-table td:nth-child(6),
+        table.data-table td:nth-child(7) {
+            text-align: center;
+            width: 8.75%;
+        }
         .footer {
-            margin-top: 30px;
-            font-size: 10px;
-            border-top: 1px solid #ddd;
-            padding-top: 15px;
-        }
-
-        .signature {
-            float: right;
-            text-align: center;
-            width: 200px;
             margin-top: 20px;
+            font-size: 10px;
         }
-
-        .page-break {
-            page-break-after: always;
-        }
-
-        @page {
-            margin: 1cm;
+        hr {
+            border: none;
+            border-top: 2px solid #000;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h2>Rekap Tahunan Absensi Guru & Karyawan</h2>
-        <p>Yayasan Pendidikan Salafiyah</p>
+        <h2>REKAP TAHUNAN ABSENSI GURU & KARYAWAN</h2>
+        <h3>Yayasan Pendidikan Salafiyah</h3>
+        <hr>
     </div>
 
-    <div class="filter-info">
-        <strong>Informasi Laporan:</strong><br>
-        <table style="border: none; font-size: 11px; margin: 5px 0;">
-            <tr style="border: none;">
-                <td style="border: none; width: 100px; padding: 2px 0;">Status</td>
-                <td style="border: none; padding: 2px 0;">: {{ $filter['status'] }}</td>
+    <div class="info-box">
+        <table>
+            <tr>
+                <td width="20%"><strong>Status</strong></td>
+                <td>: {{ $filter['status'] }}</td>
             </tr>
-            <tr style="border: none;">
-                <td style="border: none; padding: 2px 0;">Instansi</td>
-                <td style="border: none; padding: 2px 0;">: {{ $filter['instansi'] }}</td>
+            <tr>
+                <td><strong>Instansi</strong></td>
+                <td>: {{ $filter['instansi'] }}</td>
             </tr>
-            <tr style="border: none;">
-                <td style="border: none; padding: 2px 0;">Tahun Ajaran</td>
-                <td style="border: none; padding: 2px 0;">: {{ $filter['tahun_ajaran'] }}</td>
+            <tr>
+                <td><strong>Tahun Ajaran</strong></td>
+                <td>: {{ $filter['tahun_ajaran'] }}</td>
             </tr>
         </table>
     </div>
 
-    <table>
+    <table class="data-table">
         <thead>
             <tr>
-                <th width="4%">No</th>
-                <th width="12%">Tanggal</th>
-                <th width="28%">Nama Guru/Karyawan</th>
-                <th width="22%">Instansi</th>
-                <th width="12%">Datang</th>
-                <th width="12%">Pulang</th>
-                <th width="10%">Status</th>
+                <th>No</th>
+                <th>Nama Guru/Karyawan</th>
+                <th>Instansi</th>
+                <th>Hadir</th>
+                <th>Izin</th>
+                <th>Alpa</th>
+                <th>Tanpa Ket</th>
             </tr>
         </thead>
         <tbody>
-            @forelse ($presensi as $item)
-                <tr>
-                    <td class="center">{{ $loop->iteration }}</td>
-                    <td class="center">{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
-                    <td>{{ $item->user->name ?? 'N/A' }}</td>
-                    <td>{{ $item->instansi->nama_instansi ?? 'N/A' }}</td>
-                    <td class="center">{{ $item->datang ?? '-' }}</td>
-                    <td class="center">{{ $item->pulang ?? '-' }}</td>
-                    <td class="center">{{ ucfirst($item->status) }}</td>
-                </tr>
+            @forelse($rekap as $index => $item)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $item['nama'] }}</td>
+                <td>{{ $item['instansi'] }}</td>
+                <td>{{ $item['hadir'] }}</td>
+                <td>{{ $item['izin'] }}</td>
+                <td>{{ $item['alpa'] }}</td>
+                <td>{{ $item['tanpa_ket'] }}</td>
+            </tr>
             @empty
-                <tr>
-                    <td colspan="7" class="center" style="padding: 20px; font-style: italic;">
-                        Tidak ada data presensi untuk tahun ajaran yang dipilih
-                    </td>
-                </tr>
+            <tr>
+                <td colspan="7" style="text-align: center;">Tidak ada data</td>
+            </tr>
             @endforelse
         </tbody>
     </table>
 
     <div class="footer">
-        <div style="float: left;">
-            <strong>Total Data:</strong> {{ $presensi->count() }} record<br>
-            <strong>Dicetak pada:</strong> {{ now()->format('d F Y, H:i:s') }}
-        </div>
-
-        {{-- <div class="signature">
-            <p>Mengetahui,</p>
-            <br><br><br>
-            <p>_________________________</p>
-            <p>Kepala Sekolah/Pimpinan</p>
-        </div> --}}
-
+        <strong>Total Data:</strong> {{ count($rekap) }} record<br>
+        <strong>Dicetak pada:</strong> {{ \Carbon\Carbon::now()->format('d F Y, H:i:s') }}
     </div>
 </body>
 </html>

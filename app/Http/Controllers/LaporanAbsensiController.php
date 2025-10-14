@@ -13,7 +13,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class LaporanAbsensiController extends Controller
 {
@@ -21,20 +20,14 @@ class LaporanAbsensiController extends Controller
     {
         $user = auth()->user();
 
-
         try {
-            // $instansiOperator = $user->instansi()->get();
-
             // Base query dengan eager loading dan validasi relasi
             $query = Presensi::with(['user', 'instansi'])
-                ->whereHas('user') // Pastikan user exists
-                ->whereHas('instansi'); // Pastikan instansi exists
+                ->whereHas('user')
+                ->whereHas('instansi');
 
-            // Filter berdasarkan role - CRITICAL: ini harus di awal
-
-
+            // Filter berdasarkan role
             if ($user->hasRole('operator_instansi')) {
-                // Ambil instansi yang dimiliki user melalui relasi
                 $instansiUser = $user->instansi()->first();
 
                 if (!$instansiUser) {
@@ -47,11 +40,11 @@ class LaporanAbsensiController extends Controller
                         'presensi' => collect([]),
                         'instansi' => collect([]),
                         'tapels' => collect([]),
-                        'user' => $user
+                        'user' => $user,
+                        'isOperatorInstansi' => true
                     ])->with('error', 'Akun Anda belum terhubung dengan instansi. Silakan hubungi administrator.');
                 }
 
-                // Filter hanya untuk instansi miliknya
                 $query->where('instansi_id', $instansiUser->id);
 
                 Log::info('Operator Instansi Access:', [
@@ -61,7 +54,6 @@ class LaporanAbsensiController extends Controller
                     'instansi_name' => $instansiUser->nama_instansi
                 ]);
             } elseif ($user->hasRole('admin_yayasan')) {
-                // Admin yayasan bisa pilih instansi spesifik
                 if ($request->filled('instansi')) {
                     $query->where('instansi_id', $request->instansi);
 
@@ -112,56 +104,19 @@ class LaporanAbsensiController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            // Debug: Log query SQL
-            Log::info('Query Executed:', [
-                'sql' => $query->toSql(),
-                'bindings' => $query->getBindings()
-            ]);
-
-            // Validasi data yang didapat
-            $invalidRecords = $presensi->filter(function ($item) {
-                return !$item->user || !$item->instansi;
-            });
-
-            if ($invalidRecords->isNotEmpty()) {
-                Log::warning('Found records with missing relations:', [
-                    'count' => $invalidRecords->count(),
-                    'ids' => $invalidRecords->pluck('id')->toArray()
-                ]);
-            }
-
-            // Debug log
-            Log::info('Query Result Summary:', [
-                'user_role' => $user->getRoleNames()->first(),
-                'user_id' => $user->id,
-                'user_instansi_id' => $user->instansi_id ?? 'null',
-                'filter_instansi' => $request->instansi ?? 'all',
-                'filter_status' => $request->status ?? 'all',
-                'filter_tanggal' => $request->tanggal ?? 'none',
-                'total_records' => $presensi->count(),
-                'has_data' => $presensi->isNotEmpty(),
-                'sample_record' => $presensi->first() ? [
-                    'id' => $presensi->first()->id,
-                    'user_id' => $presensi->first()->user_id,
-                    'user_name' => $presensi->first()->user->name ?? 'NULL',
-                    'instansi_id' => $presensi->first()->instansi_id,
-                    'instansi_name' => $presensi->first()->instansi->nama_instansi ?? 'NULL'
-                ] : null
-            ]);
-
             // Get list instansi berdasarkan role
-            if ($user->hasRole('operator_instansi')) {
+            $isOperatorInstansi = $user->hasRole('operator_instansi');
+            if ($isOperatorInstansi) {
                 $instansiUser = $user->instansi()->first();
                 $instansi = $instansiUser ? collect([$instansiUser]) : collect([]);
             } else {
                 $instansi = Instansi::all();
             }
 
-
             // Get list tahun ajaran aktif
             $tapels = Tapel::active()->orderBy('kode', 'desc')->get();
 
-            return view('laporan.rekap_absensi', compact('presensi', 'instansi', 'tapels', 'user'));
+            return view('laporan.rekap_absensi', compact('presensi', 'instansi', 'tapels', 'user', 'isOperatorInstansi'));
         } catch (\Exception $e) {
             Log::error('ERROR in LaporanAbsensiController@index:', [
                 'message' => $e->getMessage(),
@@ -171,76 +126,110 @@ class LaporanAbsensiController extends Controller
                 'user_id' => $user->id ?? null
             ]);
 
-
-
-            // Fallback dengan data kosong
             return view('laporan.rekap_absensi', [
                 'presensi' => collect([]),
                 'instansi' => collect([]),
                 'tapels' => collect([]),
                 'user' => $user,
+                'isOperatorInstansi' => $user->hasRole('operator_instansi')
             ])->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
-
     public function exportExcel(Request $request)
     {
-        return Excel::download(new RekapHarianExport($request), 'rekap_harian_' . now()->format('Y-m-d') . '.xlsx');
+        try {
+            $filename = 'rekap_harian_' . now()->format('Y-m-d') . '.xlsx';
+            return Excel::download(new RekapHarianExport($request), $filename);
+        } catch (\Exception $e) {
+            Log::error('Excel Harian Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal export Excel: ' . $e->getMessage());
+        }
     }
 
     public function exportPDF(Request $request)
     {
-        $query = Presensi::with(['user', 'instansi']);
+        try {
+            $user = Auth::user();
+            $query = Presensi::with(['user', 'instansi']);
 
-        // Terapkan filter yang sama
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            // Filter untuk operator instansi
+            $isOperatorInstansi = $user->hasRole('operator_instansi');
+            if ($isOperatorInstansi) {
+                $instansiOperator = $user->instansi()->first();
+                if ($instansiOperator) {
+                    $query->where('instansi_id', $instansiOperator->id);
+                }
+            } elseif ($request->filled('instansi')) {
+                $query->where('instansi_id', $request->instansi);
+            }
+
+            // Filter
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('tanggal')) {
+                $query->whereDate('tanggal', $request->tanggal);
+            }
+
+            $presensi = $query->orderBy('tanggal', 'desc')->get();
+
+            // Urutkan berdasarkan instansi (PAUD → MI → MTS → MA → SMK → PATTA)
+            $urutanInstansi = ['PAUD', 'MI', 'MTS', 'MA', 'SMK', 'PATTA'];
+
+            $presensi = $presensi->sort(function ($a, $b) use ($urutanInstansi) {
+                $instansiA = strtoupper($a->instansi->nama_instansi ?? '');
+                $instansiB = strtoupper($b->instansi->nama_instansi ?? '');
+
+                $indexA = array_search($instansiA, $urutanInstansi);
+                $indexB = array_search($instansiB, $urutanInstansi);
+
+                $indexA = $indexA === false ? 999 : $indexA;
+                $indexB = $indexB === false ? 999 : $indexB;
+
+                if ($indexA === $indexB) {
+                    return $b->tanggal <=> $a->tanggal;
+                }
+
+                return $indexA - $indexB;
+            })->values();
+
+            // Ambil nama instansi untuk header
+            $namaInstansi = 'Semua';
+            if ($isOperatorInstansi) {
+                $instansiOperator = $user->instansi()->first();
+                $namaInstansi = $instansiOperator ? $instansiOperator->nama_instansi : 'Semua';
+            } elseif ($request->filled('instansi')) {
+                $instansi = Instansi::find($request->instansi);
+                $namaInstansi = $instansi ? $instansi->nama_instansi : 'Semua';
+            }
+
+            $data = [
+                'presensi' => $presensi,
+                'filter' => [
+                    'status' => $request->status ?: 'Semua',
+                    'instansi' => $namaInstansi,
+                    'tanggal' => $request->tanggal ?: now()->format('Y-m-d')
+                ]
+            ];
+
+            $pdf = Pdf::loadView('laporan.pdf_rekap_harian', $data)->setPaper('a4', 'portrait');
+            return $pdf->download('rekap_harian_' . now()->format('Y-m-d') . '.pdf');
+        } catch (\Exception $e) {
+            Log::error('PDF Harian Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal export PDF: ' . $e->getMessage());
         }
-
-        if ($request->filled('instansi')) {
-            $query->where('instansi_id', $request->instansi);
-        }
-
-        if ($request->filled('tanggal')) {
-            $query->whereDate('tanggal', $request->tanggal);
-        }
-
-        $presensi = $query->orderBy('tanggal', 'desc')->get();
-
-        // Ambil nama instansi untuk header
-        $namaInstansi = 'Semua';
-        if ($request->filled('instansi')) {
-            $instansi = Instansi::find($request->instansi);
-            $namaInstansi = $instansi ? $instansi->nama_instansi : 'Semua';
-        }
-
-        // Data untuk view PDF
-        $data = [
-            'presensi' => $presensi,
-            'filter' => [
-                'status' => $request->status ?: 'Semua',
-                'instansi' => $namaInstansi,
-                'tanggal' => $request->tanggal ?: now()->format('Y-m-d')
-            ]
-        ];
-
-        $pdf = Pdf::loadView('laporan.pdf_rekap_harian', $data)
-            ->setPaper('a4', 'portrait');
-
-        return $pdf->download('rekap_harian_' . now()->format('Y-m-d') . '.pdf');
     }
 
     public function exportExcelBulanan(Request $request)
     {
         try {
-            \Log::info('Export Excel Bulanan called with params:', $request->all());
-
+            Log::info('Export Excel Bulanan called with params:', $request->all());
             $filename = 'rekap_bulanan_' . now()->format('Y-m-d') . '.xlsx';
-
             return Excel::download(new RekapBulananExport($request), $filename);
         } catch (\Exception $e) {
-            \Log::error('Excel Bulanan Export Error: ' . $e->getMessage());
+            Log::error('Excel Bulanan Export Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal export Excel: ' . $e->getMessage());
         }
     }
@@ -248,28 +237,74 @@ class LaporanAbsensiController extends Controller
     public function exportPDFBulanan(Request $request)
     {
         try {
-            \Log::info('Export PDF Bulanan called with params:', $request->all());
+            Log::info('Export PDF Bulanan called with params:', $request->all());
 
+            $user = Auth::user();
             $query = Presensi::with(['user', 'instansi']);
+
+            // Filter untuk operator instansi
+            $isOperatorInstansi = $user->hasRole('operator_instansi');
+            if ($isOperatorInstansi) {
+                $instansiOperator = $user->instansi()->first();
+                if ($instansiOperator) {
+                    $query->where('instansi_id', $instansiOperator->id);
+                }
+            } elseif ($request->filled('instansi')) {
+                $query->where('instansi_id', $request->instansi);
+            }
 
             // Filter bulanan
             if ($request->filled('status')) {
                 $query->where('status', $request->status);
             }
 
-            if ($request->filled('instansi')) {
-                $query->where('instansi_id', $request->instansi);
-            }
-
             if ($request->filled('dari_tanggal') && $request->filled('sampai_tanggal')) {
                 $query->whereBetween('tanggal', [$request->dari_tanggal, $request->sampai_tanggal]);
             }
 
-            $presensi = $query->orderBy('tanggal', 'desc')->get();
+            $presensiData = $query->get();
+
+            // Hitung rekap per user
+            $grouped = $presensiData->groupBy('user_id');
+
+            $rekapData = $grouped->map(function ($items, $userId) {
+                $user = $items->first()->user;
+                $instansi = $items->first()->instansi;
+
+                return [
+                    'user_id' => $userId,
+                    'nama' => $user->name ?? 'N/A',
+                    'instansi' => $instansi->nama_instansi ?? 'N/A',
+                    'hadir' => $items->where('status', 'hadir')->count(),
+                    'izin' => $items->where('status', 'izin')->count(),
+                    'alpa' => $items->where('status', 'alpa')->count(),
+                    'tanpa_ket' => $items->where('status', 'tanpa_keterangan')->count(),
+                ];
+            })->values();
+
+            // Urutkan berdasarkan instansi (PAUD → MI → MTS → MA → SMK → PATTA)
+            $urutanInstansi = ['PAUD', 'MI', 'MTS', 'MA', 'SMK', 'PATTA'];
+
+            $rekapData = $rekapData->sort(function ($a, $b) use ($urutanInstansi) {
+                $indexA = array_search(strtoupper($a['instansi']), $urutanInstansi);
+                $indexB = array_search(strtoupper($b['instansi']), $urutanInstansi);
+
+                $indexA = $indexA === false ? 999 : $indexA;
+                $indexB = $indexB === false ? 999 : $indexB;
+
+                if ($indexA === $indexB) {
+                    return strcmp($a['nama'], $b['nama']);
+                }
+
+                return $indexA - $indexB;
+            })->values();
 
             // Ambil nama instansi untuk header
             $namaInstansi = 'Semua';
-            if ($request->filled('instansi')) {
+            if ($isOperatorInstansi) {
+                $instansiOperator = $user->instansi()->first();
+                $namaInstansi = $instansiOperator ? $instansiOperator->nama_instansi : 'Semua';
+            } elseif ($request->filled('instansi')) {
                 $instansi = Instansi::find($request->instansi);
                 $namaInstansi = $instansi ? $instansi->nama_instansi : 'Semua';
             }
@@ -285,7 +320,7 @@ class LaporanAbsensiController extends Controller
             }
 
             $data = [
-                'presensi' => $presensi,
+                'rekap' => $rekapData,
                 'filter' => [
                     'status' => $request->status ?: 'Semua',
                     'instansi' => $namaInstansi,
@@ -293,27 +328,22 @@ class LaporanAbsensiController extends Controller
                 ]
             ];
 
-            $pdf = Pdf::loadView('laporan.pdf_rekap_bulanan', $data)
-                ->setPaper('a4', 'portrait');
-
+            $pdf = Pdf::loadView('laporan.pdf_rekap_bulanan', $data)->setPaper('a4', 'portrait');
             return $pdf->download('rekap_bulanan_' . now()->format('Y-m-d') . '.pdf');
         } catch (\Exception $e) {
-            \Log::error('PDF Bulanan Export Error: ' . $e->getMessage());
+            Log::error('PDF Bulanan Export Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal export PDF: ' . $e->getMessage());
         }
     }
 
-    // Method baru untuk export tahunan
     public function exportExcelTahunan(Request $request)
     {
         try {
-            \Log::info('Export Excel Tahunan called with params:', $request->all());
-
+            Log::info('Export Excel Tahunan called with params:', $request->all());
             $filename = 'rekap_tahunan_' . now()->format('Y-m-d') . '.xlsx';
-
             return Excel::download(new RekapTahunanExport($request), $filename);
         } catch (\Exception $e) {
-            \Log::error('Excel Tahunan Export Error: ' . $e->getMessage());
+            Log::error('Excel Tahunan Export Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal export Excel: ' . $e->getMessage());
         }
     }
@@ -321,17 +351,25 @@ class LaporanAbsensiController extends Controller
     public function exportPDFTahunan(Request $request)
     {
         try {
-            \Log::info('Export PDF Tahunan called with params:', $request->all());
+            Log::info('Export PDF Tahunan called with params:', $request->all());
 
+            $user = Auth::user();
             $query = Presensi::with(['user', 'instansi']);
+
+            // Filter untuk operator instansi
+            $isOperatorInstansi = $user->hasRole('operator_instansi');
+            if ($isOperatorInstansi) {
+                $instansiOperator = $user->instansi()->first();
+                if ($instansiOperator) {
+                    $query->where('instansi_id', $instansiOperator->id);
+                }
+            } elseif ($request->filled('instansi')) {
+                $query->where('instansi_id', $request->instansi);
+            }
 
             // Filter tahunan
             if ($request->filled('status')) {
                 $query->where('status', $request->status);
-            }
-
-            if ($request->filled('instansi')) {
-                $query->where('instansi_id', $request->instansi);
             }
 
             if ($request->filled('tahun_ajaran')) {
@@ -344,11 +382,49 @@ class LaporanAbsensiController extends Controller
                 }
             }
 
-            $presensi = $query->orderBy('tanggal', 'desc')->get();
+            $presensiData = $query->get();
+
+            // Hitung rekap per user
+            $grouped = $presensiData->groupBy('user_id');
+
+            $rekapData = $grouped->map(function ($items, $userId) {
+                $user = $items->first()->user;
+                $instansi = $items->first()->instansi;
+
+                return [
+                    'user_id' => $userId,
+                    'nama' => $user->name ?? 'N/A',
+                    'instansi' => $instansi->nama_instansi ?? 'N/A',
+                    'hadir' => $items->where('status', 'hadir')->count(),
+                    'izin' => $items->where('status', 'izin')->count(),
+                    'alpa' => $items->where('status', 'alpa')->count(),
+                    'tanpa_ket' => $items->where('status', 'tanpa_keterangan')->count(),
+                ];
+            })->values();
+
+            // Urutkan berdasarkan instansi (PAUD → MI → MTS → MA → SMK → PATTA)
+            $urutanInstansi = ['PAUD', 'MI', 'MTS', 'MA', 'SMK', 'PATTA'];
+
+            $rekapData = $rekapData->sort(function ($a, $b) use ($urutanInstansi) {
+                $indexA = array_search(strtoupper($a['instansi']), $urutanInstansi);
+                $indexB = array_search(strtoupper($b['instansi']), $urutanInstansi);
+
+                $indexA = $indexA === false ? 999 : $indexA;
+                $indexB = $indexB === false ? 999 : $indexB;
+
+                if ($indexA === $indexB) {
+                    return strcmp($a['nama'], $b['nama']);
+                }
+
+                return $indexA - $indexB;
+            })->values();
 
             // Ambil nama instansi untuk header
             $namaInstansi = 'Semua';
-            if ($request->filled('instansi')) {
+            if ($isOperatorInstansi) {
+                $instansiOperator = $user->instansi()->first();
+                $namaInstansi = $instansiOperator ? $instansiOperator->nama_instansi : 'Semua';
+            } elseif ($request->filled('instansi')) {
                 $instansi = Instansi::find($request->instansi);
                 $namaInstansi = $instansi ? $instansi->nama_instansi : 'Semua';
             }
@@ -361,7 +437,7 @@ class LaporanAbsensiController extends Controller
             }
 
             $data = [
-                'presensi' => $presensi,
+                'rekap' => $rekapData,
                 'filter' => [
                     'status' => $request->status ?: 'Semua',
                     'instansi' => $namaInstansi,
@@ -369,62 +445,11 @@ class LaporanAbsensiController extends Controller
                 ]
             ];
 
-            $pdf = Pdf::loadView('laporan.pdf_rekap_tahunan', $data)
-                ->setPaper('a4', 'portrait');
-
+            $pdf = Pdf::loadView('laporan.pdf_rekap_tahunan', $data)->setPaper('a4', 'portrait');
             return $pdf->download('rekap_tahunan_' . now()->format('Y-m-d') . '.pdf');
         } catch (\Exception $e) {
-            \Log::error('PDF Tahunan Export Error: ' . $e->getMessage());
+            Log::error('PDF Tahunan Export Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal export PDF: ' . $e->getMessage());
         }
-    }
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

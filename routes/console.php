@@ -12,6 +12,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+//KURANG WOII KURANG JADWAL :((((((()))))))
 Schedule::call(function () {
     $today = now()->toDateString();
 

@@ -60,7 +60,8 @@
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">{{ $statsData['MTs'] }}</h2>
+                                {{-- <h2 class="stats-number">{{ $statsData['MTs'] }}</h2> --}}
+                                <h2 class="stats-number">124</h2>
                                 <p class="stats-label">GURU MTs</p>
                             </div>
                         </div>
