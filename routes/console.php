@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\HariLibur;
 use App\Models\Instansi;
 use App\Models\Jadwal;
 use App\Models\Presensi;
@@ -24,9 +25,34 @@ Schedule::call(function () {
             $presensi = Presensi::where('user_id', $user->id)->where('instansi_id', $instansi->id)->whereDate('tanggal', $today)->exists();
 
             if (!$presensi) {
-                $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->where('instansi_id', $instansi->id)->exists();
-                if (!$jadwalHariIni) {
-                    if ($user->hasRole('tenaga_pendidik')) {
+                // $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->where('instansi_id', $instansi->id)->exists();
+                // if (!$jadwalHariIni) {
+                //     if ($user->hasRole('tenaga_pendidik')) {
+                //         continue;
+                //     }
+                // }
+                $hariLibur = HariLibur::where('instansi_id', $instansi->id)->where('tanggal', now()->toDateString())->first();
+
+                if ($user->hasRole('tenaga_pendidik')) {
+                    $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->where('instansi_id', $instansi->id)->where('tapel_id', $tapelAktif->id)->first();
+                    if (!$jadwalHariIni) {
+                        continue;
+                    }
+
+                    if ($hariLibur) {
+                        if ($hariLibur->waktu) {
+
+                            if ($hariLibur->waktu <= $jadwalHariIni->datang) {
+                                continue;
+                            }
+
+                        } else {
+                            continue;
+                        }
+                    }
+
+                } else {
+                    if ($hariLibur) {
                         continue;
                     }
                 }
