@@ -12,7 +12,7 @@
                     @php
                         // Mapping data guru per instansi
                         $statsData = [
-                            'TK' => 0,
+                            'PAUD' => 0,
                             'MI' => 0,
                             'MTs' => 0,
                             'MA' => 0,
@@ -23,8 +23,8 @@
                         foreach ($totalGuruPerInstansi as $instansi) {
                             $namaInstansi = strtoupper($instansi->nama_instansi);
 
-                            if (str_contains($namaInstansi, 'TK')) {
-                                $statsData['TK'] += $instansi->user_count;
+                            if (str_contains($namaInstansi, 'PAUD')) {
+                                $statsData['PAUD'] += $instansi->user_count;
                             } elseif (str_contains($namaInstansi, 'MI')) {
                                 $statsData['MI'] += $instansi->user_count;
                             } elseif (str_contains($namaInstansi, 'MTS') || str_contains($namaInstansi, 'TSANAWIYAH')) {
@@ -42,8 +42,8 @@
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">{{ $statsData['TK'] }}</h2>
-                                <p class="stats-label">GURU TK</p>
+                                <h2 class="stats-number">{{ $statsData['PAUD'] }}</h2>
+                                <p class="stats-label">Guru & Karyawan PAUD</p>
                             </div>
                         </div>
                     </div>
@@ -52,7 +52,7 @@
                         <div class="stats-card">
                             <div class="card-body">
                                 <h2 class="stats-number">{{ $statsData['MI'] }}</h2>
-                                <p class="stats-label">GURU MI</p>
+                                <p class="stats-label">Guru & Karyawan GURU MI</p>
                             </div>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                             <div class="card-body">
                                 {{-- <h2 class="stats-number">{{ $statsData['MTs'] }}</h2> --}}
                                 <h2 class="stats-number">124</h2>
-                                <p class="stats-label">GURU MTs</p>
+                                <p class="stats-label">Guru & Karyawan MTs</p>
                             </div>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                         <div class="stats-card">
                             <div class="card-body">
                                 <h2 class="stats-number">{{ $statsData['MA'] }}</h2>
-                                <p class="stats-label">GURU MA</p>
+                                <p class="stats-label">Guru & Karyawan MA</p>
                             </div>
                         </div>
                     </div>
@@ -80,7 +80,7 @@
                         <div class="stats-card">
                             <div class="card-body">
                                 <h2 class="stats-number">{{ $statsData['SMK'] }}</h2>
-                                <p class="stats-label">GURU SMK</p>
+                                <p class="stats-label">Guru & Karyawan SMK</p>
                             </div>
                         </div>
                     </div>
@@ -89,7 +89,7 @@
                         <div class="stats-card">
                             <div class="card-body">
                                 <h2 class="stats-number">{{ $statsData['PATTA'] }}</h2>
-                                <p class="stats-label">GURU PATTA</p>
+                                <p class="stats-label">Guru & Karyawan PATTA</p>
                             </div>
                         </div>
                     </div>
@@ -104,8 +104,6 @@
                         <div id="chart"></div>
                     </div>
                 </div>
-
-
             </div>
 
             <!-- Kolom Kanan: Data Umum + Riwayat Absensi -->
@@ -124,7 +122,7 @@
                         </div>
                         <div>
                             <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">Total Guru Yayasan</h6>
+                                <h6 class="mb-0">Total Guru & Karyawan Yayasan Salafiyah</h6>
                                 <h3 class="mb-0 text-success">{{ $totalSemuaGuru }}</h3>
                             </div>
                         </div>
