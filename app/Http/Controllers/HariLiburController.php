@@ -19,10 +19,12 @@ class HariLiburController extends Controller
         //! pengecekan bersama front end
         $user = auth()->user();
 
+        //*tes
+
         if ($user->hasAnyPermission(['view all hari_libur', 'manage hari_libur'])) {
             $tapel = Tapel::where('status', 'aktif')->get();
             $tapelAktif = Tapel::where('status', 'aktif')->first();
-            $semuaHariLibur = HariLibur::tapel()->where('status', 'aktif')->get();
+            $semuaHariLibur = HariLibur::where('tapel_id', $tapelAktif->id)->get();
 
             $instansi = $user->instansi()->first(); //nanti diubah agar instansi yang muncul sesuai dengan instansi nya operator
             $operatorHariLibur = HariLibur::where('instansi_id', $instansi->id)->where('tapel_id', $tapelAktif->id)->get();
