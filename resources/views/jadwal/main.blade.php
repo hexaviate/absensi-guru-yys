@@ -12,20 +12,19 @@
 
         <div class="section-body">
 
-            <div class="d-flex justify-content-between mb-3">
-                {{-- Tombol Tambah Jadwal (kiri) --}}
-                @hasanyrole('operator_instansi')
+            @hasanyrole('operator_instansi')
+                <div class="d-flex justify-content-between mb-3">
+                    {{-- Tombol Tambah Jadwal (kiri) --}}
                     <a href="{{ route('jadwal.create') }}" class="btn btn-primary shadow">
                         Tambah Data Jadwal
                     </a>
-                @endhasanyrole
-            </div>
+                </div>
 
             <div class="row">
                 <div class="col-12">
                     <div class="card shadow">
                         <div class="card-header">
-                            <h4>Data Jadwal</h4>
+                            <h4>Data Instansi</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -103,7 +102,7 @@
         });
     </script>
 
-     <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             $('.delete-btn').on('click', function(e) {
                 e.preventDefault();

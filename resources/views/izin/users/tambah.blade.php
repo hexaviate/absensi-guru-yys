@@ -39,6 +39,9 @@
                                         @if ($user->hasRole('admin_yayasan') && $item->nama_instansi !== 'PUSPELA')
                                             @continue
                                         @endif
+                                        @if ($item->nama_instansi === 'SMK')
+                                            @continue
+                                        @endif
 
                                         <label class="selectgroup-item">
                                             <input type="checkbox" name="instansi_id[]" value="{{ $item->id }}"

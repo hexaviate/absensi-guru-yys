@@ -31,10 +31,10 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Name</th>
+                                                <th>Peran</th>
                                                 <th>No Telephone</th>
                                                 <th>Username</th>
-                                                <th>Foto Presensi</th>
-                                                <th>Foto</th>
+                                                <th>instansi</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -44,10 +44,22 @@
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $item->name }}</td>
+                                                    <td>
+                                                        @forelse ($item->roles as $role)
+                                                            {{ $role->name }}{{ !$loop->last ? ', ' : '' }}
+                                                        @empty
+                                                            Tidak Punya Role
+                                                        @endforelse
+                                                    </td>
                                                     <td>{{ $item->telp }}</td>
                                                     <td>{{ $item->username }}</td>
-                                                    <td>{{ $item->foto_presensi }}</td>
-                                                    <td>{{ $item->foto }}</td>
+                                                    <td>
+                                                        @forelse ($item->instansi as $ins)
+                                                            {{ $ins->nama_instansi }}{{ !$loop->last ? ', ' : '' }}
+                                                        @empty
+                                                            Belum Ada Instansi
+                                                        @endforelse
+                                                    </td>
                                                     <td class="d-flex">
                                                         <a class="btn btn-warning mx-1"
                                                             href="{{ route('user.edit', $item->id) }}">Edit</a>
@@ -78,6 +90,9 @@
             <div class="section-body">
                 <div class="row">
                     <div class="col-12">
+                        <div class="shadow pb-2">
+                            <a href="{{ route('user.create') }}" class="btn btn-primary m-2 shadow">Tambah Data User</a>
+                        </div>
                         <div class="card shadow">
                             <div class="card-header">
                                 <h4>Data User</h4>
@@ -89,10 +104,9 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>Name</th>
+                                                <th>Peran</th>
                                                 <th>No Telephone</th>
                                                 <th>Username</th>
-                                                <th>Foto Presensi</th>
-                                                <th>Foto</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -102,17 +116,24 @@
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $item->name }}</td>
+                                                    <td>
+                                                        @forelse ($item->roles as $role)
+                                                            {{ $role->name }}{{ !$loop->last ? ', ' : '' }}
+                                                        @empty
+                                                            Tidak Punya Role
+                                                        @endforelse
+                                                    </td>
                                                     <td>{{ $item->telp }}</td>
                                                     <td>{{ $item->username }}</td>
-                                                    <td>{{ $item->foto_presensi }}</td>
-                                                    <td>{{ $item->foto }}</td>
                                                     <td class="d-flex">
                                                         <a class="btn btn-warning mx-1"
                                                             href="{{ route('user.edit', $item->id) }}">Edit</a>
-                                                        <form action="{{ route('user.destroy', $item->id) }}" method="POST" class="delete-form d-inline">
+                                                        <form action="{{ route('user.destroy', $item->id) }}" method="POST"
+                                                            class="delete-form d-inline">
                                                             @csrf
                                                             @method('delete')
-                                                            <button type="button" class="btn btn-danger mx-1 delete-btn">Hapus</button>
+                                                            <button type="button"
+                                                                class="btn btn-danger mx-1 delete-btn">Hapus</button>
                                                         </form>
                                                     </td>
                                                 </tr>
