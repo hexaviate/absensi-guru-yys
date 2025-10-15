@@ -2,34 +2,34 @@
 
 namespace Database\Seeders;
 
-use App\Models\Jadwal;
-use DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Carbon\Carbon;
+use App\Models\Jadwal;
+use App\Models\User;
 
 class JadwalSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Jadwal::create([
-        //     "tapel_id" => 1,
-        //     "instansi_id" => 2,
-        //     "user_id" => 3,
-        //     "hari" => "17 Agustus 2025",
-        //     "datang"
-        // ]);
+        $tapelId = 1; // 2025/2026
+        $instansiId = 5; // SMK Salafiyah
+        $hariList = ['Sabtu', 'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis'];
 
-        DB::table('jadwals')->insert([
-            "tapel_id" => 1,
-            "instansi_id" => 1,
-            "user_id" => 3,
-            "hari" => Carbon::parse('19 August 2025')->isoFormat('dddd'),
-            "datang" => Carbon::createFromTime('11', '20', '00'),
-            "pulang" => Carbon::createFromTime('11', '30', '00'),
-        ]);
+        // Ambil semua user SMK Salafiyah kecuali user id=1 (Pak Admin)
+        $users = User::whereHas('instansi', function ($q) use ($instansiId) {
+            $q->where('instansi_id', $instansiId);
+        })->where('id', '!=', 1)->get();
+
+        foreach ($users as $user) {
+            foreach ($hariList as $hari) {
+                Jadwal::create([
+                    'tapel_id' => $tapelId,
+                    'instansi_id' => $instansiId,
+                    'user_id' => $user->id,
+                    'hari' => $hari,
+                    'datang' => '07:30:00',
+                    'pulang' => '14:00:00',
+                ]);
+            }
+        }
     }
 }

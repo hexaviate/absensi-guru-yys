@@ -25,7 +25,7 @@
                 <div class="col-12">
                     <div class="card shadow">
                         <div class="card-header">
-                            <h4>Data Instansi</h4>
+                            <h4>Data Jadwal</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
