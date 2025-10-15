@@ -255,6 +255,7 @@ class IzinController extends Controller
     public function izinIndexOperator()
     {
         $user = auth()->user();
+
         if (!$user->hasAnyPermission(['manage izin'])) {
             return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
@@ -272,6 +273,7 @@ class IzinController extends Controller
     public function viewIzinVerify(string $id)
     {
         $user = auth()->user();
+
         if (!$user->hasAnyPermission(['manage izin'])) {
             return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
@@ -287,6 +289,8 @@ class IzinController extends Controller
     public function izinVerify(Request $request, string $id)
     {
         $user = auth()->user();
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
+
         if (!$user->hasAnyPermission(['manage izin'])) {
             return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
@@ -334,6 +338,7 @@ class IzinController extends Controller
 
 
             Presensi::create([
+                'tapel_id' => $tapelAktif->id,
                 "instansi_id" => $izin->instansi_id,
                 "user_id" => $izin->user_id,
                 "izin_id" => $izin->id,
@@ -356,6 +361,7 @@ class IzinController extends Controller
     public function viewIzinCreateOperator()
     {
         $user = auth()->user();
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
 
         if (!$user->hasAnyPermission(['manage izin'])) {
             return redirect()->back()->with('error', 'Anda tidak mempunya permission');
@@ -378,6 +384,7 @@ class IzinController extends Controller
     public function izinCreateOperator(Request $request)
     {
         $user = auth()->user();
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
 
         if (!$user->hasAnyPermission(['manage izin'])) {
             return redirect()->back()->with('error', 'Anda tidak mempunya permission');
@@ -468,6 +475,7 @@ class IzinController extends Controller
 
             // Simpan data izin dengan status diterima (karena dibuat oleh operator)
             $izin = Izin::create([
+                'tapel_id' => $tapelAktif->id,
                 'user_id' => $request->user_id,
                 'instansi_id' => $request->instansi_id,
                 'bukti_izin' => $buktiIzinPath,
@@ -477,13 +485,42 @@ class IzinController extends Controller
             ]);
 
             // Buat presensi izin otomatis
-            Presensi::create([
-                'instansi_id' => $request->instansi_id,
-                'user_id' => $request->user_id,
-                'izin_id' => $izin->id,
-                'status' => 'izin',
-                'tanggal' => $request->tanggal,
-            ]);
+            // Presensi::create([
+            //     'tapel_id' => $tapelAktif->id,
+            //     'instansi_id' => $request->instansi_id,
+            //     'user_id' => $request->user_id,
+            //     'izin_id' => $izin->id,
+            //     'status' => 'izin',
+            //     'tanggal' => $request->tanggal,
+            // ]);
+
+            if ($izin->status == 'diterima') {
+
+                if (Presensi::where('instansi_id', $izin->instansi_id)->where('user_id', $izin->user_id)->where('tanggal', $izin->tanggal)->exists()) {
+
+                    $presensi = Presensi::where('instansi_id', $izin->instansi_id)->where('user_id', $izin->user_id)->where('tanggal', $izin->tanggal)->first();
+
+                    if ($presensi->pulang) {
+                        return redirect()->back()->with('error', 'User ini telah emiliki data presensi');
+                    }
+
+                    $presensi->update([
+                        "izin_id" => $izin->id,
+                        "pulang" => ""
+                    ]);
+                }
+
+
+
+                Presensi::create([
+                    'tapel_id' => $tapelAktif->id,
+                    "instansi_id" => $izin->instansi_id,
+                    "user_id" => $izin->user_id,
+                    "izin_id" => $izin->id,
+                    "status" => 'izin',
+                    "tanggal" => $izin->tanggal,
+                ]);
+            }
 
             return redirect()->route('izinIndexOperator')
                 ->with('success', 'Data izin berhasil ditambahkan');

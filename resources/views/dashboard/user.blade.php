@@ -8,122 +8,80 @@
             </div>
         </div>
 
-        <!-- Notifikasi Penting -->
-        <div class="alert alert-warning alert-has-icon alert-dismissible show fade">
-            <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <div class="alert-body">
-                <div class="alert-title">Perhatian!</div>
-                ⚠️ Kamu belum melakukan absen pulang di SD Harapan hari ini
-            </div>
-            <button class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
+        <!-- Header Greeting -->
+        <div class="header-greeting mb-4">
+            <h2 class="greeting-title">Halo, Pak Aziz 👋</h2>
+            <p class="greeting-subtitle">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM YYYY') }}</p>
         </div>
 
-        <!-- Card Status Kehadiran Hari Ini -->
+        <!-- Status Kehadiran Hari Ini -->
         <div class="row">
             <div class="col-12">
                 <h6 class="mb-3 font-weight-bold text-dark">Status Kehadiran Hari Ini</h6>
             </div>
 
-            <!-- Container untuk instansi cards dengan layout responsif -->
-            <div class="col-12">
-                <div class="instansi-container">
-                    <!-- Instansi 1: SD Harapan -->
-                    <div class="col-12">
-                        <div class="instansi-container">
-                            @forelse($presensiHariIni as $presensi)
-                                <div class="instansi-card-wrapper">
-                                    <div class="card card-custom shadow-sm">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                                <div>
-                                                    <h6 class="font-weight-bold text-primary mb-1">
-                                                        {{ $presensi->instansi->nama_instansi ?? 'N/A' }}
-                                                    </h6>
-                                                    <small class="text-muted">
-                                                        {{ \Carbon\Carbon::parse($presensi->tanggal)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
-                                                    </small>
-                                                </div>
-
-                                                @if ($presensi->jam_pulang)
-                                                    <span class="badge badge-success badge-lg">✅ Hadir</span>
-                                                @else
-                                                    <span class="badge badge-warning badge-lg">⏳ Belum Pulang</span>
-                                                @endif
-                                            </div>
-
-                                            <div class="attendance-time-row">
-                                                <div class="time-item">
-                                                    <i class="fa-solid fa-right-to-bracket text-success"></i>
-                                                    <div class="time-detail">
-                                                        <small class="text-muted d-block">Jam Datang</small>
-                                                        <strong class="text-dark">
-                                                            {{ $presensi->datang ? \Carbon\Carbon::parse($presensi->datanng)->format('H:i') . ' WIB' : '-- : --' }}
-                                                        </strong>
-                                                    </div>
-                                                </div>
-                                                <div class="time-divider"></div>
-                                                <div class="time-item">
-                                                    <i class="fa-solid fa-right-from-bracket text-danger"></i>
-                                                    <div class="time-detail">
-                                                        <small class="text-muted d-block">Jam Pulang</small>
-                                                        <strong
-                                                            class="{{ $presensi->pulang ? 'text-dark' : 'text-muted' }}">
-                                                            {{ $presensi->pulang ? \Carbon\Carbon::parse($presensi->pulang)->format('H:i') . ' WIB' : '-- : --' }}
-                                                        </strong>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+            @forelse($presensiHariIni as $presensi)
+                <div class="col-lg-6 col-12 mb-3">
+                    <div class="card card-attendance shadow-sm">
+                        <div class="card-body">
+                            <div class="card-title-custom">
+                                <div class="school-icon-custom">
+                                    <i class="fas fa-school"></i>
                                 </div>
-                            @empty
-                                <div class="col-12">
-                                    <div class="alert alert-info">
-                                        <i class="fa-solid fa-info-circle"></i> Belum ada presensi hari ini
-                                    </div>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                <h6 class="school-name">{{ $presensi->instansi->nama_instansi ?? 'N/A' }}</h6>
+                            </div>
 
-        <div class="row">
-            <div class="col-12">
-                <h6 class="mb-3 font-weight-bold text-dark">Jadwal Hari Ini</h6>
-            </div>
-            @forelse($jadwalHariIni as $jadwal)
-                <div class="col-12 mb-3">
-                    <div class="card card-jadwal shadow-sm border-0">
-                        <div class="card-body p-3">
-                            <div class="row align-items-center">
-                                <div class="col-5">
-                                    <h6 class="font-weight-bold text-dark mb-0">
-                                        {{ $jadwal->instansi->nama_instansi ?? 'N/A' }}
-                                    </h6>
+                            <div class="info-row-custom">
+                                <span class="emoji-icon">📅</span>
+                                <div class="info-content">
+                                    <span class="info-label-custom">Jadwal:</span>
+                                    <span class="info-text-custom">
+                                        Datang <span class="time-highlight">{{ $presensi->jadwal->datang ?? '--:--' }}</span> |
+                                        Pulang <span class="time-highlight">{{ $presensi->jadwal->pulang ?? '--:--' }}</span>
+                                    </span>
                                 </div>
-                                <div class="col-7">
-                                    <div class="row">
-                                        <div class="col-6 text-center">
-                                            <div class="time-box bg-success-light">
-                                                <small class="text-success d-block mb-1">Masuk</small>
-                                                <strong class="text-dark">
-                                                    {{ $jadwal->datang ? \Carbon\Carbon::parse($jadwal->datang)->format('H:i') : '--:--' }}
-                                                </strong>
-                                            </div>
-                                        </div>
-                                        <div class="col-6 text-center">
-                                            <div class="time-box bg-danger-light">
-                                                <small class="text-danger d-block mb-1">Pulang</small>
-                                                <strong class="text-dark">
-                                                    {{ $jadwal->pulang ? \Carbon\Carbon::parse($jadwal->pulang)->format('H:i') : '--:--' }}
-                                                </strong>
-                                            </div>
-                                        </div>
-                                    </div>
+                            </div>
+
+                            <div class="info-row-custom">
+                                <span class="emoji-icon">🕓</span>
+                                <div class="info-content">
+                                    <span class="info-label-custom">Absensi:</span>
+                                    <span class="info-text-custom">
+                                        Datang
+                                        @if($presensi->datang)
+                                            <span class="time-highlight">{{ \Carbon\Carbon::parse($presensi->datang)->format('H:i') }}</span>
+                                        @else
+                                            <span class="time-empty">—</span>
+                                        @endif
+                                        | Pulang
+                                        @if($presensi->pulang)
+                                            <span class="time-highlight">{{ \Carbon\Carbon::parse($presensi->pulang)->format('H:i') }}</span>
+                                        @else
+                                            <span class="time-empty">—</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="divider-custom"></div>
+
+                            <div class="info-row-custom">
+                                <span class="emoji-icon">📊</span>
+                                <div class="info-content">
+                                    <span class="info-label-custom">Status:</span>
+                                    @if($presensi->datang && $presensi->pulang)
+                                        <span class="status-badge-custom status-success-custom">
+                                            Hadir Tepat Waktu ✅
+                                        </span>
+                                    @elseif($presensi->datang && !$presensi->pulang)
+                                        <span class="status-badge-custom status-warning-custom">
+                                            Belum Pulang ⚠️
+                                        </span>
+                                    @else
+                                        <span class="status-badge-custom status-danger-custom">
+                                            Belum Absen ❌
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -132,19 +90,46 @@
             @empty
                 <div class="col-12 mb-3">
                     <div class="alert alert-info">
-                        <i class="fa-solid fa-calendar-xmark"></i> Tidak ada jadwal untuk hari ini
+                        <i class="fa-solid fa-info-circle"></i> Belum ada presensi hari ini
                     </div>
                 </div>
             @endforelse
-
-
         </div>
 
-
-        <!-- Riwayat Absensi & Rekap Bulanan -->
+        <!-- Rekap Bulan Ini -->
         <div class="row">
-            <!-- Riwayat Absensi Terakhir -->
-            <div class="col-12 col-lg-7 mb-4">
+            <div class="col-12">
+                <h6 class="mb-3 font-weight-bold text-dark">Rekap Bulan Ini ({{ \Carbon\Carbon::now()->locale('id')->isoFormat('MMMM YYYY') }})</h6>
+            </div>
+            <div class="col-12 mb-4">
+                <div class="card card-rekap shadow-sm">
+                    <div class="card-body">
+                        <div class="card-title-custom">
+                            <div class="school-icon-custom">
+                                <i class="fas fa-calendar-days"></i>
+                            </div>
+                            <h6 class="school-name">Ringkasan Kehadiran</h6>
+                        </div>
+
+                        <div class="rekap-grid-custom">
+                            @foreach($presensiHariIni as $presensi)
+                                <div class="rekap-item-custom">
+                                    <span class="rekap-label-custom">🏫 {{ Str::limit($presensi->instansi->nama_instansi ?? 'N/A', 20) }}</span>
+                                    <div class="rekap-value-custom">H20 · I2 · A1</div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Riwayat Absensi -->
+        <div class="row">
+            <div class="col-12">
+                <h6 class="mb-3 font-weight-bold text-dark">Riwayat Absensi Minggu Ini</h6>
+            </div>
+            <div class="col-12">
                 <div class="card card-custom shadow-sm">
                     <div class="card-header">
                         <h6 class="font-weight-bold text-dark mb-0">
@@ -161,23 +146,17 @@
                                     </div>
                                     <div class="history-detail">
                                         <div class="history-location">
-                                            {{-- Gabungkan nama instansi dengan separator " - " --}}
                                             {{ $presensiPerHari->pluck('instansi.nama_instansi')->filter()->implode(' - ') }}
                                         </div>
 
-                                        {{-- Tentukan status berdasarkan semua presensi di hari itu --}}
                                         @php
                                             $semuaHadir = $presensiPerHari->every(fn($p) => $p->datang && $p->pulang);
-                                            $adaIzin = $presensiPerHari->contains(
-                                                fn($p) => $p->keterangan == 'izin' || $p->status == 'izin',
-                                            );
-                                            $adaBelumPulang = $presensiPerHari->contains(
-                                                fn($p) => $p->datang && !$p->pulang,
-                                            );
+                                            $adaIzin = $presensiPerHari->contains(fn($p) => $p->keterangan == 'izin' || $p->status == 'izin');
+                                            $adaBelumPulang = $presensiPerHari->contains(fn($p) => $p->datang && !$p->pulang);
                                             $semuaAlpha = $presensiPerHari->every(fn($p) => !$p->datang);
                                         @endphp
 
-                                        @if ($semuaHadir)
+                                        @if($semuaHadir)
                                             <div class="history-status status-present">
                                                 <i class="fa-solid fa-circle-check"></i> Hadir
                                             </div>
@@ -210,140 +189,197 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Rekap Bulanan -->
-            <div class="col-12 col-lg-5 mb-4">
-                <div class="card card-custom shadow-sm card-recap-monthly">
-                    <div class="card-header border-0">
-                        <h6 class="font-weight-bold text-dark mb-0">
-                            <i class="fa-solid fa-calendar-days text-primary"></i> Rekap Bulan Ini
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="monthly-recap">
-                            <div class="recap-item">
-                                <div class="recap-icon text-success">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                </div>
-                                <div class="recap-info">
-                                    <h3 class="mb-0 text-dark">18x</h3>
-                                    <small class="text-muted">Hadir</small>
-                                </div>
-                            </div>
-                            <div class="recap-divider"></div>
-                            <div class="recap-item">
-                                <div class="recap-icon text-warning">
-                                    <i class="fa-solid fa-file-lines"></i>
-                                </div>
-                                <div class="recap-info">
-                                    <h3 class="mb-0 text-dark">3x</h3>
-                                    <small class="text-muted">Izin</small>
-                                </div>
-                            </div>
-                            <div class="recap-divider"></div>
-                            <div class="recap-item">
-                                <div class="recap-icon text-danger">
-                                    <i class="fa-solid fa-circle-xmark"></i>
-                                </div>
-                                <div class="recap-info">
-                                    <h3 class="mb-0 text-dark">1x</h3>
-                                    <small class="text-muted">Alpha</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="progress mt-4" style="height: 8px;">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: 81.8%"
-                                aria-valuenow="81.8" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <small class="d-block mt-2 text-muted">Tingkat kehadiran: <strong
-                                class="text-dark">81.8%</strong></small>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 @endsection
 
 @push('style')
     <style>
-        .card-jadwal {
+        /* Header Greeting Section */
+        .header-greeting {
+            background: linear-gradient(135deg, #6777ef 0%, #5a67d8 100%);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(103, 119, 239, 0.2);
+        }
+
+        .greeting-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .greeting-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0;
+        }
+
+        /* Card Attendance */
+        .card-attendance {
+            background: #fff;
             border-radius: 12px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid #e4e6fc;
             transition: all 0.3s ease;
-            border-left: 4px solid #007bff;
+            height: 100%;
         }
 
-        .card-jadwal:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12) !important;
+        .card-attendance:hover {
+            box-shadow: 0 4px 16px rgba(103, 119, 239, 0.15) !important;
+            transform: translateY(-2px);
         }
 
-        .time-box {
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+        .card-attendance .card-body {
+            padding: 20px;
         }
 
-        .time-box:hover {
-            transform: scale(1.05);
+        .card-title-custom {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
-        .bg-success-light {
-            background-color: #d4edda;
+        .school-icon-custom {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #6777ef 0%, #5a67d8 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            flex-shrink: 0;
         }
 
-        .bg-danger-light {
-            background-color: #f8d7da;
+        .school-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #191d21;
+            margin-bottom: 0;
         }
 
-        .instansi-container {
+        .info-row-custom {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-row-custom:last-child {
+            margin-bottom: 0;
+        }
+
+        .emoji-icon {
+            min-width: 24px;
+            margin-right: 8px;
+            margin-top: 2px;
+            font-size: 16px;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label-custom {
+            font-weight: 600;
+            color: #34395e;
+        }
+
+        .info-text-custom {
+            color: #6c757d;
+        }
+
+        .time-highlight {
+            font-weight: 700;
+            color: #6777ef;
+        }
+
+        .time-late {
+            font-weight: 700;
+            color: #fc544b;
+        }
+
+        .time-empty {
+            color: #95aac9;
+            font-weight: 600;
+        }
+
+        .divider-custom {
+            height: 1px;
+            background: #e4e6fc;
+            margin: 14px 0;
+        }
+
+        .status-badge-custom {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .status-success-custom {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning-custom {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-danger-custom {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Card Rekap */
+        .card-rekap {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fc 100%);
+            border: 1px solid #e4e6fc;
+            border-radius: 12px;
+        }
+
+        .rekap-grid-custom {
             display: grid;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
         }
 
-        /* Mobile: 1 column, full width */
-        @media (max-width: 575.98px) {
-            .instansi-container {
-                grid-template-columns: 1fr;
-            }
+        .rekap-item-custom {
+            background: #fff;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #e4e6fc;
+            text-align: center;
         }
 
-        /* Tablet: 2 columns untuk 2-3 cards, 1 column untuk 1 card */
-        @media (min-width: 576px) and (max-width: 991.98px) {
-            .instansi-container {
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            }
+        .rekap-label-custom {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 6px;
+            display: block;
         }
 
-        /* Desktop: Maksimal 3 columns */
-        @media (min-width: 992px) {
-            .instansi-container {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-                gap: 1.25rem;
-            }
-
-            /* Jika hanya 1 card, buat tidak terlalu lebar */
-            .instansi-container:has(.instansi-card-wrapper:only-child) {
-                grid-template-columns: minmax(320px, 600px);
-            }
-
-            /* Jika 2 cards, buat seimbang */
-            .instansi-container:has(.instansi-card-wrapper:nth-child(2):last-child) {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .rekap-value-custom {
+            font-size: 16px;
+            font-weight: 700;
+            color: #34395e;
         }
 
-        .instansi-card-wrapper {
-            min-height: 160px;
-        }
-
-        /* Card Custom Styling */
+        /* History List - Keep existing styles */
         .card-custom {
             border: 1px solid #e4e6fc;
             border-radius: 12px;
             transition: all 0.3s ease;
-            height: 100%;
             background-color: #ffffff;
         }
 
@@ -364,88 +400,6 @@
             padding: 1.25rem;
         }
 
-        /* Badge Styling */
-        .badge-lg {
-            padding: 0.45rem 0.75rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border-radius: 6px;
-        }
-
-        /* Attendance Time Row */
-        .attendance-time-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #f8f9fc;
-            padding: 1rem;
-            border-radius: 10px;
-        }
-
-        .time-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex: 1;
-        }
-
-        .time-item i {
-            font-size: 1.5rem;
-        }
-
-        .time-detail small {
-            font-size: 0.75rem;
-        }
-
-        .time-detail strong {
-            font-size: 1rem;
-        }
-
-        .time-divider {
-            width: 2px;
-            height: 40px;
-            background-color: #dee2e6;
-            margin: 0 1rem;
-        }
-
-        /* Comparison Box */
-        .comparison-box {
-            display: flex;
-            gap: 1rem;
-            flex-direction: column;
-        }
-
-        .comparison-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            background-color: #f8f9fc;
-        }
-
-        .comparison-item.today {
-            border-left: 4px solid #6777ef;
-        }
-
-        .comparison-item.yesterday {
-            border-left: 4px solid #95a5a6;
-        }
-
-        .comparison-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-        }
-
-        .comparison-time {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #333;
-        }
-
-        /* History List */
         .history-list {
             margin: 0;
         }
@@ -519,92 +473,22 @@
             color: #721c24;
         }
 
-        /* Monthly Recap - White Background */
-        /* Fix untuk card recap monthly agar tidak terlalu tinggi */
-        .card-recap-monthly {
-            height: fit-content;
-            align-self: start;
-        }
-
-        .card-recap-monthly .card-body {
-            padding: 1.5rem 1.25rem;
-        }
-
-        .card-recap-monthly .card-header {
-            background-color: #f8f9fc;
-        }
-
-        .monthly-recap {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        .recap-item {
-            text-align: center;
-        }
-
-        .recap-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .recap-info h3 {
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .recap-info small {
-            font-size: 0.85rem;
-        }
-
-        .recap-divider {
-            width: 1px;
-            height: 60px;
-            background-color: #e4e6fc;
-        }
-
-        /* Responsive Adjustments */
+        /* Responsive */
         @media (max-width: 768px) {
-            .attendance-time-row {
-                flex-direction: column;
-                gap: 0.75rem;
-                padding: 0.875rem;
+            .greeting-title {
+                font-size: 22px;
             }
 
-            .time-divider {
-                width: 100%;
-                height: 1px;
-                margin: 0;
+            .header-greeting {
+                padding: 20px;
             }
 
-            .time-item {
-                width: 100%;
-                padding: 0.5rem;
-                background-color: #fff;
-                border-radius: 6px;
+            .card-attendance .card-body {
+                padding: 16px;
             }
 
-            .monthly-recap {
-                flex-direction: column;
-                gap: 1.5rem;
-                padding: 0.5rem 0;
-            }
-
-            .recap-divider {
-                width: 80%;
-                height: 1px;
-            }
-
-            .badge-lg {
-                font-size: 0.75rem;
-                padding: 0.35rem 0.6rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .card-custom .card-body {
-                padding: 1rem;
+            .rekap-grid-custom {
+                grid-template-columns: 1fr;
             }
 
             .history-item {
@@ -626,5 +510,3 @@
 
 @push('script')
 @endpush
-
-{{-- INI USER --}}
