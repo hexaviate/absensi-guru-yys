@@ -90,7 +90,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/izin/search-users', [IzinController::class, 'searchUsers'])
             ->name('izin.searchUsers');
 
-
+        Route::post('jadwal/import', [JadwalController::class,'import'])->name('jadwal.import');
     });
 });
 

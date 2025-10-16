@@ -9,20 +9,6 @@
             </div>
         </div>
 
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" id="alertMessage">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert" id="alertMessage">
-                {{ session('success') }}
-            </div>
-        @endif
-
-
-
         <div class="section-body">
 
             <div class="card shadow-sm">
@@ -32,8 +18,6 @@
 
 
                 <div class="card-body">
-
-
                     <form action="{{ route('jadwal.store') }}" method="POST">
                         @csrf
                         <div class="row">
@@ -122,6 +106,31 @@
                                 <input type="time" id="pulang" name="pulang" class="form-control">
                             </div>
                         </div>
+
+                        <div class="d-flex justify-content-end" style="gap: 10px;">
+                            <button type="submit" class="btn btn-primary px-4">Simpan</button>
+                            <a href="{{ route('jadwal.index') }}" class="btn btn-secondary">Batal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Import Jadwal</h5>
+                </div>
+
+
+                <div class="card-body">
+                    <form action="{{ route('jadwal.import') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tapel" class="form-label">Imput File Exel</label>
+                                <input type="file" class="form-control" name="file" accept=".xslx, .xls, .csv" required>
+                            </div>
+                        </div>
+
+
 
                         <div class="d-flex justify-content-end" style="gap: 10px;">
                             <button type="submit" class="btn btn-primary px-4">Simpan</button>

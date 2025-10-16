@@ -5,11 +5,44 @@ namespace App\Http\Controllers;
 use App\Models\Jadwal;
 use App\Models\Tapel;
 use App\Models\User;
+use App\Imports\JadwalImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Livewire\Attributes\Validate;
+use Maatwebsite\Excel\Validators\Failure;
+use Throwable;
+use Maatwebsite\Excel\Facades\Excel;
+use ValueError;
+use function Livewire\of;
+use function PHPUnit\Framework\returnArgument;
 
 class JadwalController extends Controller
 {
+
+    public function import(request $request)
+    {
+        $import = new JadwalImport();
+        // $request = Validate([
+        //     'file' => 'required|mimes:xslx,xls,csv'
+        // ]);
+
+        try {
+            Excel::import($import, $request->file('file'));
+
+            if($import->failures()->isNotEmpty()){
+                $rows = $import->failures()->map(function($failure){
+                    return $failure->row();
+                })->unique()->implode(',');
+
+                return back()->with('error',"Terdapat Kesalahan Pada Baris $rows");
+            };
+
+            return back()->with('success','Semua Data Jadwal Berhasil Di Import');
+
+        }catch(\Exception $e){
+            return back()->with('error','terjadi kesalahan' . $e->getMessage());
+        }
+    }
     /**
      * Display a listing of the resource.
      */
