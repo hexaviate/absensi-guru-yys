@@ -25,6 +25,10 @@ Schedule::call(function () {
             $presensi = Presensi::where('user_id', $user->id)->where('instansi_id', $instansi->id)->whereDate('tanggal', $today)->exists();
 
             if (!$presensi) {
+                if (now()->toDateString() == "Jumat") {
+                    continue;
+                }
+
                 // $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->where('instansi_id', $instansi->id)->exists();
                 // if (!$jadwalHariIni) {
                 //     if ($user->hasRole('tenaga_pendidik')) {

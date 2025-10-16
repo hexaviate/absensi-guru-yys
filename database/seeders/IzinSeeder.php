@@ -15,14 +15,14 @@ class IzinSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('izins')->insert([
-            "user_id" => 3,
-            "instansi_id" => 1,
-            "tapel_id" => 1,
-            "bukti_izin" => "operator.pdf",
-            "status" => "belum_diverifikasi",
-            "tanggal" => Carbon::now(),
-            "keterangan" => "Tes Izin",
-        ]);
+        // DB::table('izins')->insert([
+        //     "user_id" => 3,
+        //     "instansi_id" => 1,
+        //     "tapel_id" => 1,
+        //     "bukti_izin" => "operator.pdf",
+        //     "status" => "belum_diverifikasi",
+        //     "tanggal" => Carbon::now(),
+        //     "keterangan" => "Tes Izin",
+        // ]);
     }
 }
