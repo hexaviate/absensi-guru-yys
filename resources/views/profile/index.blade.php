@@ -54,7 +54,9 @@
                                                 <span class="font-weight-bold">Operator {{ $item->nama_instansi }}</span>
                                             @endforeach
                                         @elseif ($user->hasRole('tenaga_pendidik') || $user->hasRole('tenaga_kependidikan'))
-                                            <span class="font-weight-bold">{{ $user->name }}</span>
+                                            @foreach ($role as $item)
+                                                <span class="font-weight-bold">{{ Str::of($item->name)->replace('_', ' ')->title() }}</span>
+                                            @endforeach
                                         @else
                                             <span class="font-weight-bold">Role Tidak Dikenal</span>
                                         @endif
@@ -140,6 +142,7 @@
             overflow: hidden;
             border: none;
         }
+
         /* Profile Card */
         .profile-card {
             background: white;
@@ -163,6 +166,7 @@
             bottom: 0;
             background: linear-gradient(135deg, #6777ef 0%, #4d63d5 100%);
         }
+
         .gradient-bg {
             position: absolute;
             top: 0;
@@ -179,6 +183,7 @@
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
         }
+
         .gradient-bg::before,
         .gradient-bg::after {
             content: '';
@@ -193,6 +198,7 @@
             top: -50px;
             right: -50px;
         }
+
         .gradient-bg::before {
             width: 200px;
             height: 200px;
@@ -250,6 +256,7 @@
             position: relative;
             z-index: 2;
         }
+
         .profile-content {
             position: relative;
             z-index: 2;
@@ -260,6 +267,7 @@
             text-align: center;
             margin-bottom: 20px;
         }
+
         /* Profile Avatar */
         .profile-avatar {
             text-align: center;
@@ -270,6 +278,7 @@
             position: relative;
             display: inline-block;
         }
+
         .avatar-wrapper {
             position: relative;
             display: inline-block;
@@ -284,6 +293,7 @@
             display: block;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
+
         .avatar-img {
             width: 120px;
             height: 120px;
@@ -304,6 +314,7 @@
             border: 3px solid rgba(255, 255, 255, 0.3);
             animation: pulse-ring 2s ease-in-out infinite;
         }
+
         .avatar-ring {
             position: absolute;
             top: -8px;
@@ -328,6 +339,7 @@
                 opacity: 0.7;
             }
         }
+
         @keyframes pulse-ring {
 
             0%,
@@ -347,6 +359,7 @@
             text-align: center;
             margin-bottom: 25px;
         }
+
         /* User Info */
         .user-info {
             text-align: center;
@@ -359,6 +372,7 @@
             font-weight: 700;
             margin-bottom: 5px;
         }
+
         .user-name {
             color: white;
             font-size: 24px;
@@ -371,6 +385,7 @@
             font-size: 14px;
             margin: 0;
         }
+
         .user-role {
             color: rgba(255, 255, 255, 0.8);
             font-size: 14px;
@@ -393,6 +408,7 @@
             align-items: center;
             gap: 15px;
         }
+
         .contact-item {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
@@ -416,6 +432,7 @@
             font-size: 18px;
             flex-shrink: 0;
         }
+
         .contact-icon {
             width: 45px;
             height: 45px;
@@ -433,6 +450,7 @@
             flex: 1;
             text-align: left;
         }
+
         .contact-text {
             flex: 1;
             text-align: left;
@@ -444,6 +462,7 @@
             font-size: 12px;
             margin-bottom: 3px;
         }
+
         .contact-text small {
             display: block;
             color: rgba(255, 255, 255, 0.7);
@@ -457,6 +476,7 @@
             margin: 0;
             font-size: 15px;
         }
+
         .contact-text p {
             color: white;
             font-weight: 600;
@@ -506,6 +526,7 @@
             gap: 12px;
             transition: all 0.3s ease;
         }
+
         .instansi-card {
             background: #f8f9fc;
             border: 2px solid #e3e8ef;
@@ -521,6 +542,7 @@
         .instansi-card:last-child {
             margin-bottom: 0;
         }
+
         .instansi-card:last-child {
             margin-bottom: 0;
         }
@@ -546,6 +568,7 @@
             flex-shrink: 0;
             box-shadow: 0 2px 8px rgba(103, 119, 239, 0.3);
         }
+
         .instansi-number {
             width: 40px;
             height: 40px;
@@ -565,6 +588,7 @@
             flex: 1;
             min-width: 0;
         }
+
         .instansi-detail {
             flex: 1;
             min-width: 0;
@@ -581,6 +605,7 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
         }
+
         .instansi-detail h6 {
             color: #2c3e50;
             font-weight: 700;
@@ -602,6 +627,7 @@
             gap: 6px;
             line-height: 1.5;
         }
+
         .instansi-detail p {
             color: #8898aa;
             font-size: 13px;
@@ -633,6 +659,7 @@
             color: #d1d5db;
             margin-bottom: 12px;
         }
+
         .empty-state i {
             font-size: 50px;
             color: #d1d5db;
@@ -644,6 +671,7 @@
             font-size: 14px;
             margin: 0;
         }
+
         .empty-state p {
             color: #8898aa;
             font-size: 14px;
@@ -673,6 +701,7 @@
                 width: 100px;
                 height: 100px;
             }
+
             .avatar-img {
                 width: 100px;
                 height: 100px;
@@ -681,6 +710,7 @@
             .user-name {
                 font-size: 20px;
             }
+
             .user-name {
                 font-size: 20px;
             }
@@ -692,6 +722,7 @@
             .instansi-card {
                 padding: 12px;
             }
+
             .instansi-card {
                 padding: 12px;
             }
