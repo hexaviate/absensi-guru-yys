@@ -9,6 +9,7 @@ use App\Imports\JadwalImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Validate;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Validators\Failure;
 use Throwable;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,26 +20,33 @@ use function PHPUnit\Framework\returnArgument;
 class JadwalController extends Controller
 {
 
-    public function import(request $request)
+    public function import(Request $request)
     {
         $import = new JadwalImport();
 
-        try {
+        DB::beginTransaction();
 
+        try {
             Excel::import($import, $request->file('file'));
 
-            if($import->failures()->isNotEmpty()){
-                $rows = $import->failures()->map(function($failure){
-                    return $failure->row();
-                })->unique()->implode(',');
+            if ($import->failures()->isNotEmpty()) {
+                $rows = $import->failures()
+                    ->map(fn($failure) => $failure->row())
+                    ->unique()
+                    ->implode(',');
 
-                return back()->with('error',"Terdapat Kesalahan Pada Baris $rows");
-            };
+                // rollback sebelum keluar
+                DB::rollBack();
 
+                return back()->with('error', "Terdapat Kesalahan Pada Baris $rows");
+            }
+
+            DB::commit();
             return back()->with('success', 'Semua Data Jadwal Berhasil Di Import');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'terjadi kesalahan' . $e->getMessage());
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
     /**
