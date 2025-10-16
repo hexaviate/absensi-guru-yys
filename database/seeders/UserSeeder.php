@@ -61,7 +61,7 @@ class UserSeeder extends Seeder
             ['Hilma Huril Aini, S.Pd.', 'tenaga_pendidik'],
             ['Eni Mufarichah, S.Pd.', 'tenaga_kependidikan'],
             ['Aziz Muslim, S.Pd.I', 'tenaga_pendidik'],
-            ['Muhammad Fahmi ‘Ainunnajib', 'tenaga_kependidikan'],
+            ['Muhammad Fahmi ‘Ainunnajib', 'operator_instansi'],
             ['Ahmad Hanif Dzikron', 'tenaga_kependidikan'],
             ['Nabila Putri Agustin, S.Pd.', 'tenaga_kependidikan'],
             ['Ahmad Saiful', 'tenaga_kependidikan'],
