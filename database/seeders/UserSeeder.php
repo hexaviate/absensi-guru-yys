@@ -11,7 +11,10 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        // $faker = Faker
+
         $admin = User::create([
+            "nomor_induk_yayasan" => "0982",
             "name" => 'Pak Admin',
             'telp' => '081',
             'username' => 'admin1',
@@ -70,6 +73,7 @@ class UserSeeder extends Seeder
 
         foreach ($users as $index => [$name, $role]) {
             $user = User::create([
+                'nomor_induk_yayasan' => fake()->unique()->randomNumber(5, true),
                 'name' => $name,
                 'telp' => '08' . rand(100000000, 999999999),
                 'username' => strtolower(str_replace(['.', ',', ' ', '\'', '’'], '', explode(' ', $name)[0])) . rand(10, 99),
