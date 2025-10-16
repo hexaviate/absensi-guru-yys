@@ -17,6 +17,11 @@ Artisan::command('inspire', function () {
 
 //KURANG WOII KURANG JADWAL :((((((()))))))
 Schedule::call(function () {
+
+    if (now()->isoFormat('dddd') == "Kamis") {
+        return;
+    }
+
     $today = now()->toDateString();
     $tapelAktif = Tapel::where('status', "aktif")->first();
     $users = User::with('instansi')->get();
@@ -25,6 +30,8 @@ Schedule::call(function () {
             $presensi = Presensi::where('user_id', $user->id)->where('instansi_id', $instansi->id)->whereDate('tanggal', $today)->exists();
 
             if (!$presensi) {
+
+
                 // $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->where('instansi_id', $instansi->id)->exists();
                 // if (!$jadwalHariIni) {
                 //     if ($user->hasRole('tenaga_pendidik')) {
@@ -53,7 +60,9 @@ Schedule::call(function () {
 
                 } else {
                     if ($hariLibur) {
-                        continue;
+                        if (!$hariLibur->waktu) {
+                            continue;
+                        }
                     }
                 }
 
@@ -71,7 +80,7 @@ Schedule::call(function () {
         }
 
     }
-})->dailyAt('14:00'); //! waktu nanti disesuaikan
+})->dailyAt('11:58'); //! waktu nanti disesuaikan
 
 //!perlu disusaikan cron nya jika sudah di server
 //*jika running lokal maka pakai "php artisan schedule:work"
