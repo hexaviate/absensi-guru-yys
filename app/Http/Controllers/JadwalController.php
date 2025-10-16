@@ -22,11 +22,9 @@ class JadwalController extends Controller
     public function import(request $request)
     {
         $import = new JadwalImport();
-        // $request = Validate([
-        //     'file' => 'required|mimes:xslx,xls,csv'
-        // ]);
 
         try {
+
             Excel::import($import, $request->file('file'));
 
             if($import->failures()->isNotEmpty()){
@@ -37,10 +35,10 @@ class JadwalController extends Controller
                 return back()->with('error',"Terdapat Kesalahan Pada Baris $rows");
             };
 
-            return back()->with('success','Semua Data Jadwal Berhasil Di Import');
+            return back()->with('success', 'Semua Data Jadwal Berhasil Di Import');
 
-        }catch(\Exception $e){
-            return back()->with('error','terjadi kesalahan' . $e->getMessage());
+        } catch (\Exception $e) {
+            return back()->with('error', 'terjadi kesalahan' . $e->getMessage());
         }
     }
     /**

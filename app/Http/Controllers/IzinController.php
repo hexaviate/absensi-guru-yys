@@ -57,13 +57,14 @@ class IzinController extends Controller
     {
 
         $user = auth()->user();
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
         if (!$user->hasAnyPermission(['view self izin', 'manage izin'])) {
             return redirect()->back()->with('error', 'Anda tidak mempunya permission');
         }
 
 
         $validate = Validator::make($request->all(), [
-            'tapel_id' => 'required',
+            // 'tapel_id' => 'required',
             'bukti_izin' => 'required',
             'instansi_id' => 'required|exists:instansis,id',
             'keterangan' => 'required',
@@ -76,7 +77,7 @@ class IzinController extends Controller
 
         foreach ($request->instansi_id as $instansi) {
 
-            if ($instansi == Instansi::where('nama_instansi', 'SMK')->first()->id) {
+            if ($instansi == Instansi::where('nama_instansi', 'SMK Salafiyah')->first()->id) {
                 return redirect()->back()->with('error', 'Anda tidak bisa izin di instansi ini');
             }
 
@@ -97,6 +98,7 @@ class IzinController extends Controller
 
 
                 Izin::create([
+                    'tapel_id' => $tapelAktif->id,
                     'user_id' => $user->id,
                     'instansi_id' => $instansi,
                     'bukti_izin' => $file,
@@ -118,6 +120,7 @@ class IzinController extends Controller
                 $fotoIzin->encode(new AutoEncoder(50))->save(public_path('bukti_izin/' . $buktiIzin));
 
                 Izin::create([
+                    'tapel_id' => $tapelAktif->id,
                     'user_id' => $user->id,
                     'instansi_id' => $instansi,
                     'bukti_izin' => $buktiIzin,
@@ -139,7 +142,7 @@ class IzinController extends Controller
         }
 
         $izin = Izin::find($id);
-        $instansi = $user->instansi->get();
+        $instansi = $user->instansi()->get();
         $instansiId = $user->instansi()->first()->id;
 
 

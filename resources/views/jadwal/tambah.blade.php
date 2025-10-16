@@ -126,7 +126,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="tapel" class="form-label">Imput File Exel</label>
-                                <input type="file" class="form-control" name="file" accept=".xslx, .xls, .csv" required>
+                                <input type="file" class="form-control" name="file" accept=".xlsx, .xls, .csv" required>
                             </div>
                         </div>
 
