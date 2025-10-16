@@ -94,7 +94,7 @@
                                             <input type="radio" name="role_id" value="{{ $item->id }}"
                                                 data-role-name="{{ $item->name }}" class="selectgroup-input role-radio"
                                                 {{ old('role_id', $user->roles->first()->id ?? '') == $item->id ? 'checked' : '' }}>
-                                            <span class="selectgroup-button">{{ $item->name }}</span>
+                                            <span class="selectgroup-button">{{ Str::of($item->name)->replace('_', ' ')->title() }}</span>
                                         </label>
                                     @empty
                                         <p class="text-muted mb-0">Tidak ada role</p>

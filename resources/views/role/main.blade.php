@@ -40,7 +40,7 @@
                                             @forelse ($role as $item)
                                                 <tr>
                                                     <td class="">{{ $loop->iteration }}</td>
-                                                    <td>{{ $item->name }}</td>
+                                                    <td>{{ Str::of($item->name)->replace('_', ' ')->title() }}</td>
                                                     <td class="d-flex">
                                                         <a href="{{ route('role.edit', $item->id) }}"
                                                             class="btn btn-warning">Edit</a>

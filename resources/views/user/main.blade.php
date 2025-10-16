@@ -129,7 +129,7 @@
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $item->name }}</td>
-                                                        <td>
+                                                    <td>
                                                             @forelse ($item->roles as $role)
                                                                 {{ Str::of($role->name)->replace('_', ' ')->title() }}{{ !$loop->last ? ', ' : '' }}
                                                             @empty
