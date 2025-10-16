@@ -88,7 +88,7 @@
 
                             @if ($jadwal->isEmpty())
                                 <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> Tidak ada jadwal praktik ditemukan
+                                     Tidak ada jadwal praktik ditemukan
                                     @if (request('filter_instansi') || request('filter_hari'))
                                         dengan filter yang dipilih.
                                     @else

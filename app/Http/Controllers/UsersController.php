@@ -32,9 +32,14 @@ class UsersController extends Controller
         $userInstansi = $instansi->user()->whereDoesntHave('roles', function ($query) {
             $query->where('name', 'admin_yayasan');
         })->get(); //untuk operator
-        
+
         return view('user.main', compact('userInstansi', 'instansi', 'semuaUser', 'semuaRole', 'semuaInstansi'));
     }
+
+
+    //mapping
+
+
 
     /**
      * Show the form for creating a new resource.

@@ -21,6 +21,7 @@
                         <div class="card-header">
                             <h4>Data Instansi</h4>
                         </div>
+                        
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table id="example" class="table table-striped table-bordered table-md">

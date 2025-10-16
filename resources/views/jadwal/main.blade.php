@@ -12,6 +12,59 @@
 
         <div class="section-body">
 
+            @hasanyrole('admin_yayasan')
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header">
+                                <h4>Data Jadwal</h4>
+                            </div>
+                            <div class="card-body">
+                                @if ($semuaJadwal->isEmpty())
+                                    <div class="d-flex justify-content-center align-items-center" style="height: 50px;">
+                                        <span class="font-weight-bold">Data Jadwal Kosong</span>
+                                    </div>
+                                @else
+                                    <div class="table-responsive">
+                                        <table id="example" class="table table-striped table-bordered table-md">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Tapel</th>
+                                                    <th>Instansi</th>
+                                                    <th>User</th>
+                                                    <th>Hari</th>
+                                                    <th>Datang</th>
+                                                    <th>Pulang</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($semuaJadwal as $item)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $item->tapel->kode }}</td>
+                                                        <td>{{ $item->instansi->nama_instansi }}</td>
+                                                        <td>{{ $item->user->name }}</td>
+                                                        <td>{{ $item->hari }}</td>
+                                                        <td>{{ $item->datang }}</td>
+                                                        <td>{{ $item->pulang }}</td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="8" class="text-center">Data Jadwal Kosong</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endhasanyrole
+
             @hasanyrole('operator_instansi')
                 <div class="d-flex justify-content-between mb-3">
                     {{-- Tombol Tambah Jadwal (kiri) --}}
@@ -20,60 +73,69 @@
                     </a>
                 </div>
 
-            <div class="row">
-                <div class="col-12">
-                    <div class="card shadow">
-                        <div class="card-header">
-                            <h4>Data Instansi</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="example" class="table table-striped table-bordered table-md">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Tapel</th>
-                                            <th>Instansi</th>
-                                            <th>User</th>
-                                            <th>Hari</th>
-                                            <th>Datang</th>
-                                            <th>Pulang</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($semuaJadwal as $item)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $item->tapel->kode }}</td>
-                                                <td>{{ $item->instansi->nama_instansi }}</td>
-                                                <td>{{ $item->user->name }}</td>
-                                                <td>{{ $item->hari }}</td>
-                                                <td>{{ $item->datang }}</td>
-                                                <td>{{ $item->pulang }}</td>
-                                                <td class="d-flex">
-                                                    <a href="{{ route('jadwal.edit', $item->id) }}"
-                                                        class="btn btn-warning mx-2">Edit</a>
-                                                    <form action="{{ route('jadwal.destroy', $item->id) }}" method="POST"
-                                                        onsubmit="return confirm('Yakin ingin menghapus?')">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button type="submit" class="btn btn-danger delete-btn">Hapus</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="8" class="text-center">Data Jadwal Kosong</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow">
+                            <div class="card-header">
+                                <h4>Data Jadwal</h4>
+                            </div>
+                            <div class="card-body">
+                                @if ($jadwal->isEmpty())
+                                    <div class="d-flex justify-content-center align-items-center" style="height: 50px;">
+                                        <span class="font-weight-bold">Data Jadwal Kosong</span>
+                                    </div>
+                                @else
+                                    <div class="table-responsive">
+                                        <table id="example" class="table table-striped table-bordered table-md">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Tapel</th>
+                                                    <th>Instansi</th>
+                                                    <th>User</th>
+                                                    <th>Hari</th>
+                                                    <th>Datang</th>
+                                                    <th>Pulang</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($jadwal as $item)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $item->tapel->kode }}</td>
+                                                        <td>{{ $item->instansi->nama_instansi }}</td>
+                                                        <td>{{ $item->user->name }}</td>
+                                                        <td>{{ $item->hari }}</td>
+                                                        <td>{{ $item->datang }}</td>
+                                                        <td>{{ $item->pulang }}</td>
+                                                        <td class="d-flex">
+                                                            <a href="{{ route('jadwal.edit', $item->id) }}"
+                                                                class="btn btn-warning mx-2">Edit</a>
+                                                            <form action="{{ route('jadwal.destroy', $item->id) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Yakin ingin menghapus?')">
+                                                                @csrf
+                                                                @method('delete')
+                                                                <button type="submit"
+                                                                    class="btn btn-danger delete-btn">Hapus</button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="8" class="text-center">Data Jadwal Kosong</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endhasanyrole
         </div>
     </section>
 @endsection
