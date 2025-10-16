@@ -45,9 +45,21 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
+
+                                            @php
+                                                $user = auth()->user();
+                                            @endphp
+
                                             <label for="instansi_id">Instansi <span class="text-danger">*</span></label>
                                             <select name="instansi_id" class="form-control">
                                                 @foreach ($instansi as $item)
+                                                    @if ($user->hasRole('admin_yayasan') && $item->nama_instansi !== 'PUSPELA')
+                                                        @continue
+                                                    @endif
+                                                    @if ($item->nama_instansi === 'SMK Salafiyah')
+                                                        @continue
+                                                    @endif
+
                                                     <option value="{{ $item->id }}"
                                                         {{ $item->id == $izin->instansi_id ? 'selected' : '' }}>
                                                         {{ $item->nama_instansi }}
@@ -96,7 +108,8 @@
                                             <label for="bukti_izin">Bukti Izin Baru</label>
                                             <div class="custom-file">
                                                 <input type="file" name="bukti_izin" id="bukti_izin"
-                                                    class="custom-file-input" accept=".jpg,.jpeg,.png,.pdf" value="{{ old('bukti_izin', $izin->bukti_izin) }}">
+                                                    class="custom-file-input" accept=".jpg,.jpeg,.png,.pdf"
+                                                    value="{{ old('bukti_izin', $izin->bukti_izin) }}">
                                                 <label class="custom-file-label" for="bukti_izin">Pilih file...</label>
                                             </div>
                                             <small class="form-text text-muted">

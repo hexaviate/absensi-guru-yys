@@ -132,7 +132,7 @@
 
             @php
                 $isOnlySMK =
-                    $user->instansi()->count() == 1 && $user->instansi()->where('nama_Instansi', 'SMK')->exists();
+                    $user->instansi()->count() == 1 && $user->instansi()->where('nama_Instansi', 'SMK Salafiyah')->exists();
             @endphp
 
             @if ($isOnlySMK)
