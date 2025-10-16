@@ -38,7 +38,7 @@ class IzinController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->instansi()->where('nama_Instansi', 'SMK') && $user->instansi()->count() == 1) {
+        if ($user->instansi()->where('nama_Instansi', 'SMK Salafiyah') && $user->instansi()->count() == 1) {
             return redirect()->back()->with('error', 'Anda tidak bisa Izin di instansi ini');
         }
 
@@ -76,7 +76,7 @@ class IzinController extends Controller
 
         foreach ($request->instansi_id as $instansi) {
 
-            if ($instansi == Instansi::where('nama_instansi', 'SMK')->first()->id) {
+            if ($instansi == Instansi::where('nama_instansi', 'SMK Salafiyah')->first()->id) {
                 return redirect()->back()->with('error', 'Anda tidak bisa izin di instansi ini');
             }
 

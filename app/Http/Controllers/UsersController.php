@@ -78,7 +78,8 @@ class UsersController extends Controller
             "telp" => "required|numeric",
             "username" => "required",
             "password" => "required",
-            'jarak_tempuh' => 'required'
+            'jarak_tempuh' => 'required',
+            "nomor_induk_yayasan" => "required"
         ]);
 
         if ($validate->fails()) {
@@ -105,6 +106,7 @@ class UsersController extends Controller
         $imagePresensi->encode(new AutoEncoder(50))->save(public_path('foto_presensi/' . $imageNamePresensi));
 
         $user = User::create([
+            "nomor_induk_yayasan" => $request->nomor_induk_yayasan,
             "name" => $request->name,
             "telp" => $request->telp,
             "username" => $request->username,
@@ -179,7 +181,9 @@ class UsersController extends Controller
             "foto_presensi" => "nullable|image|mimes:jpeg,png,jpg|max:2048",
             "jarak_tempuh" => "nullable|numeric|min:0",
             "role_id" => "required|min:1",
-            "instansi_id" => "required|array|min:1"
+            "instansi_id" => "required|array|min:1",
+            "nomor_induk_yayasan" => "required"
+
         ];
 
         // Validasi username hanya jika berubah
@@ -211,6 +215,7 @@ class UsersController extends Controller
             "telp" => $request->telp,
             "username" => $request->username,
             "jarak_tempuh" => $request->jarak_tempuh ?? 0,
+            "nomor_induk_yayasan" => $request->nomor_induk_yayasan,
         ];
 
         // Update password hanya jika diisi

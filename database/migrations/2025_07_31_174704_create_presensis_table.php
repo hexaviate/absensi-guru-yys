@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->time('pulang')->nullable();
             $table->enum('status', ['hadir', 'izin']);
             $table->date('tanggal');
+            $table->string('keterangan');
             $table->string('akurasi')->nullable();
             $table->string('userAgent')->nullable();
             $table->timestamps();
