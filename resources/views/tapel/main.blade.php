@@ -21,45 +21,53 @@
                             <h4>Data Kaldik</h4>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-md" id="example">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Tahun</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                        @forelse ($tapel as $item)
+                            @if ($tapel->isEmpty())
+                                <div class="d-flex justify-content-center align-items-center" style="height: 50px;">
+                                    <span class="font-weight-bold">Data Jadwal Kosong</span>
+                                </div>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-md" id="example">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $item->kode }}</td>
-                                                <td>{{ $item->status }}</td>
-                                                <td class="d-flex">
-                                                    <a href="{{ route('tapel.edit', $item->id) }}"
-                                                        class="btn btn-warning">Edit</a>
-                                                    <form action="{{ route('tapel.destroy', $item->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button type="submit" class="btn btn-danger mx-2 delete-btn">Hapus</button>
-                                                    </form>
-                                                </td>
+                                                <th>No</th>
+                                                <th>Tahun</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
 
-                                                {{-- @foreach ($item->tag as $k)
+                                            @forelse ($tapel as $item)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $item->kode }}</td>
+                                                    <td>{{ $item->status }}</td>
+                                                    <td class="d-flex">
+                                                        <a href="{{ route('tapel.edit', $item->id) }}"
+                                                            class="btn btn-warning">Edit</a>
+                                                        <form action="{{ route('tapel.destroy', $item->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('delete')
+                                                            <button type="submit"
+                                                                class="btn btn-danger mx-2 delete-btn">Hapus</button>
+                                                        </form>
+                                                    </td>
+
+                                                    {{-- @foreach ($item->tag as $k)
                                                 {{ $k->nama }},
                                                 @endforeach INI CONTOH UNTUK FOREACH --}}
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="7" class="text-center">Data Tapel Kosong</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="7" class="text-center">Data Tapel Kosong</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

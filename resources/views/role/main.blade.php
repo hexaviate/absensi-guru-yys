@@ -21,39 +21,45 @@
                             <h4>Data Peran</h4>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-md" id="example">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                        @forelse ($role as $item)
+                            @if ($role->isEmpty())
+                                <div class="d-flex justify-content-center align-items-center" style="height: 50px;">
+                                    <span class="font-weight-bold">Data Jadwal Kosong</span>
+                                </div>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-md" id="example">
+                                        <thead>
                                             <tr>
-                                                <td class="">{{ $loop->iteration }}</td>
-                                                <td>{{ $item->name }}</td>
-                                                <td class="d-flex">
-                                                    <a href="{{ route('role.edit', $item->id) }}"
-                                                        class="btn btn-warning">Edit</a>
-                                                    <form action="{{ route('role.destroy', $item->id) }}" method="POST"
-                                                        class="delete-form d-inline">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <button type="button"
-                                                            class="btn btn-danger mx-2 delete-btn">Hapus</button>
-                                                    </form>
-                                                </td>
+                                                <th>No</th>
+                                                <th>Nama</th>
+                                                <th>Action</th>
                                             </tr>
-                                        @empty
-                                            <p>Data Peran Kosong, Perlu di Isi</p>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+
+                                            @forelse ($role as $item)
+                                                <tr>
+                                                    <td class="">{{ $loop->iteration }}</td>
+                                                    <td>{{ Str::of($item->name)->replace('_', ' ')->title() }}</td>
+                                                    <td class="d-flex">
+                                                        <a href="{{ route('role.edit', $item->id) }}"
+                                                            class="btn btn-warning">Edit</a>
+                                                        <form action="{{ route('role.destroy', $item->id) }}" method="POST"
+                                                            class="delete-form d-inline">
+                                                            @csrf
+                                                            @method('delete')
+                                                            <button type="button"
+                                                                class="btn btn-danger mx-2 delete-btn">Hapus</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <p>Data Peran Kosong, Perlu di Isi</p>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

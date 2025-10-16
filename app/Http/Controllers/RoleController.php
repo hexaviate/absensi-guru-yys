@@ -24,6 +24,8 @@ class RoleController extends Controller
         return view('role.main', compact('role'));
     }
 
+
+
     /**
      * Show the form for creating a new resource.
      */

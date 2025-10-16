@@ -25,57 +25,65 @@
                                 <h4>Data User</h4>
                             </div>
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-md" id="example">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Name</th>
-                                                <th>Peran</th>
-                                                <th>No Telephone</th>
-                                                <th>Username</th>
-                                                <th>instansi</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            @forelse ($semuaUser as $item)
+                                @if ($semuaUser->isEmpty())
+                                    <div class="d-flex justify-content-center align-items-center" style="height: 50px;">
+                                        <span class="font-weight-bold">Data Jadwal Kosong</span>
+                                    </div>
+                                @else
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-md" id="example">
+                                            <thead>
                                                 <tr>
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $item->name }}</td>
-                                                    <td>
-                                                        @forelse ($item->roles as $role)
-                                                            {{ $role->name }}{{ !$loop->last ? ', ' : '' }}
-                                                        @empty
-                                                            Tidak Punya Role
-                                                        @endforelse
-                                                    </td>
-                                                    <td>{{ $item->telp }}</td>
-                                                    <td>{{ $item->username }}</td>
-                                                    <td>
-                                                        @forelse ($item->instansi as $ins)
-                                                            {{ $ins->nama_instansi }}{{ !$loop->last ? ', ' : '' }}
-                                                        @empty
-                                                            Belum Ada Instansi
-                                                        @endforelse
-                                                    </td>
-                                                    <td class="d-flex">
-                                                        <a class="btn btn-warning mx-1"
-                                                            href="{{ route('user.edit', $item->id) }}">Edit</a>
-                                                        <form action="{{ route('user.destroy', $item->id) }}" method="POST">
-                                                            @csrf
-                                                            @method('delete')
-                                                            <button class="btn btn-danger mx-1 delete-btn">Hapus</button>
-                                                        </form>
-                                                    </td>
+                                                    <th>No</th>
+                                                    <th>Name</th>
+                                                    <th>Peran</th>
+                                                    <th>No Telephone</th>
+                                                    <th>Username</th>
+                                                    <th>instansi</th>
+                                                    <th>Action</th>
                                                 </tr>
-                                            @empty
-                                                <p>Data Users Kosong, Perlu di Isi</p>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+
+                                                @forelse ($semuaUser as $item)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $item->name }}</td>
+                                                        <td>
+                                                            @forelse ($item->roles as $role)
+                                                                {{ Str::of($role->name)->replace('_', ' ')->title() }}{{ !$loop->last ? ', ' : '' }}
+                                                            @empty
+                                                                Tidak Punya Role
+                                                            @endforelse
+                                                        </td>
+
+                                                        <td>{{ $item->telp }}</td>
+                                                        <td>{{ $item->username }}</td>
+                                                        <td>
+                                                            @forelse ($item->instansi as $ins)
+                                                                {{ $ins->nama_instansi }}{{ !$loop->last ? ', ' : '' }}
+                                                            @empty
+                                                                Belum Ada Instansi
+                                                            @endforelse
+                                                        </td>
+                                                        <td class="d-flex">
+                                                            <a class="btn btn-warning mx-1"
+                                                                href="{{ route('user.edit', $item->id) }}">Edit</a>
+                                                            <form action="{{ route('user.destroy', $item->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('delete')
+                                                                <button class="btn btn-danger mx-1 delete-btn">Hapus</button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <p>Data Users Kosong, Perlu di Isi</p>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -98,51 +106,57 @@
                                 <h4>Data User</h4>
                             </div>
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-md" id="example">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Name</th>
-                                                <th>Peran</th>
-                                                <th>No Telephone</th>
-                                                <th>Username</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            @forelse ($userInstansi as $item)
+                                @if ($userInstansi->isEmpty())
+                                    <div class="d-flex justify-content-center align-items-center" style="height: 50px;">
+                                        <span class="font-weight-bold">Data Jadwal Kosong</span>
+                                    </div>
+                                @else
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-md" id="example">
+                                            <thead>
                                                 <tr>
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $item->name }}</td>
-                                                    <td>
-                                                        @forelse ($item->roles as $role)
-                                                            {{ $role->name }}{{ !$loop->last ? ', ' : '' }}
-                                                        @empty
-                                                            Tidak Punya Role
-                                                        @endforelse
-                                                    </td>
-                                                    <td>{{ $item->telp }}</td>
-                                                    <td>{{ $item->username }}</td>
-                                                    <td class="d-flex">
-                                                        <a class="btn btn-warning mx-1"
-                                                            href="{{ route('user.edit', $item->id) }}">Edit</a>
-                                                        <form action="{{ route('user.destroy', $item->id) }}" method="POST"
-                                                            class="delete-form d-inline">
-                                                            @csrf
-                                                            @method('delete')
-                                                            <button type="button"
-                                                                class="btn btn-danger mx-1 delete-btn">Hapus</button>
-                                                        </form>
-                                                    </td>
+                                                    <th>No</th>
+                                                    <th>Name</th>
+                                                    <th>Peran</th>
+                                                    <th>No Telephone</th>
+                                                    <th>Username</th>
+                                                    <th>Action</th>
                                                 </tr>
-                                            @empty
-                                                <p>Data Users Kosong, Perlu di Isi</p>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+
+                                                @forelse ($userInstansi as $item)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $item->name }}</td>
+                                                    <td>
+                                                            @forelse ($item->roles as $role)
+                                                                {{ Str::of($role->name)->replace('_', ' ')->title() }}{{ !$loop->last ? ', ' : '' }}
+                                                            @empty
+                                                                Tidak Punya Role
+                                                            @endforelse
+                                                        </td>
+                                                        <td>{{ $item->telp }}</td>
+                                                        <td>{{ $item->username }}</td>
+                                                        <td class="d-flex">
+                                                            <a class="btn btn-warning mx-1"
+                                                                href="{{ route('user.edit', $item->id) }}">Edit</a>
+                                                            <form action="{{ route('user.destroy', $item->id) }}"
+                                                                method="POST" class="delete-form d-inline">
+                                                                @csrf
+                                                                @method('delete')
+                                                                <button type="button"
+                                                                    class="btn btn-danger mx-1 delete-btn">Hapus</button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <p>Data Users Kosong, Perlu di Isi</p>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

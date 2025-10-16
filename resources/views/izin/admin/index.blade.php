@@ -18,77 +18,86 @@
                             <h4>Data Izin Yang Perlu Diverifikasi</h4>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="example" class="table table-striped table-bordered table-md">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama Instansi</th>
-                                            <th>Nama Pemohon</th>
-                                            <th>Tanggal</th>
-                                            <th>Keterangan Izin</th>
-                                            <th>Bukti</th>
-                                            <th>Status</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($izin as $item)
+                            @if ($izin->isEmpty())
+                                <div class="d-flex justify-content-center align-items-center" style="height: 50px;">
+                                    <span class="font-weight-bold">Data Jadwal Kosong</span>
+                                </div>
+                            @else
+                                <div class="table-responsive">
+                                    <table id="example" class="table table-striped table-bordered table-md">
+                                        <thead>
                                             <tr>
-                                                <td class="align-middle">{{ $loop->iteration }}</td>
-                                                <td class="align-middle">{{ $item->instansi->nama_instansi }}</td>
-                                                <td class="align-middle">{{ $item->user->name }}</td>
-                                                <td class="align-middle">{{ $item->tanggal }}</td>
-                                                <td class="align-middle">{{ $item->keterangan }}</td>
-                                                <td class="align-middle">
-                                                    <div class="d-flex flex-column gap-2 align-items-center">
-                                                        @php
-                                                            $fileExtension = strtolower(
-                                                                pathinfo($item->bukti_izin, PATHINFO_EXTENSION),
-                                                            );
-                                                        @endphp
+                                                <th>No</th>
+                                                <th>Nama Instansi</th>
+                                                <th>Nama Pemohon</th>
+                                                <th>Tanggal</th>
+                                                <th>Keterangan Izin</th>
+                                                <th>Bukti</th>
+                                                <th>Status</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($izin as $item)
+                                                <tr>
+                                                    <td class="align-middle">{{ $loop->iteration }}</td>
+                                                    <td class="align-middle">{{ $item->instansi->nama_instansi }}</td>
+                                                    <td class="align-middle">{{ $item->user->name }}</td>
+                                                    <td class="align-middle">{{ $item->tanggal }}</td>
+                                                    <td class="align-middle">{{ $item->keterangan }}</td>
+                                                    <td class="align-middle">
+                                                        <div class="d-flex flex-column gap-2 align-items-center">
+                                                            @php
+                                                                $fileExtension = strtolower(
+                                                                    pathinfo($item->bukti_izin, PATHINFO_EXTENSION),
+                                                                );
+                                                            @endphp
 
-                                                        @if ($fileExtension === 'pdf')
-                                                            <a href="{{ asset('bukti_izin/' . $item->bukti_izin) }}"
-                                                                target="_blank" class="text text-sm text-primary w-100 m-1">
-                                                                <i class="fas fa-file-pdf"></i> Lihat PDF
-                                                            </a>
-                                                        @else
-                                                            <a href="#" data-toggle="modal"
-                                                                data-target="#modal-bukti-{{ $item->id }}"
-                                                                class="text text-sm text-primary w-100 m-1">
-                                                                <i class="fas fa-eye"></i> Lihat Gambar
-                                                            </a>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <span
-                                                        class="badge badge-{{ $item->status == 'belum_diverifikasi' ? 'warning' : ($item->status == 'diterima' ? 'success' : 'danger') }} w-100 text-center m-1">
-                                                        {{ ucwords(str_replace('_', ' ', $item->status)) }}
-                                                    </span>
-                                                </td>
-                                                <td class="align-middle">
-                                                    <div class="d-flex flex-column gap-2 align-items-center w-100">
-                                                        @if ($item->status == 'belum_diverifikasi')
-                                                            <button type="button" class="btn btn-info btn-sm w-100 m-1"
-                                                                data-toggle="modal" data-target="#modal-verify-{{ $item->id }}">
-                                                                <i class="fas fa-check-circle"></i> Verifikasi
-                                                            </button>
-                                                        @else
-                                                            <span class="text-muted small">Sudah Diverifikasi</span>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="7" class="align-middle text-center">Tidak Ada Data Izin Yang Perlu Diverifikasi</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+                                                            @if ($fileExtension === 'pdf')
+                                                                <a href="{{ asset('bukti_izin/' . $item->bukti_izin) }}"
+                                                                    target="_blank"
+                                                                    class="text text-sm text-primary w-100 m-1">
+                                                                    <i class="fas fa-file-pdf"></i> Lihat PDF
+                                                                </a>
+                                                            @else
+                                                                <a href="#" data-toggle="modal"
+                                                                    data-target="#modal-bukti-{{ $item->id }}"
+                                                                    class="text text-sm text-primary w-100 m-1">
+                                                                    <i class="fas fa-eye"></i> Lihat Gambar
+                                                                </a>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <span
+                                                            class="badge badge-{{ $item->status == 'belum_diverifikasi' ? 'warning' : ($item->status == 'diterima' ? 'success' : 'danger') }} w-100 text-center m-1">
+                                                            {{ ucwords(str_replace('_', ' ', $item->status)) }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <div class="d-flex flex-column gap-2 align-items-center w-100">
+                                                            @if ($item->status == 'belum_diverifikasi')
+                                                                <button type="button" class="btn btn-info btn-sm w-100 m-1"
+                                                                    data-toggle="modal"
+                                                                    data-target="#modal-verify-{{ $item->id }}">
+                                                                    <i class="fas fa-check-circle"></i> Verifikasi
+                                                                </button>
+                                                            @else
+                                                                <span class="text-muted small">Sudah Diverifikasi</span>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="7" class="align-middle text-center">Tidak Ada Data Izin
+                                                        Yang Perlu Diverifikasi</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -109,7 +118,7 @@
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title">
                                 <i class="fas fa-image mr-2"></i>
-                                Bukti Izin - {{ $item->user->name}}
+                                Bukti Izin - {{ $item->user->name }}
                             </h5>
                             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -158,7 +167,7 @@
                     <div class="modal-content">
                         <form method="POST" action="{{ route('izinVerify', $item->id) }}">
                             @csrf
-                            @method("PUT")
+                            @method('PUT')
                             <div class="modal-header bg-primary text-white">
                                 <h5 class="modal-title">
                                     <i class="fas fa-check-circle mr-2"></i>
@@ -173,7 +182,8 @@
                                 <div class="alert alert-light border">
                                     <h6 class="mb-2"><strong>Detail Izin:</strong></h6>
                                     <p class="mb-1"><strong>Nama:</strong> {{ $item->user->name }}</p>
-                                    <p class="mb-1"><strong>Tanggal Izin:</strong> {{ \Carbon\Carbon::parse($item->tanggal)->format('d F Y') }}</p>
+                                    <p class="mb-1"><strong>Tanggal Izin:</strong>
+                                        {{ \Carbon\Carbon::parse($item->tanggal)->format('d F Y') }}</p>
                                     <p class="mb-0"><strong>Keterangan:</strong> {{ $item->keterangan }}</p>
                                 </div>
 
@@ -182,16 +192,18 @@
                                     <label class="font-weight-bold">Keputusan Verifikasi:</label>
                                     <div class="mt-2">
                                         <div class="custom-control custom-radio mb-2">
-                                            <input type="radio" id="diterima-{{ $item->id }}" name="status" value="diterima"
-                                                class="custom-control-input status-radio" required>
-                                            <label class="custom-control-label text-success" for="diterima-{{ $item->id }}">
+                                            <input type="radio" id="diterima-{{ $item->id }}" name="status"
+                                                value="diterima" class="custom-control-input status-radio" required>
+                                            <label class="custom-control-label text-success"
+                                                for="diterima-{{ $item->id }}">
                                                 <i class="fas fa-check mr-1"></i> Diterima
                                             </label>
                                         </div>
                                         <div class="custom-control custom-radio">
-                                            <input type="radio" id="tidak_diterima-{{ $item->id }}" name="status" value="tidak_diterima"
-                                                class="custom-control-input status-radio" required>
-                                            <label class="custom-control-label text-danger" for="tidak_diterima-{{ $item->id }}">
+                                            <input type="radio" id="tidak_diterima-{{ $item->id }}" name="status"
+                                                value="tidak_diterima" class="custom-control-input status-radio" required>
+                                            <label class="custom-control-label text-danger"
+                                                for="tidak_diterima-{{ $item->id }}">
                                                 <i class="fas fa-times mr-1"></i> Ditolak
                                             </label>
                                         </div>
@@ -199,14 +211,15 @@
                                 </div>
 
                                 <!-- Keterangan Ditolak (akan muncul jika ditolak) -->
-                                <div class="form-group" id="keterangan-ditolak-{{ $item->id }}" style="display: none;">
+                                <div class="form-group" id="keterangan-ditolak-{{ $item->id }}"
+                                    style="display: none;">
                                     <label for="keterangan_ditolak-{{ $item->id }}" class="font-weight-bold">
                                         Keterangan Penolakan (Opsional):
                                     </label>
-                                    <textarea name="keterangan_ditolak" id="keterangan_ditolak-{{ $item->id }}"
-                                        class="form-control" rows="3"
+                                    <textarea name="keterangan_ditolak" id="keterangan_ditolak-{{ $item->id }}" class="form-control" rows="3"
                                         placeholder="Masukkan alasan penolakan (opsional)"></textarea>
-                                    <small class="text-muted">Berikan alasan penolakan untuk membantu pemohon memahami keputusan Anda.</small>
+                                    <small class="text-muted">Berikan alasan penolakan untuk membantu pemohon memahami
+                                        keputusan Anda.</small>
                                 </div>
                             </div>
                             <div class="modal-footer d-flex justify-content-between">
@@ -326,17 +339,17 @@
             font-weight: 500;
         }
 
-        .custom-control-input:checked ~ .custom-control-label::before {
+        .custom-control-input:checked~.custom-control-label::before {
             border-color: #007bff;
             background-color: #007bff;
         }
 
-        .text-success .custom-control-input:checked ~ .custom-control-label::before {
+        .text-success .custom-control-input:checked~.custom-control-label::before {
             border-color: #28a745;
             background-color: #28a745;
         }
 
-        .text-danger .custom-control-input:checked ~ .custom-control-label::before {
+        .text-danger .custom-control-input:checked~.custom-control-label::before {
             border-color: #dc3545;
             background-color: #dc3545;
         }
@@ -409,24 +422,23 @@
 
 @push('message')
     {{-- di layout blade, misalnya di bagian bawah sebelum </body> --}}
-{{-- <script src="{{ asset('assets/modules/izitoast/js/iziToast.min.js') }}"></script> --}}
+    {{-- <script src="{{ asset('assets/modules/izitoast/js/iziToast.min.js') }}"></script> --}}
 
-<script>
-    @if(session('success'))
-        iziToast.success({
-            title: 'Sukses',
-            message: "{{ session('success') }}",
-            position: 'topRight'
-        });
-    @endif
+    <script>
+        @if (session('success'))
+            iziToast.success({
+                title: 'Sukses',
+                message: "{{ session('success') }}",
+                position: 'topRight'
+            });
+        @endif
 
-    @if(session('error'))
-        iziToast.error({
-            title: 'Error',
-            message: "{{ session('error') }}",
-            position: 'topRight'
-        });
-    @endif
-</script>
-
+        @if (session('error'))
+            iziToast.error({
+                title: 'Error',
+                message: "{{ session('error') }}",
+                position: 'topRight'
+            });
+        @endif
+    </script>
 @endpush
