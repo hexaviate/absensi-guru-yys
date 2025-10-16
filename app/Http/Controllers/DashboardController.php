@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HariLibur;
 use App\Models\Instansi;
 use App\Models\Izin;
 use App\Models\Presensi;
 use App\Models\Tapel;
+use App\Models\TidakHadir;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,6 +31,7 @@ class DashboardController extends Controller
         $guruHadirHariIni = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->limit('5')->latest()->get();
         $totalGuruIzin = Izin::where('instansi_id', $instansi->id)->where('status', 'diterima')->whereDate('created_at', today())->count();
         $totalGuruHadir = Presensi::where('instansi_id', $instansi->id)->where('status', 'hadir')->where('tanggal', today()->toDateString())->count();
+        $totalGuruAlpha = TidakHadir::where('tanggal', now()->toDateString())->where('instansi_id', $instansi->id)->where('tapel_id', Tapel::where('status', 'aktif')->first()->id)->count();
 
         $persentaseHadir = $totalGuruInstansi > 0
             ? round(($totalGuruHadir / $totalGuruInstansi) * 100, 2)
@@ -38,7 +41,7 @@ class DashboardController extends Controller
             ? round(($totalGuruIzin / $totalGuruInstansi) * 100, 2)
             : 0;
 
-        return view('dashboard.operator', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruHadir', 'persentaseHadir', 'persentaseIzin'));
+        return view('dashboard.operator', compact('totalGuruInstansi', 'guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruHadir', 'persentaseHadir', 'persentaseIzin', 'totalGuruAlpha'));
     }
 
     public function adminDashboard()
@@ -53,6 +56,7 @@ class DashboardController extends Controller
             return redirect()->route('login')->with('error', "anda tidak punya akses");
         }
 
+        $totalGuruTidakHadirHariIni = TidakHadir::where('tanggal', now()->toDateString())->withCount('user');
         //Total guru setiap instansi
         $totalGuruPerInstansi = Instansi::withCount('user')->get();
         // total seluruh guru di yayasan
@@ -64,7 +68,7 @@ class DashboardController extends Controller
         //total guru yang izin hari ini
         $totalGuruIzin = Izin::where('status', 'diterima')->whereDate('created_at', today())->count();
 
-        return view('dashboard.yys', compact('guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruPerInstansi', 'totalSemuaGuru', 'instansi'));
+        return view('dashboard.yys', compact('guruHadirHariIni', 'totalGuruIzin', 'user', 'totalGuruPerInstansi', 'totalSemuaGuru', 'instansi', 'totalGuruTidakHadirHariIni'));
     }
 
     public function userDashboard()
@@ -86,7 +90,8 @@ class DashboardController extends Controller
         $presensiBulanIni = $user->presensi()->whereMonth('created_at', now()->month)->count();
         $tidakHadirBulanIni = $user->tidak_hadir()->whereMonth('created_at', now()->month)->count();
         $instansi = $user->instansi()->get();
+        $hariIniHariLibur = HariLibur::where('tanggal', now()->toDateString())->get();
 
-        return view('dashboard.user', compact('presensiHariIni', 'jadwalHariIni', 'instansi', 'izinBulanIni', 'presensiMingguIni', 'presensiBulanIni', 'tidakHadirBulanIni'));
+        return view('dashboard.user', compact('presensiHariIni', 'jadwalHariIni', 'instansi', 'izinBulanIni', 'presensiMingguIni', 'presensiBulanIni', 'tidakHadirBulanIni', 'hariIniHariLibur'));
     }
 }

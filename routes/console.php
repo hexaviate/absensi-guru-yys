@@ -18,7 +18,7 @@ Artisan::command('inspire', function () {
 //KURANG WOII KURANG JADWAL :((((((()))))))
 Schedule::call(function () {
 
-    if (now()->isoFormat('dddd') == "Kamis") {
+    if (now()->isoFormat('dddd') == "Jumat") {
         return;
     }
 
@@ -80,7 +80,7 @@ Schedule::call(function () {
         }
 
     }
-})->dailyAt('11:58'); //! waktu nanti disesuaikan
+})->dailyAt('14:06'); //! waktu nanti disesuaikan
 
 //!perlu disusaikan cron nya jika sudah di server
 //*jika running lokal maka pakai "php artisan schedule:work"
