@@ -52,7 +52,7 @@
                         <div class="stats-card">
                             <div class="card-body">
                                 <h2 class="stats-number">{{ $statsData['MI'] }}</h2>
-                                <p class="stats-label">Guru & Karyawan GURU MI</p>
+                                <p class="stats-label">Guru & Karyawan <br>MI</p>
                             </div>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                             <div class="card-body">
                                 {{-- <h2 class="stats-number">{{ $statsData['MTs'] }}</h2> --}}
                                 <h2 class="stats-number">124</h2>
-                                <p class="stats-label">Guru & Karyawan MTs</p>
+                                <p class="stats-label">Guru & Karyawan <br>MTs</p>
                             </div>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                         <div class="stats-card">
                             <div class="card-body">
                                 <h2 class="stats-number">{{ $statsData['MA'] }}</h2>
-                                <p class="stats-label">Guru & Karyawan MA</p>
+                                <p class="stats-label">Guru & Karyawan <br>MA</p>
                             </div>
                         </div>
                     </div>
@@ -80,7 +80,7 @@
                         <div class="stats-card">
                             <div class="card-body">
                                 <h2 class="stats-number">{{ $statsData['SMK'] }}</h2>
-                                <p class="stats-label">Guru & Karyawan SMK</p>
+                                <p class="stats-label">Guru & Karyawan <br>SMK</p>
                             </div>
                         </div>
                     </div>
@@ -122,7 +122,7 @@
                         </div>
                         <div>
                             <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">Total Guru & Karyawan Yayasan Salafiyah</h6>
+                                <h6 class="mb-0">Total Guru & Karyawan </h6>
                                 <h3 class="mb-0 text-success">{{ $totalSemuaGuru }}</h3>
                             </div>
                         </div>
@@ -260,252 +260,249 @@
 
     </script>
     <script>
-    // ==================== CHART GURU (DATA REAL DARI DATABASE) ====================
+        // ==================== CHART GURU (DATA REAL DARI DATABASE) ====================
 
-    // Data dari controller
-    const totalGuruYayasan = {{ $totalSemuaGuru }};
-    const guruHadirHariIni = {{ $guruHadirHariIni->count() }};
-    const guruIzinHariIni = {{ $totalGuruIzin ?? 0 }};
+        // Data dari controller
+        const totalGuruYayasan = {{ $totalSemuaGuru }};
+        const guruHadirHariIni = {{ $guruHadirHariIni->count() }};
+        const guruIzinHariIni = {{ $totalGuruIzin ?? 0 }};
 
-    console.log('Total Guru:', totalGuruYayasan);
-    console.log('Hadir Hari Ini:', guruHadirHariIni);
-    console.log('Izin Hari Ini:', guruIzinHariIni);
+        console.log('Total Guru:', totalGuruYayasan);
+        console.log('Hadir Hari Ini:', guruHadirHariIni);
+        console.log('Izin Hari Ini:', guruIzinHariIni);
 
-    // Ambil data presensi 14 hari terakhir dari database
-    let hadirData = [];
-    let izinData = [];
+        // Ambil data presensi 14 hari terakhir dari database
+        let hadirData = [];
+        let izinData = [];
 
-    @php
-        use Carbon\Carbon;
-        use App\Models\Presensi;
-        use App\Models\User;
+        @php
+            use Carbon\Carbon;
+            use App\Models\Presensi;
+            use App\Models\User;
 
-        $chartData = [];
-        $user = auth()->user();
+            $chartData = [];
+            $user = auth()->user();
 
-        // Ambil semua instansi_id yang terkait dengan user (many-to-many)
-        $instansiIds = [];
-
-        try {
-            // Ambil semua instansi yang terkait dengan user
-            if (method_exists($user, 'instansi')) {
-                // Jika relasi bernama 'instansi' (singular)
-                $instansiIds = $user->instansi()->pluck('instansi_id')->toArray();
-
-                // Jika tidak ada, coba ambil kolom 'id'
-                if (empty($instansiIds)) {
-                    $instansiIds = $user->instansi()->pluck('id')->toArray();
-                }
-            } elseif (method_exists($user, 'instansis')) {
-                // Jika relasi bernama 'instansis' (plural)
-                $instansiIds = $user->instansis()->pluck('instansi_id')->toArray();
-
-                if (empty($instansiIds)) {
-                    $instansiIds = $user->instansis()->pluck('id')->toArray();
-                }
-            }
-
-            // Jika masih kosong, ambil dari presensi terakhir
-            if (empty($instansiIds)) {
-                $lastPresensi = Presensi::where('user_id', $user->id)->latest()->first();
-                if ($lastPresensi) {
-                    $instansiIds = [$lastPresensi->instansi_id];
-                }
-            }
-        } catch (\Exception $e) {
-            // Jika error, set kosong (akan ambil semua data)
+            // Ambil semua instansi_id yang terkait dengan user (many-to-many)
             $instansiIds = [];
-        }
 
-        // Hitung total guru
-        $totalGuru = $totalSemuaGuru ?? 0;
+            try {
+                // Ambil semua instansi yang terkait dengan user
+                if (method_exists($user, 'instansi')) {
+                    // Jika relasi bernama 'instansi' (singular)
+                    $instansiIds = $user->instansi()->pluck('instansi_id')->toArray();
 
-        for ($i = 13; $i >= 0; $i--) {
-            $tanggal = Carbon::now()->subDays($i);
+                    // Jika tidak ada, coba ambil kolom 'id'
+                    if (empty($instansiIds)) {
+                        $instansiIds = $user->instansi()->pluck('id')->toArray();
+                    }
+                } elseif (method_exists($user, 'instansis')) {
+                    // Jika relasi bernama 'instansis' (plural)
+                    $instansiIds = $user->instansis()->pluck('instansi_id')->toArray();
 
-            // Query dasar
-            $queryHadir = Presensi::whereDate('tanggal', $tanggal->toDateString())
-                ->where('status', 'hadir');
+                    if (empty($instansiIds)) {
+                        $instansiIds = $user->instansis()->pluck('id')->toArray();
+                    }
+                }
 
-            $queryIzin = Presensi::whereDate('tanggal', $tanggal->toDateString())
-                ->where('status', 'izin');
-
-            // Filter dengan whereIn untuk many-to-many
-            if (!empty($instansiIds) && count($instansiIds) > 0) {
-                $queryHadir->whereIn('instansi_id', $instansiIds);
-                $queryIzin->whereIn('instansi_id', $instansiIds);
+                // Jika masih kosong, ambil dari presensi terakhir
+                if (empty($instansiIds)) {
+                    $lastPresensi = Presensi::where('user_id', $user->id)->latest()->first();
+                    if ($lastPresensi) {
+                        $instansiIds = [$lastPresensi->instansi_id];
+                    }
+                }
+            } catch (\Exception $e) {
+                // Jika error, set kosong (akan ambil semua data)
+                $instansiIds = [];
             }
 
-            // Hitung hadir (yang ada datang ATAU pulang)
-            $hadir = $queryHadir->where(function($query) {
-                    $query->whereNotNull('datang')
-                          ->orWhereNotNull('pulang');
-                })
-                ->distinct('user_id')
-                ->count('user_id');
+            // Hitung total guru
+            $totalGuru = $totalSemuaGuru ?? 0;
 
-            // Hitung izin
-            $izin = $queryIzin->distinct('user_id')
-                ->count('user_id');
+            for ($i = 13; $i >= 0; $i--) {
+                $tanggal = Carbon::now()->subDays($i);
 
-            $chartData[] = [
-                'timestamp' => $tanggal->timestamp * 1000,
-                'tanggal' => $tanggal->format('Y-m-d'),
-                'hadir' => $hadir,
-                'izin' => $izin,
-            ];
-        }
-    @endphp
+                // Query dasar
+                $queryHadir = Presensi::whereDate('tanggal', $tanggal->toDateString())->where('status', 'hadir');
 
-    // Populate data dari PHP ke JavaScript
-    const dataFromDB = @json($chartData);
+                $queryIzin = Presensi::whereDate('tanggal', $tanggal->toDateString())->where('status', 'izin');
 
-    console.log('Data Chart:', dataFromDB);
+                // Filter dengan whereIn untuk many-to-many
+                if (!empty($instansiIds) && count($instansiIds) > 0) {
+                    $queryHadir->whereIn('instansi_id', $instansiIds);
+                    $queryIzin->whereIn('instansi_id', $instansiIds);
+                }
 
-    dataFromDB.forEach(function(item) {
-        hadirData.push({
-            x: item.timestamp,
-            y: item.hadir
-        });
-        izinData.push({
-            x: item.timestamp,
-            y: item.izin
-        });
-    });
+                // Hitung hadir (yang ada datang ATAU pulang)
+                $hadir = $queryHadir
+                    ->where(function ($query) {
+                        $query->whereNotNull('datang')->orWhereNotNull('pulang');
+                    })
+                    ->distinct('user_id')
+                    ->count('user_id');
 
-    console.log('Hadir Data:', hadirData);
-    console.log('Izin Data:', izinData);
+                // Hitung izin
+                $izin = $queryIzin->distinct('user_id')->count('user_id');
 
-    // Konfigurasi chart
-    var options = {
-        series: [{
-                name: 'Hadir',
-                data: hadirData
-            },
-            {
-                name: 'Izin',
-                data: izinData
+                $chartData[] = [
+                    'timestamp' => $tanggal->timestamp * 1000,
+                    'tanggal' => $tanggal->format('Y-m-d'),
+                    'hadir' => $hadir,
+                    'izin' => $izin,
+                ];
             }
-        ],
-        chart: {
-            id: 'chartGuru',
-            height: 350,
-            type: 'line',
-            animations: {
-                enabled: true,
-                easing: 'easeinout',
-                speed: 800
+        @endphp
+
+        // Populate data dari PHP ke JavaScript
+        const dataFromDB = @json($chartData);
+
+        console.log('Data Chart:', dataFromDB);
+
+        dataFromDB.forEach(function(item) {
+            hadirData.push({
+                x: item.timestamp,
+                y: item.hadir
+            });
+            izinData.push({
+                x: item.timestamp,
+                y: item.izin
+            });
+        });
+
+        console.log('Hadir Data:', hadirData);
+        console.log('Izin Data:', izinData);
+
+        // Konfigurasi chart
+        var options = {
+            series: [{
+                    name: 'Hadir',
+                    data: hadirData
+                },
+                {
+                    name: 'Izin',
+                    data: izinData
+                }
+            ],
+            chart: {
+                id: 'chartGuru',
+                height: 350,
+                type: 'line',
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
+                },
+                toolbar: {
+                    show: true,
+                    tools: {
+                        download: true,
+                        selection: true,
+                        zoom: true,
+                        zoomin: true,
+                        zoomout: true,
+                        pan: true,
+                        reset: true
+                    }
+                },
+                zoom: {
+                    enabled: true,
+                    type: 'x',
+                    autoScaleYaxis: false
+                }
             },
-            toolbar: {
+            colors: ['#28a745', '#ffc107', '#dc3545'],
+            xaxis: {
+                type: 'datetime',
+                labels: {
+                    format: 'dd MMM',
+                    style: {
+                        fontSize: '12px'
+                    }
+                }
+            },
+            yaxis: {
+                min: 0,
+                max: Math.max(totalGuruYayasan, 10), // Minimal 10 untuk tampilan
+                tickAmount: 7,
+                labels: {
+                    formatter: function(value) {
+                        return Math.round(value);
+                    }
+                }
+            },
+            markers: {
+                size: 4,
+                hover: {
+                    size: 6
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            legend: {
                 show: true,
-                tools: {
-                    download: true,
-                    selection: true,
-                    zoom: true,
-                    zoomin: true,
-                    zoomout: true,
-                    pan: true,
-                    reset: true
+                position: 'top',
+                horizontalAlign: 'center'
+            },
+            tooltip: {
+                x: {
+                    format: 'dd MMM yyyy'
+                },
+                y: {
+                    formatter: function(value) {
+                        return value + ' guru';
+                    }
                 }
             },
-            zoom: {
-                enabled: true,
-                type: 'x',
-                autoScaleYaxis: false
-            }
-        },
-        colors: ['#28a745', '#ffc107', '#dc3545'],
-        xaxis: {
-            type: 'datetime',
-            labels: {
-                format: 'dd MMM',
+            grid: {
+                borderColor: '#e7e7e7',
+                strokeDashArray: 5
+            },
+            noData: {
+                text: 'Belum ada data presensi',
+                align: 'center',
+                verticalAlign: 'middle',
                 style: {
-                    fontSize: '12px'
+                    fontSize: '16px'
                 }
             }
-        },
-        yaxis: {
-            min: 0,
-            max: Math.max(totalGuruYayasan, 10), // Minimal 10 untuk tampilan
-            tickAmount: 7,
-            labels: {
-                formatter: function(value) {
-                    return Math.round(value);
-                }
-            }
-        },
-        markers: {
-            size: 4,
-            hover: {
-                size: 6
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'smooth',
-            width: 3
-        },
-        legend: {
-            show: true,
-            position: 'top',
-            horizontalAlign: 'center'
-        },
-        tooltip: {
-            x: {
-                format: 'dd MMM yyyy'
-            },
-            y: {
-                formatter: function(value) {
-                    return value + ' guru';
-                }
-            }
-        },
-        grid: {
-            borderColor: '#e7e7e7',
-            strokeDashArray: 5
-        },
-        noData: {
-            text: 'Belum ada data presensi',
-            align: 'center',
-            verticalAlign: 'middle',
-            style: {
-                fontSize: '16px'
-            }
-        }
-    };
-
-    var chart = new ApexCharts(document.querySelector("#chart"), options);
-    chart.render();
-
-    // Fungsi untuk update tanggal di card
-    function updateDateDisplay() {
-        var today = new Date();
-        var dateOptions = {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
         };
-        var dateString = today.toLocaleDateString('id-ID', dateOptions);
 
-        var cardBody = document.querySelector("#chart").closest('.card-body');
-        var dateElement = cardBody.querySelector('.chart-date');
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
 
-        if (!dateElement) {
-            dateElement = document.createElement('div');
-            dateElement.className = 'chart-date text-center mt-3';
-            dateElement.style.color = '#6c757d';
-            dateElement.style.fontSize = '14px';
-            cardBody.appendChild(dateElement);
+        // Fungsi untuk update tanggal di card
+        function updateDateDisplay() {
+            var today = new Date();
+            var dateOptions = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            var dateString = today.toLocaleDateString('id-ID', dateOptions);
+
+            var cardBody = document.querySelector("#chart").closest('.card-body');
+            var dateElement = cardBody.querySelector('.chart-date');
+
+            if (!dateElement) {
+                dateElement = document.createElement('div');
+                dateElement.className = 'chart-date text-center mt-3';
+                dateElement.style.color = '#6c757d';
+                dateElement.style.fontSize = '14px';
+                cardBody.appendChild(dateElement);
+            }
+
+            dateElement.innerHTML = '<strong>Terakhir update:</strong> ' + dateString;
         }
 
-        dateElement.innerHTML = '<strong>Terakhir update:</strong> ' + dateString;
-    }
-
-    updateDateDisplay();
-</script>
+        updateDateDisplay();
+    </script>
 @endpush
 
 {{-- INI YSS --}}

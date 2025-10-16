@@ -8,133 +8,87 @@
             </div>
         </div>
 
+
+        @php
+            $user = auth()->user();
+        @endphp
+
         <!-- Header Greeting -->
-        <div class="header-greeting mb-4">
-            <h2 class="greeting-title">Halo, Pak Aziz 👋</h2>
+        {{-- <div class="header-greeting mb-4">
+            <h2 class="greeting-title">Halo, {{ $user->name }}</h2>
             <p class="greeting-subtitle">{{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM YYYY') }}</p>
-        </div>
+        </div> --}}
 
         <!-- Status Kehadiran Hari Ini -->
         <div class="row">
-            <div class="col-12">
-                <h6 class="mb-3 font-weight-bold text-dark">Status Kehadiran Hari Ini</h6>
-            </div>
-
-            @forelse($presensiHariIni as $presensi)
-                <div class="col-lg-6 col-12 mb-3">
-                    <div class="card card-attendance shadow-sm">
-                        <div class="card-body">
-                            <div class="card-title-custom">
-                                <div class="school-icon-custom">
-                                    <i class="fas fa-school"></i>
-                                </div>
-                                <h6 class="school-name">{{ $presensi->instansi->nama_instansi ?? 'N/A' }}</h6>
-                            </div>
-
-                            <div class="info-row-custom">
-                                <span class="emoji-icon">📅</span>
-                                <div class="info-content">
-                                    <span class="info-label-custom">Jadwal:</span>
-                                    <span class="info-text-custom">
-                                        Datang <span class="time-highlight">{{ $presensi->jadwal->datang ?? '--:--' }}</span> |
-                                        Pulang <span class="time-highlight">{{ $presensi->jadwal->pulang ?? '--:--' }}</span>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="info-row-custom">
-                                <span class="emoji-icon">🕓</span>
-                                <div class="info-content">
-                                    <span class="info-label-custom">Absensi:</span>
-                                    <span class="info-text-custom">
-                                        Datang
-                                        @if($presensi->datang)
-                                            <span class="time-highlight">{{ \Carbon\Carbon::parse($presensi->datang)->format('H:i') }}</span>
-                                        @else
-                                            <span class="time-empty">—</span>
-                                        @endif
-                                        | Pulang
-                                        @if($presensi->pulang)
-                                            <span class="time-highlight">{{ \Carbon\Carbon::parse($presensi->pulang)->format('H:i') }}</span>
-                                        @else
-                                            <span class="time-empty">—</span>
-                                        @endif
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="divider-custom"></div>
-
-                            <div class="info-row-custom">
-                                <span class="emoji-icon">📊</span>
-                                <div class="info-content">
-                                    <span class="info-label-custom">Status:</span>
-                                    @if($presensi->datang && $presensi->pulang)
-                                        <span class="status-badge-custom status-success-custom">
-                                            Hadir Tepat Waktu ✅
-                                        </span>
-                                    @elseif($presensi->datang && !$presensi->pulang)
-                                        <span class="status-badge-custom status-warning-custom">
-                                            Belum Pulang ⚠️
-                                        </span>
-                                    @else
-                                        <span class="status-badge-custom status-danger-custom">
-                                            Belum Absen ❌
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @empty
+            {{-- cek kalau user tenaga pendidik dan tidak punya jadwal hari ini --}}
+            @if (auth()->user()->hasAnyRole('tenaga_pendidik') && $jadwalHariIni->isEmpty())
                 <div class="col-12 mb-3">
-                    <div class="alert alert-info">
-                        <i class="fa-solid fa-info-circle"></i> Belum ada presensi hari ini
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fa-solid fa-exclamation-triangle"></i> Anda tidak memiliki jadwal pada hari ini.
                     </div>
                 </div>
-            @endforelse
-        </div>
-
-        <!-- Rekap Bulan Ini -->
-        <div class="row">
-            <div class="col-12">
-                <h6 class="mb-3 font-weight-bold text-dark">Rekap Bulan Ini ({{ \Carbon\Carbon::now()->locale('id')->isoFormat('MMMM YYYY') }})</h6>
-            </div>
-            <div class="col-12 mb-4">
-                <div class="card card-rekap shadow-sm">
-                    <div class="card-body">
-                        <div class="card-title-custom">
-                            <div class="school-icon-custom">
-                                <i class="fas fa-calendar-days"></i>
-                            </div>
-                            <h6 class="school-name">Ringkasan Kehadiran</h6>
-                        </div>
-
-                        <div class="rekap-grid-custom">
-                            @foreach($presensiHariIni as $presensi)
-                                <div class="rekap-item-custom">
-                                    <span class="rekap-label-custom">🏫 {{ Str::limit($presensi->instansi->nama_instansi ?? 'N/A', 20) }}</span>
-                                    <div class="rekap-value-custom">H20 · I2 · A1</div>
+            @else
+                {{-- tampilkan card presensi --}}
+                @forelse($presensiHariIni as $presensi)
+                    <div class="col-lg-6 col-12 mb-4">
+                        <div class="card shadow-sm border-0 rounded-lg hover-shadow"
+                            style="transition: all 0.3s; border-left: 6px solid #4e73df;">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <h6 class="text-primary mb-0">
+                                        <i
+                                            class="fa-solid fa-building mr-2"></i>{{ $presensi->instansi->nama_instansi ?? 'N/A' }}
+                                    </h6>
+                                    <span class="badge badge-light text-primary">{{ now()->format('d M Y') }}</span>
                                 </div>
-                            @endforeach
+                                <hr>
+                                <div class="small text-muted mb-1">Jadwal</div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <strong>{{ $presensi->jadwal->datang ?? '07:00' }}</strong><br><small>Datang</small>
+                                    </div>
+                                    <div>
+                                        <strong>{{ $presensi->jadwal->pulang ?? '14:00' }}</strong><br><small>Pulang</small>
+                                    </div>
+                                </div>
+                                <div class="small text-muted mb-1">Absensi</div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <strong>{{ $presensi->datang ? \Carbon\Carbon::parse($presensi->datang)->format('H:i') : '—' }}</strong><br>
+                                        <small>Datang</small>
+                                    </div>
+                                    <div>
+                                        <strong>{{ $presensi->pulang ? \Carbon\Carbon::parse($presensi->pulang)->format('H:i') : '—' }}</strong><br>
+                                        <small>Pulang</small>
+                                    </div>
+                                </div>
+                                @if ($presensi->datang && $presensi->pulang)
+                                    <span class="badge badge-success px-3 py-1 rounded-pill">Hadir Tepat Waktu</span>
+                                @elseif($presensi->datang && !$presensi->pulang)
+                                    <span class="badge badge-warning px-3 py-1 rounded-pill">Belum Pulang</span>
+                                @else
+                                    <span class="badge badge-warning px-3 py-1 rounded-pill">Belum Absen</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                @empty
+                    <div class="col-12 mb-3">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fa-solid fa-exclamation-triangle"></i> Belum ada data presensi untuk hari ini.
+                        </div>
+                    </div>
+                @endforelse
+            @endif
         </div>
 
-        <!-- Riwayat Absensi -->
+        <!-- Rekap Bulan Ini     -->
         <div class="row">
-            <div class="col-12">
-                <h6 class="mb-3 font-weight-bold text-dark">Riwayat Absensi Minggu Ini</h6>
-            </div>
-            <div class="col-12">
+            <div class="col-lg-8 col-md-12 col-12 col-sm-12 mb-4">
                 <div class="card card-custom shadow-sm">
                     <div class="card-header">
-                        <h6 class="font-weight-bold text-dark mb-0">
-                            <i class="fa-solid fa-clock-rotate-left text-primary"></i> Riwayat Absensi
-                        </h6>
+                        <h6 class="font-weight-bold text-dark mb-0">Riwayat Absensi Minggu Ini</h6>
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled history-list">
@@ -148,44 +102,89 @@
                                         <div class="history-location">
                                             {{ $presensiPerHari->pluck('instansi.nama_instansi')->filter()->implode(' - ') }}
                                         </div>
-
                                         @php
                                             $semuaHadir = $presensiPerHari->every(fn($p) => $p->datang && $p->pulang);
-                                            $adaIzin = $presensiPerHari->contains(fn($p) => $p->keterangan == 'izin' || $p->status == 'izin');
-                                            $adaBelumPulang = $presensiPerHari->contains(fn($p) => $p->datang && !$p->pulang);
+                                            $adaIzin = $presensiPerHari->contains(
+                                                fn($p) => $p->keterangan == 'izin' || $p->status == 'izin',
+                                            );
+                                            $adaBelumPulang = $presensiPerHari->contains(
+                                                fn($p) => $p->datang && !$p->pulang,
+                                            );
                                             $semuaAlpha = $presensiPerHari->every(fn($p) => !$p->datang);
                                         @endphp
-
-                                        @if($semuaHadir)
-                                            <div class="history-status status-present">
-                                                <i class="fa-solid fa-circle-check"></i> Hadir
-                                            </div>
+                                        @if ($semuaHadir)
+                                            <div class="history-status status-present"><i
+                                                    class="fa-solid fa-circle-check"></i> Hadir</div>
                                         @elseif($adaIzin)
-                                            <div class="history-status status-leave">
-                                                <i class="fa-solid fa-file-lines"></i> Izin
-                                            </div>
+                                            <div class="history-status status-leave"><i class="fa-solid fa-file-lines"></i>
+                                                Izin</div>
                                         @elseif($adaBelumPulang)
-                                            <div class="history-status status-leave">
-                                                <i class="fa-solid fa-clock"></i> Belum Pulang
-                                            </div>
+                                            <div class="history-status status-leave"><i class="fa-solid fa-clock"></i> Belum
+                                                Pulang</div>
                                         @elseif($semuaAlpha)
-                                            <div class="history-status status-absent">
-                                                <i class="fa-solid fa-circle-xmark"></i> Alpha
-                                            </div>
+                                            <div class="history-status status-absent"><i
+                                                    class="fa-solid fa-circle-xmark"></i> Alpha</div>
                                         @else
-                                            <div class="history-status status-leave">
-                                                <i class="fa-solid fa-clock"></i> Sebagian Hadir
-                                            </div>
+                                            <div class="history-status status-leave"><i class="fa-solid fa-clock"></i>
+                                                Sebagian Hadir</div>
                                         @endif
                                     </div>
                                 </li>
                             @empty
-                                <li class="text-center text-muted py-4">
-                                    <i class="fa-solid fa-inbox"></i><br>
-                                    Belum ada riwayat presensi minggu ini
-                                </li>
+                                <li class="text-center text-muted py-4"><i class="fa-solid fa-inbox"></i><br>Belum ada
+                                    riwayat presensi minggu ini</li>
                             @endforelse
                         </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-12 col-12 col-sm-12">
+                <!-- Ringkasan Kehadiran Hari Ini -->
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <h4>Ringkasan Kehadiran</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="font-weight-bold">
+                                    Hadir
+                                </span>
+                                <span class="badge badge-success badge-pill">15</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 75%"
+                                    aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="font-weight-bold">
+                                    Izin
+                                </span>
+                                <span class="badge badge-warning badge-pill">3</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 15%"
+                                    aria-valuenow="15" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="font-weight-bold">
+                                    Alpha
+                                </span>
+                                <span class="badge badge-danger badge-pill">2</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 10%" aria-valuenow="10"
+                                    aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

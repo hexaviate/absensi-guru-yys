@@ -320,10 +320,9 @@
                             </h6>
 
                             <!-- Info Presensi -->
-                            {{-- <small class="text-muted" id="info-presensi">
-                            <i class="fas fa-info-circle me-1"></i>
-                            Anda Sudah Absensi (datang / pulang) Hari Ini
-                        </small> --}}
+                            <small class="text-muted" id="info-presensi" style="display:none;">
+
+                            </small>
 
                             <!-- lokasi -->
                             <div class="p-3 text-center mb-2">
@@ -798,10 +797,23 @@
                                 })
                                 .then(res => res.json())
                                 .then(data => {
-                                    console.log("Response Laravel:", data);
+                                    const infoPresensi = document.getElementById('info-presensi');
+
+                                    if (data.datang && data.pulang) {
+                                        infoPresensi.textContent = 'Anda sudah melakukan presensi hari ini.';
+                                    } else if (data.pulang) {
+                                        infoPresensi.textContent = 'Anda sudah mencatat presensi pulang.';
+                                    } else if (data.datang) {
+                                        infoPresensi.textContent = 'Anda sudah mencatat presensi datang.';
+                                    } else {
+                                        infoPresensi.textContent = 'Tidak mencatat presensi.';
+                                    }
+
+                                    infoPresensi.style.display = 'block';
+                                })
 
 
-                                });
+
 
                             if (hasil.valid) {
                                 if (statusMessage) {
@@ -916,12 +928,14 @@
                     startCamera(currentCameraIndex);
                 }
             });
-        </script>
 
-        {{-- modal  --}}
 
-        <script>
-            const tutorialModal = document.getElementById('tutorialModal');
+
+            // {{-- modal  --}}
+
+            <
+            script >
+                const tutorialModal = document.getElementById('tutorialModal');
             tutorialModal.addEventListener('click', function(e) {
                 if (e.target === tutorialModal) {
                     const modalInstance = bootstrap.Modal.getInstance(tutorialModal);

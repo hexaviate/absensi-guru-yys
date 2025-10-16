@@ -29,100 +29,32 @@ class PresensiController extends Controller
     }
 
     public function prosesPresensi(Request $request)
-    {
+{
+    $user = auth()->user();
+    $now = Carbon::now();
+    $hariIni = Carbon::now()->isoFormat('dddd');
+    $tapelAktif = Tapel::where('status', "aktif")->first();
 
-        $user = auth()->user(); //diubah ketika final, nanti diisi user id
-        $now = Carbon::now();
+    $jadwal = Jadwal::where('user_id', $user->id)
+        ->where('instansi_id', $request->instansi_id)
+        ->where('hari', $hariIni)
+        ->where('tapel_id', $tapelAktif->id)
+        ->first();
 
-        //*Mengambil Hari Saat ini
-        $hariIni = Carbon::now()->isoFormat('dddd');
+    $presensiHariIni = Presensi::where('user_id', $user->id)
+        ->where('instansi_id', $request->instansi_id)
+        ->whereDate('created_at', $now->toDateString())
+        ->first();
 
-        $tapelAktif = Tapel::where('status', "aktif")->first();
+    $token = '74SPnec8JM2KKXmKDNSz';
 
-        //* mengambil jadwal user dan guru
-        $jadwal = Jadwal::where('user_id', $user->id)->where('instansi_id', $request->instansi_id)->where('hari', $hariIni)->where('tapel_id', $tapelAktif->id)->first();
-
-        // Cek apakah user sudah pernah presensi hari ini untuk instansi ini, dengan menggunakan created_at
-        $presensiHariIni = Presensi::where('user_id', $user->id)
-            ->where('instansi_id', $request->instansi_id)
-            ->whereDate('created_at', $now->toDateString())
-            ->first();
-
-        $token = '74SPnec8JM2KKXmKDNSz';
-
-
-        //? tidak ada jadwal
-        if (!$jadwal) {
-            if (!$presensiHariIni) {
-                if ($now->greaterThan(Carbon::createFromTime('06', '00', '00')) && $now->lessThan(Carbon::createFromTime('12', '00', '00'))) {
-                    Presensi::create([
-                        'instansi_id' => $request->instansi_id,
-                        "user_id" => $user->id, //diubah ketika testing final, nanti diisi user id
-                        "tapel_id" => $tapelAktif->id,
-                        "datang" => Carbon::now(),
-                        "status" => 'hadir',
-                        'tanggal' => Carbon::now()->toDateString(),
-                        'akurasi' => $request->akurasi,
-                        'userAgent' => $request->userAgent()
-                    ]);
-
-                    return response()->json([
-                        "status" => 'anda berhasil absensi tidak ada jadwal hari ini' //status diganti ke return view blade
-                    ]);
-                } elseif ($now->greaterThan(Carbon::createFromTime('12', '00', '00')) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) {
-                    Presensi::create([
-                        'instansi_id' => $request->instansi_id,
-                        "user_id" => $user->id, //diubah ketika testing final, nanti diisi user id
-                        "tapel_id" => $tapelAktif->id,
-                        "pulang" => Carbon::now(),
-                        "status" => 'hadir',
-                        'tanggal' => Carbon::now()->toDateString(),
-                        'akurasi' => $request->akurasi,
-                        'userAgent' => $request->userAgent()
-                    ]);
-                    return response()->json([
-                        "status" => 'anda berhasil absensi pulang dan tidak ada jadwal hari ni' //status diganti ke return view blade
-                    ]);
-                } else {
-                    return response()->json([
-                        "status" => 'absen belum dibuka'
-                    ]); // status diganti ke return view blade
-                }
-            } else if (!$presensiHariIni->pulang) {
-                // dd($now);
-                if ($now->greaterThan(Carbon::createFromTime('12', '00', '00')) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) {
-
-                    $presensiHariIni->update([
-                        "pulang" => now()
-                    ]);
-                    return response()->json([
-                        "status" => 'anda berhasil absensi pulang'
-                    ]);
-                }
-            } else if ($presensiHariIni) {
-                if ($now->greaterThan(Carbon::createFromTime('06', '00', '00')) && $now->lessThan(Carbon::createFromTime('12', '00', '00'))) {
-                    return response()->json([
-                        "status" => 'anda telah absensi datang' //status diganti ke return view blade
-                    ]);
-                } else {
-                    return response()->json([
-                        'status' => 'anda tidak ada absen dan diluar jadwal pulang ataupun datamg'
-                    ]);
-                }
-            }
-        }
-
-        //mengambil jam datang dan pulang dari jadwal
-        $jamDatang = Carbon::parse($jadwal->datang);
-        $jamPulang = Carbon::parse($jadwal->pulang);
-
-
-        // jika belum ada presensi
+    // Tidak ada jadwal
+    if (!$jadwal) {
         if (!$presensiHariIni) {
-            if ($now->lessThan($jamPulang) && $now->greaterThan(Carbon::createFromTime('6', '00', '00'))) {
+            if ($now->greaterThan(Carbon::createFromTime('06', '00', '00')) && $now->lessThan(Carbon::createFromTime('12', '00', '00'))) {
                 Presensi::create([
                     'instansi_id' => $request->instansi_id,
-                    "user_id" => $user->id, //diubah ketika testing final, nanti diisi user id
+                    "user_id" => $user->id,
                     "tapel_id" => $tapelAktif->id,
                     "datang" => Carbon::now(),
                     "status" => 'hadir',
@@ -131,13 +63,20 @@ class PresensiController extends Controller
                     'userAgent' => $request->userAgent()
                 ]);
 
+                $presensiHariIni = Presensi::where('user_id', $user->id)
+                    ->where('instansi_id', $request->instansi_id)
+                    ->whereDate('created_at', $now->toDateString())
+                    ->first();
+
                 return response()->json([
-                    "status" => 'anda berhasil absensi' //status diganti ke return view blade
+                    "status" => 'anda berhasil absensi tidak ada jadwal hari ini',
+                    "datang" => $presensiHariIni->datang ?? null,
+                    "pulang" => $presensiHariIni->pulang ?? null
                 ]);
-            } elseif ($now->greaterThan($jamPulang) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) { //!masih dipertanyakan
+            } elseif ($now->greaterThan(Carbon::createFromTime('12', '00', '00')) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) {
                 Presensi::create([
                     'instansi_id' => $request->instansi_id,
-                    "user_id" => $user->id, //diubah ketika testing final, nanti diisi user id
+                    "user_id" => $user->id,
                     "tapel_id" => $tapelAktif->id,
                     "pulang" => Carbon::now(),
                     "status" => 'hadir',
@@ -146,66 +85,150 @@ class PresensiController extends Controller
                     'userAgent' => $request->userAgent()
                 ]);
 
-                return response()->json([
-                    "status" => 'anda berhasil absensi pulang' //status diganti ke return view blade
-                ]);
+                $presensiHariIni = Presensi::where('user_id', $user->id)
+                    ->where('instansi_id', $request->instansi_id)
+                    ->whereDate('created_at', $now->toDateString())
+                    ->first();
 
+                return response()->json([
+                    "status" => 'anda berhasil absensi pulang dan tidak ada jadwal hari ni',
+                    "datang" => $presensiHariIni->datang ?? null,
+                    "pulang" => $presensiHariIni->pulang ?? null
+                ]);
             } else {
                 return response()->json([
-                    "status" => 'absen belum dibuka'
-                ]); // status diganti ke return view blade
+                    "status" => 'absen belum dibuka',
+                    "datang" => null,
+                    "pulang" => null
+                ]);
             }
         } else if (!$presensiHariIni->pulang) {
-            // dd($now);
-            if ($now->greaterThan($jamPulang) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) {
-
+            if ($now->greaterThan(Carbon::createFromTime('12', '00', '00')) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) {
                 $presensiHariIni->update([
                     "pulang" => now()
                 ]);
+
+                $presensiHariIni = Presensi::where('user_id', $user->id)
+                    ->where('instansi_id', $request->instansi_id)
+                    ->whereDate('created_at', $now->toDateString())
+                    ->first();
+
                 return response()->json([
-                    "status" => 'anda berhasil absensi pulang'
+                    "status" => 'anda berhasil absensi pulang',
+                    "datang" => $presensiHariIni->datang ?? null,
+                    "pulang" => $presensiHariIni->pulang ?? null
                 ]);
             }
         } else if ($presensiHariIni) {
-            if ($now->lessThan($jamPulang) && $now->greaterThan(Carbon::createFromTime('06', '00', '00'))) {
+            if ($now->greaterThan(Carbon::createFromTime('06', '00', '00')) && $now->lessThan(Carbon::createFromTime('12', '00', '00'))) {
                 return response()->json([
-                    "status" => 'anda telah absensi datang' //status diganti ke return view blade
+                    "status" => 'anda telah absensi datang',
+                    "datang" => $presensiHariIni->datang ?? null,
+                    "pulang" => $presensiHariIni->pulang ?? null
                 ]);
             } else {
                 return response()->json([
-                    'status' => 'anda telah absen hari ini'
+                    'status' => 'anda tidak ada absen dan diluar jadwal pulang ataupun datang',
+                    "datang" => $presensiHariIni->datang ?? null,
+                    "pulang" => $presensiHariIni->pulang ?? null
                 ]);
             }
         }
-
-        return response()->json([
-            "status" => 'invalid'
-        ]);
-
-
-        //* kebutuhan testing saja
-
-        //  else if ($now > $jamPulang && $now->lessThan(Carbon::createFromTime('18', '00', '00'))){
-
-        //     }
-
-        // Presensi::create([
-        //     'instansi_id' => $request->instansi_id,
-        //     "user_id" => 3,
-        //     "datang" => Carbon::now(),
-        //     "pulang" => Carbon::now(),
-        //     "status" => 'hadir',
-        //     'tanggal' => Carbon::parse('19 August 2025')->toDateString(),
-        //     'akurasi' => $request->akurasi,
-        //     'userAgent' => $request->userAgent()
-        // ]);
-
-        // return response()->json([
-        //     "instansi" => $request->instansi_id,
-        //     "akurasi" => $request->akurasi,
-        //     "userAgent" => $request->userAgent
-        // ]);
-
-
     }
+
+    $jamDatang = Carbon::parse($jadwal->datang);
+    $jamPulang = Carbon::parse($jadwal->pulang);
+
+    // Jika belum ada presensi
+    if (!$presensiHariIni) {
+        if ($now->lessThan($jamPulang) && $now->greaterThan(Carbon::createFromTime('6', '00', '00'))) {
+            Presensi::create([
+                'instansi_id' => $request->instansi_id,
+                "user_id" => $user->id,
+                "tapel_id" => $tapelAktif->id,
+                "datang" => Carbon::now(),
+                "status" => 'hadir',
+                'tanggal' => Carbon::now()->toDateString(),
+                'akurasi' => $request->akurasi,
+                'userAgent' => $request->userAgent()
+            ]);
+
+            $presensiHariIni = Presensi::where('user_id', $user->id)
+                ->where('instansi_id', $request->instansi_id)
+                ->whereDate('created_at', $now->toDateString())
+                ->first();
+
+            return response()->json([
+                "status" => 'anda berhasil absensi',
+                "datang" => $presensiHariIni->datang ?? null,
+                "pulang" => $presensiHariIni->pulang ?? null
+            ]);
+        } elseif ($now->greaterThan($jamPulang) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) {
+            Presensi::create([
+                'instansi_id' => $request->instansi_id,
+                "user_id" => $user->id,
+                "tapel_id" => $tapelAktif->id,
+                "pulang" => Carbon::now(),
+                "status" => 'hadir',
+                'tanggal' => Carbon::now()->toDateString(),
+                'akurasi' => $request->akurasi,
+                'userAgent' => $request->userAgent()
+            ]);
+
+            $presensiHariIni = Presensi::where('user_id', $user->id)
+                ->where('instansi_id', $request->instansi_id)
+                ->whereDate('created_at', $now->toDateString())
+                ->first();
+
+            return response()->json([
+                "status" => 'anda berhasil absensi pulang',
+                "datang" => $presensiHariIni->datang ?? null,
+                "pulang" => $presensiHariIni->pulang ?? null
+            ]);
+        } else {
+            return response()->json([
+                "status" => 'absen belum dibuka',
+                "datang" => null,
+                "pulang" => null
+            ]);
+        }
+    } else if (!$presensiHariIni->pulang) {
+        if ($now->greaterThan($jamPulang) && $now->lessThan(Carbon::createFromTime('18', '00', '00'))) {
+            $presensiHariIni->update([
+                "pulang" => now()
+            ]);
+
+            $presensiHariIni = Presensi::where('user_id', $user->id)
+                ->where('instansi_id', $request->instansi_id)
+                ->whereDate('created_at', $now->toDateString())
+                ->first();
+
+            return response()->json([
+                "status" => 'anda berhasil absensi pulang',
+                "datang" => $presensiHariIni->datang ?? null,
+                "pulang" => $presensiHariIni->pulang ?? null
+            ]);
+        }
+    } else if ($presensiHariIni) {
+        if ($now->lessThan($jamPulang) && $now->greaterThan(Carbon::createFromTime('06', '00', '00'))) {
+            return response()->json([
+                "status" => 'anda telah absensi datang',
+                "datang" => $presensiHariIni->datang ?? null,
+                "pulang" => $presensiHariIni->pulang ?? null
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'anda telah absen hari ini',
+                "datang" => $presensiHariIni->datang ?? null,
+                "pulang" => $presensiHariIni->pulang ?? null
+            ]);
+        }
+    }
+
+    return response()->json([
+        "status" => 'invalid',
+        "datang" => null,
+        "pulang" => null
+    ]);
+}
 }
