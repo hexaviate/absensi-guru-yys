@@ -151,11 +151,12 @@
                                 <span class="font-weight-bold">
                                     Hadir
                                 </span>
-                                <span class="badge badge-success badge-pill">15</span>
+                                <span class="badge badge-success badge-pill">{{ $presensiBulanIni }}</span>
                             </div>
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 75%"
-                                    aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                          <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success " role="progressbar"
+                                    style="width: {{ $persentaseHadir }}%;"
+                                    aria-valuenow="{{ $persentaseHadir }}" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div>
                         </div>
@@ -164,11 +165,12 @@
                                 <span class="font-weight-bold">
                                     Izin
                                 </span>
-                                <span class="badge badge-warning badge-pill">3</span>
+                                <span class="badge badge-warning badge-pill">{{ $izinBulanIni }}</span>
                             </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 15%"
-                                    aria-valuenow="15" aria-valuemin="0" aria-valuemax="100">
+                           <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-waring" role="progressbar"
+                                    style="width: {{ $persentaseIzin }}%;"
+                                    aria-valuenow="{{ $persentaseIzin }}" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div>
                         </div>
@@ -177,11 +179,12 @@
                                 <span class="font-weight-bold">
                                     Alpha
                                 </span>
-                                <span class="badge badge-danger badge-pill">2</span>
+                                <span class="badge badge-danger badge-pill">{{ $tidakHadirBulanIni }}</span>
                             </div>
                             <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: 10%" aria-valuenow="10"
-                                    aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar bg-danger" role="progressbar"
+                                    style="width: {{ $persentaseTidakHadir }}%;"
+                                    aria-valuenow="{{ $persentaseTidakHadir }}" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div>
                         </div>

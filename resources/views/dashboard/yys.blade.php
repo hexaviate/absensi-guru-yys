@@ -264,114 +264,40 @@
 
         // Data dari controller
         const totalGuruYayasan = {{ $totalSemuaGuru }};
-        const guruHadirHariIni = {{ $guruHadirHariIni->count() }};
-        const guruIzinHariIni = {{ $totalGuruIzin ?? 0 }};
+        const statistikHariIni = @json($statistikHariIni);
 
         console.log('Total Guru:', totalGuruYayasan);
-        console.log('Hadir Hari Ini:', guruHadirHariIni);
-        console.log('Izin Hari Ini:', guruIzinHariIni);
+        console.log('Statistik Hari Ini:', statistikHariIni);
 
-        // Ambil data presensi 14 hari terakhir dari database
+        // Ambil data presensi 14 hari terakhir dari database (langsung dari controller)
         let hadirData = [];
         let izinData = [];
+        let tidakHadirData = [];
 
-        @php
-            use Carbon\Carbon;
-            use App\Models\Presensi;
-            use App\Models\User;
-
-            $chartData = [];
-            $user = auth()->user();
-
-            // Ambil semua instansi_id yang terkait dengan user (many-to-many)
-            $instansiIds = [];
-
-            try {
-                // Ambil semua instansi yang terkait dengan user
-                if (method_exists($user, 'instansi')) {
-                    // Jika relasi bernama 'instansi' (singular)
-                    $instansiIds = $user->instansi()->pluck('instansi_id')->toArray();
-
-                    // Jika tidak ada, coba ambil kolom 'id'
-                    if (empty($instansiIds)) {
-                        $instansiIds = $user->instansi()->pluck('id')->toArray();
-                    }
-                } elseif (method_exists($user, 'instansis')) {
-                    // Jika relasi bernama 'instansis' (plural)
-                    $instansiIds = $user->instansis()->pluck('instansi_id')->toArray();
-
-                    if (empty($instansiIds)) {
-                        $instansiIds = $user->instansis()->pluck('id')->toArray();
-                    }
-                }
-
-                // Jika masih kosong, ambil dari presensi terakhir
-                if (empty($instansiIds)) {
-                    $lastPresensi = Presensi::where('user_id', $user->id)->latest()->first();
-                    if ($lastPresensi) {
-                        $instansiIds = [$lastPresensi->instansi_id];
-                    }
-                }
-            } catch (\Exception $e) {
-                // Jika error, set kosong (akan ambil semua data)
-                $instansiIds = [];
-            }
-
-            // Hitung total guru
-            $totalGuru = $totalSemuaGuru ?? 0;
-
-            for ($i = 13; $i >= 0; $i--) {
-                $tanggal = Carbon::now()->subDays($i);
-
-                // Query dasar
-                $queryHadir = Presensi::whereDate('tanggal', $tanggal->toDateString())->where('status', 'hadir');
-
-                $queryIzin = Presensi::whereDate('tanggal', $tanggal->toDateString())->where('status', 'izin');
-
-                // Filter dengan whereIn untuk many-to-many
-                if (!empty($instansiIds) && count($instansiIds) > 0) {
-                    $queryHadir->whereIn('instansi_id', $instansiIds);
-                    $queryIzin->whereIn('instansi_id', $instansiIds);
-                }
-
-                // Hitung hadir (yang ada datang ATAU pulang)
-                $hadir = $queryHadir
-                    ->where(function ($query) {
-                        $query->whereNotNull('datang')->orWhereNotNull('pulang');
-                    })
-                    ->distinct('user_id')
-                    ->count('user_id');
-
-                // Hitung izin
-                $izin = $queryIzin->distinct('user_id')->count('user_id');
-
-                $chartData[] = [
-                    'timestamp' => $tanggal->timestamp * 1000,
-                    'tanggal' => $tanggal->format('Y-m-d'),
-                    'hadir' => $hadir,
-                    'izin' => $izin,
-                ];
-            }
-        @endphp
-
-        // Populate data dari PHP ke JavaScript
+        // Data sudah disiapkan di controller
         const dataFromDB = @json($chartData);
 
-        console.log('Data Chart:', dataFromDB);
+        console.log('Data Chart dari Controller:', dataFromDB);
 
+        // Populate data dari PHP ke JavaScript
         dataFromDB.forEach(function(item) {
             hadirData.push({
-                x: item.timestamp,
+                x: new Date(item.tanggal).getTime(),
                 y: item.hadir
             });
             izinData.push({
-                x: item.timestamp,
+                x: new Date(item.tanggal).getTime(),
                 y: item.izin
+            });
+            tidakHadirData.push({
+                x: new Date(item.tanggal).getTime(),
+                y: item.tidak_hadir
             });
         });
 
         console.log('Hadir Data:', hadirData);
         console.log('Izin Data:', izinData);
+        console.log('Tidak Hadir Data:', tidakHadirData);
 
         // Konfigurasi chart
         var options = {
@@ -382,6 +308,10 @@
                 {
                     name: 'Izin',
                     data: izinData
+                },
+                {
+                    name: 'Tidak Hadir',
+                    data: tidakHadirData
                 }
             ],
             chart: {
@@ -455,7 +385,7 @@
                 },
                 y: {
                     formatter: function(value) {
-                        return value + ' guru';
+                        return Math.round(value) + ' guru';
                     }
                 }
             },
