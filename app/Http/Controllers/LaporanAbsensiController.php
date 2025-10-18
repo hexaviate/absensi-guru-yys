@@ -5,17 +5,166 @@ namespace App\Http\Controllers;
 use App\Exports\RekapHarianExport;
 use App\Exports\RekapBulananExport;
 use App\Exports\RekapTahunanExport;
+use App\Models\HariLibur;
 use App\Models\Instansi;
 use App\Models\Presensi;
+use App\Models\TidakHadir;
 use App\Models\Tapel;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class LaporanAbsensiController extends Controller
 {
+    /**
+     * Proses pengecekan alpa otomatis untuk semua user
+     * Dipanggil setiap hari jam 14:00 via scheduler
+     */
+    public function prosesAlpaOtomatis()
+    {
+        try {
+            $today = Carbon::today();
+            $jam14 = Carbon::today()->setTime(14, 0, 0);
+
+            // Cek apakah sudah lewat jam 14:00
+            if (Carbon::now()->lt($jam14)) {
+                Log::info('Belum waktunya proses alpa (sebelum jam 14:00)');
+                return;
+            }
+
+            // Ambil semua user yang memiliki instansi
+            $users = User::whereHas('instansi')->with('instansi')->get();
+
+            foreach ($users as $user) {
+                foreach ($user->instansi as $instansi) {
+                    // Cek apakah instansi adalah SMK
+                    $isSMK = strtoupper($instansi->nama_instansi) === 'SMK';
+
+                    // Skip jika hari ini adalah hari libur untuk instansi ini
+                    $isLibur = false;
+
+                    // Jika SMK dan hari Jumat, skip
+                    if ($isSMK && $today->dayOfWeek == 5) {
+                        continue;
+                    }
+
+                    // Cek hari libur resmi
+                    $hariLibur = HariLibur::whereDate('tanggal', $today)
+                        ->where('instansi_id', $instansi->id)
+                        ->exists();
+
+                    if ($hariLibur) {
+                        continue;
+                    }
+
+                    // Cek apakah user sudah presensi hadir hari ini
+                    $sudahHadir = Presensi::where('user_id', $user->id)
+                        ->where('instansi_id', $instansi->id)
+                        ->whereDate('tanggal', $today)
+                        ->where('status', 'hadir')
+                        ->exists();
+
+                    // Cek apakah user sudah izin hari ini
+                    $sudahIzin = Presensi::where('user_id', $user->id)
+                        ->where('instansi_id', $instansi->id)
+                        ->whereDate('tanggal', $today)
+                        ->where('status', 'izin')
+                        ->exists();
+
+                    // Jika tidak hadir dan tidak izin, tambahkan ke tabel tidak_hadirs
+                    if (!$sudahHadir && !$sudahIzin) {
+                        // Cek apakah sudah ada record di tidak_hadirs
+                        $tidakHadirExists = TidakHadir::where('user_id', $user->id)
+                            ->where('instansi_id', $instansi->id)
+                            ->whereDate('tanggal', $today)
+                            ->exists();
+
+                        if (!$tidakHadirExists) {
+                            TidakHadir::create([
+                                'user_id' => $user->id,
+                                'instansi_id' => $instansi->id,
+                                'tanggal' => $today,
+                                'keterangan' => 'Alpa otomatis - tidak presensi sampai jam 14:00'
+                            ]);
+
+                            Log::info('Alpa otomatis ditambahkan:', [
+                                'user_id' => $user->id,
+                                'user_name' => $user->name,
+                                'instansi_id' => $instansi->id,
+                                'tanggal' => $today->toDateString()
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            Log::info('Proses alpa otomatis selesai untuk tanggal: ' . $today->toDateString());
+        } catch (\Exception $e) {
+            Log::error('Error proses alpa otomatis: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Hitung alpa dari tabel tidak_hadirs
+     */
+    private function hitungAlpa($userId, $instansiId, $dari, $sampai)
+    {
+        $dari = Carbon::parse($dari);
+        $sampai = Carbon::parse($sampai);
+
+        $alpa = TidakHadir::where('user_id', $userId)
+            ->where('instansi_id', $instansiId)
+            ->whereBetween('tanggal', [$dari, $sampai])
+            ->count();
+
+        return $alpa;
+    }
+
+    /**
+     * Ambil data rekap tanpa kolom hari kerja
+     */
+    private function getRekapData($query, $dari, $sampai)
+    {
+        $dari = Carbon::parse($dari);
+        $sampai = Carbon::parse($sampai);
+
+        $presensiData = $query->get();
+
+        // Group by user_id dan instansi_id
+        $grouped = $presensiData->groupBy(function ($item) {
+            return $item->user_id . '_' . $item->instansi_id;
+        });
+
+        $rekapData = $grouped->map(function ($items, $key) use ($dari, $sampai) {
+            $firstItem = $items->first();
+            $user = $firstItem->user;
+            $instansi = $firstItem->instansi;
+
+            // Hitung presensi
+            $hadir = $items->where('status', 'hadir')->count();
+            $izin = $items->where('status', 'izin')->count();
+
+            // Hitung alpa dari tabel tidak_hadirs
+            $alpa = $this->hitungAlpa($user->id, $instansi->id, $dari, $sampai);
+
+            return [
+                'user_id' => $user->id,
+                'nama' => $user->name ?? 'N/A',
+                'instansi_id' => $instansi->id,
+                'instansi' => $instansi->nama_instansi ?? 'N/A',
+                'hadir' => $hadir,
+                'izin' => $izin,
+                'alpa' => $alpa,
+            ];
+        })->values();
+
+        return $rekapData;
+    }
+
     public function index(Request $request)
     {
         $user = auth()->user();
@@ -151,7 +300,9 @@ class LaporanAbsensiController extends Controller
     {
         try {
             $user = Auth::user();
-            $query = Presensi::with(['user', 'instansi']);
+            $query = Presensi::with(['user', 'instansi'])
+                ->whereHas('user')
+                ->whereHas('instansi');
 
             // Filter untuk operator instansi
             $isOperatorInstansi = $user->hasRole('operator_instansi');
@@ -240,7 +391,9 @@ class LaporanAbsensiController extends Controller
             Log::info('Export PDF Bulanan called with params:', $request->all());
 
             $user = Auth::user();
-            $query = Presensi::with(['user', 'instansi']);
+            $query = Presensi::with(['user', 'instansi'])
+                ->whereHas('user')
+                ->whereHas('instansi');
 
             // Filter untuk operator instansi
             $isOperatorInstansi = $user->hasRole('operator_instansi');
@@ -258,29 +411,28 @@ class LaporanAbsensiController extends Controller
                 $query->where('status', $request->status);
             }
 
-            if ($request->filled('dari_tanggal') && $request->filled('sampai_tanggal')) {
-                $query->whereBetween('tanggal', [$request->dari_tanggal, $request->sampai_tanggal]);
+            $dari = $request->filled('dari_tanggal') ? $request->dari_tanggal : now()->startOfMonth()->toDateString();
+            $sampai = $request->filled('sampai_tanggal') ? $request->sampai_tanggal : now()->endOfMonth()->toDateString();
+
+            $query->whereBetween('tanggal', [$dari, $sampai]);
+
+            // Ambil tapel untuk info saja
+            $tapelKode = 'Semua Tahun Ajaran';
+
+            if ($request->filled('tahun_ajaran')) {
+                $tapel = Tapel::find($request->tahun_ajaran);
+                if ($tapel) {
+                    $tapelKode = $tapel->kode;
+                }
+            } else {
+                $tapel = Tapel::where('status', 'aktif')->first();
+                if ($tapel) {
+                    $tapelKode = $tapel->kode;
+                }
             }
 
-            $presensiData = $query->get();
-
-            // Hitung rekap per user
-            $grouped = $presensiData->groupBy('user_id');
-
-            $rekapData = $grouped->map(function ($items, $userId) {
-                $user = $items->first()->user;
-                $instansi = $items->first()->instansi;
-
-                return [
-                    'user_id' => $userId,
-                    'nama' => $user->name ?? 'N/A',
-                    'instansi' => $instansi->nama_instansi ?? 'N/A',
-                    'hadir' => $items->where('status', 'hadir')->count(),
-                    'izin' => $items->where('status', 'izin')->count(),
-                    'alpa' => $items->where('status', 'alpa')->count(),
-                    'tanpa_ket' => $items->where('status', 'tanpa_keterangan')->count(),
-                ];
-            })->values();
+            // Get rekap data
+            $rekapData = $this->getRekapData($query, $dari, $sampai);
 
             // Urutkan berdasarkan instansi (PAUD → MI → MTS → MA → SMK → PATTA)
             $urutanInstansi = ['PAUD', 'MI', 'MTS', 'MA', 'SMK', 'PATTA'];
@@ -312,9 +464,9 @@ class LaporanAbsensiController extends Controller
             // Format periode
             $periode = '';
             if ($request->filled('dari_tanggal') && $request->filled('sampai_tanggal')) {
-                $dari = \Carbon\Carbon::parse($request->dari_tanggal)->format('d F Y');
-                $sampai = \Carbon\Carbon::parse($request->sampai_tanggal)->format('d F Y');
-                $periode = $dari . ' s/d ' . $sampai;
+                $dariFormat = Carbon::parse($dari)->format('d F Y');
+                $sampaiFormat = Carbon::parse($sampai)->format('d F Y');
+                $periode = $dariFormat . ' s/d ' . $sampaiFormat;
             } else {
                 $periode = 'Semua Periode';
             }
@@ -324,7 +476,8 @@ class LaporanAbsensiController extends Controller
                 'filter' => [
                     'status' => $request->status ?: 'Semua',
                     'instansi' => $namaInstansi,
-                    'periode' => $periode
+                    'periode' => $periode,
+                    'tahun_ajaran' => $tapelKode
                 ]
             ];
 
@@ -354,7 +507,9 @@ class LaporanAbsensiController extends Controller
             Log::info('Export PDF Tahunan called with params:', $request->all());
 
             $user = Auth::user();
-            $query = Presensi::with(['user', 'instansi']);
+            $query = Presensi::with(['user', 'instansi'])
+                ->whereHas('user')
+                ->whereHas('instansi');
 
             // Filter untuk operator instansi
             $isOperatorInstansi = $user->hasRole('operator_instansi');
@@ -372,37 +527,39 @@ class LaporanAbsensiController extends Controller
                 $query->where('status', $request->status);
             }
 
+            $dari = now()->startOfYear()->toDateString();
+            $sampai = now()->endOfYear()->toDateString();
+            $tahunAjaran = 'Semua Tahun Ajaran';
+
             if ($request->filled('tahun_ajaran')) {
                 $tapel = Tapel::find($request->tahun_ajaran);
                 if ($tapel) {
                     $dateRange = $tapel->getDateRange();
-                    if ($dateRange) {
-                        $query->whereBetween('tanggal', [$dateRange['start'], $dateRange['end']]);
+                    if ($dateRange && isset($dateRange['start']) && isset($dateRange['end'])) {
+                        $dari = $dateRange['start'];
+                        $sampai = $dateRange['end'];
+                        $tahunAjaran = $tapel->kode;
+                        $query->whereBetween('tanggal', [$dari, $sampai]);
+                    }
+                }
+            } else {
+                // Gunakan tapel aktif sebagai default
+                $tapel = Tapel::where('status', 'aktif')->first();
+                if ($tapel) {
+                    $dateRange = $tapel->getDateRange();
+                    if ($dateRange && isset($dateRange['start']) && isset($dateRange['end'])) {
+                        $dari = $dateRange['start'];
+                        $sampai = $dateRange['end'];
+                        $tahunAjaran = $tapel->kode;
+                        $query->whereBetween('tanggal', [$dari, $sampai]);
                     }
                 }
             }
 
-            $presensiData = $query->get();
+            // Get rekap data
+            $rekapData = $this->getRekapData($query, $dari, $sampai);
 
-            // Hitung rekap per user
-            $grouped = $presensiData->groupBy('user_id');
-
-            $rekapData = $grouped->map(function ($items, $userId) {
-                $user = $items->first()->user;
-                $instansi = $items->first()->instansi;
-
-                return [
-                    'user_id' => $userId,
-                    'nama' => $user->name ?? 'N/A',
-                    'instansi' => $instansi->nama_instansi ?? 'N/A',
-                    'hadir' => $items->where('status', 'hadir')->count(),
-                    'izin' => $items->where('status', 'izin')->count(),
-                    'alpa' => $items->where('status', 'alpa')->count(),
-                    'tanpa_ket' => $items->where('status', 'tanpa_keterangan')->count(),
-                ];
-            })->values();
-
-            // Urutkan berdasarkan instansi (PAUD → MI → MTS → MA → SMK → PATTA)
+            // Urutkan berdasarkan instansi
             $urutanInstansi = ['PAUD', 'MI', 'MTS', 'MA', 'SMK', 'PATTA'];
 
             $rekapData = $rekapData->sort(function ($a, $b) use ($urutanInstansi) {
@@ -427,13 +584,6 @@ class LaporanAbsensiController extends Controller
             } elseif ($request->filled('instansi')) {
                 $instansi = Instansi::find($request->instansi);
                 $namaInstansi = $instansi ? $instansi->nama_instansi : 'Semua';
-            }
-
-            // Ambil tahun ajaran
-            $tahunAjaran = 'Semua Tahun Ajaran';
-            if ($request->filled('tahun_ajaran')) {
-                $tapel = Tapel::find($request->tahun_ajaran);
-                $tahunAjaran = $tapel ? $tapel->kode : 'Semua Tahun Ajaran';
             }
 
             $data = [
