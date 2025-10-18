@@ -9,6 +9,8 @@
             </div>
         </div>
 
+
+
         {{-- DATA USER UNTUK ADMIN YAYASAN --}}
 
         @hasanyrole('admin_yayasan')
@@ -35,6 +37,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
+                                                    <th>Nomor Induk</th>
                                                     <th>Name</th>
                                                     <th>Peran</th>
                                                     <th>No Telephone</th>
@@ -48,6 +51,7 @@
                                                 @forelse ($semuaUser as $item)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $item->nomor_induk_yayasan }}</td>
                                                         <td>{{ $item->name }}</td>
                                                         <td>
                                                             @forelse ($item->roles as $role)
@@ -116,6 +120,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
+                                                    <th>NOmor Induk</th>
                                                     <th>Name</th>
                                                     <th>Peran</th>
                                                     <th>No Telephone</th>
@@ -128,8 +133,9 @@
                                                 @forelse ($userInstansi as $item)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $item->nomor_induk_yayasan }}</td>
                                                         <td>{{ $item->name }}</td>
-                                                    <td>
+                                                        <td>
                                                             @forelse ($item->roles as $role)
                                                                 {{ Str::of($role->name)->replace('_', ' ')->title() }}{{ !$loop->last ? ', ' : '' }}
                                                             @empty

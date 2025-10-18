@@ -103,6 +103,13 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
+                                <label for="nomor_induk_yayasan" class="form-label">Nomor Induk</label>
+                                <input type="text" class="form-control" id="nomor_induk_yayasan" name="nomor_induk_yayasan"
+                                    placeholder="Masukkan jarak tempuh"
+                                    value="{{ old('nomor_induk_yayasan', $user->nomor_induk_yayasan) }}" step="0.01">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Instansi</label>
                                 <div class="form-group">
                                     @forelse ($instansi as $item)

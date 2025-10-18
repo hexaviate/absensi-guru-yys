@@ -65,7 +65,7 @@
                                     @forelse ($guruHadirHariIni as $item)
                                         <tr>
                                             <td>
-                                                <img src="{{ asset('foto_presensi/' . $item->user->foto) }}"
+                                                <img src="{{ asset('foto_presensi/' . $item->user->foto_presensi) }}"
                                                     alt="foto {{ $item->user->name }}" class="rounded-circle" width="45"
                                                     height="45">
                                             </td>

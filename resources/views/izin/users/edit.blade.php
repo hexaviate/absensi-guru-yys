@@ -56,6 +56,7 @@
                                                     @if ($user->hasRole('admin_yayasan') && $item->nama_instansi !== 'PUSPELA')
                                                         @continue
                                                     @endif
+
                                                     @if ($item->nama_instansi === 'SMK Salafiyah')
                                                         @continue
                                                     @endif
