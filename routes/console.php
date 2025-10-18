@@ -80,7 +80,7 @@ Schedule::call(function () {
         }
 
     }
-})->dailyAt('14:06'); //! waktu nanti disesuaikan
+})->dailyAt('09:01'); //! waktu nanti disesuaikan
 
 //!perlu disusaikan cron nya jika sudah di server
 //*jika running lokal maka pakai "php artisan schedule:work"
