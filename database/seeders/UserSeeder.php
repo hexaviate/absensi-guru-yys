@@ -79,7 +79,6 @@ class UserSeeder extends Seeder
                 'username' => strtolower(str_replace(['.', ',', ' ', '\'', '’'], '', explode(' ', $name)[0])) . rand(10, 99),
                 'password' => Hash::make('123456'),
                 'foto_presensi' => 'pegawai.jpg',
-                'foto' => 'pegawai.jpg',
                 'jarak_tempuh' => rand(1, 15),
             ]);
 
