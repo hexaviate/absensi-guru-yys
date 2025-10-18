@@ -174,14 +174,14 @@
         </tbody>
     </table>
 
-    <div class="formula-note">
+    {{-- <div class="formula-note">
         <strong>📌 Catatan Perhitungan:</strong><br>
         • <strong>Hadir</strong> = Total kehadiran yang tercatat dalam sistem<br>
         • <strong>Izin</strong> = Total izin yang diajukan dan disetujui<br>
         • <strong>Alpa</strong> = Tidak presensi sampai jam 14:00 + tidak ada izin (otomatis tercatat di sistem)<br>
         • Sabtu & Minggu tetap dihitung sebagai hari kerja (kecuali hari libur resmi)<br>
         • Khusus SMK, Jumat adalah hari libur
-    </div>
+    </div> --}}
 
     <div class="footer">
         <strong>Total Data:</strong> {{ count($rekap) }} record<br>
