@@ -79,7 +79,7 @@ class UsersController extends Controller
             "username" => "required",
             "password" => "required",
             'jarak_tempuh' => 'required',
-            "nomor_induk_yayasan" => "required"
+            "nomor_induk_yayasan" => "required",
         ]);
 
         if ($validate->fails()) {

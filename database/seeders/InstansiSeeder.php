@@ -47,8 +47,8 @@ class InstansiSeeder extends Seeder
                 'kepala_instansi' => 'Erni Sofa Nugraha, S.Pd.',
                 'alamat_instansi' => 'Jl. KH. Sahal Mahfudh No.5, Kajen, Margoyoso, Pati',
                 'telp_instansi' => '081234567894',
-                'latitude' => -6.608540,
-                'longitude' => 111.059240,
+                'latitude' => -6.6079262,
+                'longitude' => 111.0594567,
             ],
             [
                 'nama_instansi' => 'PATTA',
