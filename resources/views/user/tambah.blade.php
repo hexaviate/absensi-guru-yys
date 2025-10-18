@@ -74,7 +74,8 @@
                                             <input type="radio" name="role_id[]" value="{{ $item->id }}"
                                                 data-role-name="{{ $item->name }}" class="selectgroup-input role-radio"
                                                 {{ old('role_id') == $item->id ? 'checked' : '' }}>
-                                            <span class="selectgroup-button">{{ Str::of($item->name)->replace('_', ' ')->title() }}</span>
+                                            <span
+                                                class="selectgroup-button">{{ Str::of($item->name)->replace('_', ' ')->title() }}</span>
                                         </label>
                                     @empty
                                         <p class="text-muted mb-0">Tidak ada role</p>
@@ -83,7 +84,13 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Instansi</label>
+                                <label for="nomor_induk_yayasan" class="form-label">Nomor Induk</label>
+                                <input type="text" class="form-control" id="nomor_induk_yayasan" name="nomor_induk_yayasan"
+                                    placeholder="Masukkan Nomor Induk Yayasan" value="{{ old('nomor_induk_yayasan') }}" step="0.01">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="instansi">Instansi</label>
                                 <div class="form-group">
                                     @forelse ($instansi as $item)
                                         <div class="form-check form-check-inline instansi-item"

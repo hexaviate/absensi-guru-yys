@@ -364,6 +364,8 @@ class IzinController extends Controller
     public function viewIzinCreateOperator()
     {
         $user = auth()->user();
+        $userId = auth()->user()->id;
+
         $tapelAktif = Tapel::where('status', 'aktif')->first();
 
         if (!$user->hasAnyPermission(['manage izin'])) {
@@ -476,26 +478,27 @@ class IzinController extends Controller
                 }
             }
 
-            // Simpan data izin dengan status diterima (karena dibuat oleh operator)
-            $izin = Izin::create([
-                'tapel_id' => $tapelAktif->id,
-                'user_id' => $request->user_id,
-                'instansi_id' => $request->instansi_id,
-                'bukti_izin' => $buktiIzinPath,
-                'tanggal' => $request->tanggal,
-                'keterangan' => $request->keterangan,
-                'status' => 'diterima', // Auto approve karena dibuat operator
-            ]);
 
-            // Buat presensi izin otomatis
-            // Presensi::create([
-            //     'tapel_id' => $tapelAktif->id,
-            //     'instansi_id' => $request->instansi_id,
-            //     'user_id' => $request->user_id,
-            //     'izin_id' => $izin->id,
-            //     'status' => 'izin',
-            //     'tanggal' => $request->tanggal,
-            // ]);
+            // $izin = Izin::find($user->id);
+
+            if ($request->user_id == $user->id) {
+                return redirect()->intended('izinIndexOperator')->with('error', 'anda tidak Bisa Menbuat Izin Anda Sendiri');
+
+            } else {
+                // Simpan data izin dengan status diterima (karena dibuat oleh operator)
+                $izin = Izin::create([
+                    'tapel_id' => $tapelAktif->id,
+                    'user_id' => $request->user_id,
+                    'instansi_id' => $request->instansi_id,
+                    'bukti_izin' => $buktiIzinPath,
+                    'tanggal' => $request->tanggal,
+                    'keterangan' => $request->keterangan,
+                    'status' => 'diterima', // Auto approve karena dibuat operator
+                ]);
+
+            }
+
+
 
             if ($izin->status == 'diterima') {
 
@@ -511,18 +514,35 @@ class IzinController extends Controller
                         "izin_id" => $izin->id,
                         "pulang" => ""
                     ]);
+
+                    Presensi::create([
+                        'tapel_id' => $tapelAktif->id,
+                        "instansi_id" => $izin->instansi_id,
+                        "user_id" => $izin->user_id,
+                        "izin_id" => $izin->id,
+                        "status" => 'izin',
+                        "tanggal" => $izin->tanggal,
+                        'keterangan' => 'User Ini Izin'
+                    ]);
+
+                } else {
+
+
+                    // auto buat izin jika tidak da data
+                    Presensi::create([
+                        'tapel_id' => $tapelAktif->id,
+                        "instansi_id" => $izin->instansi_id,
+                        "user_id" => $izin->user_id,
+                        "izin_id" => $izin->id,
+                        "status" => 'izin',
+                        "tanggal" => $izin->tanggal,
+                        'keterangan' => 'User Ini Izin'
+                    ]);
                 }
 
 
 
-                Presensi::create([
-                    'tapel_id' => $tapelAktif->id,
-                    "instansi_id" => $izin->instansi_id,
-                    "user_id" => $izin->user_id,
-                    "izin_id" => $izin->id,
-                    "status" => 'izin',
-                    "tanggal" => $izin->tanggal,
-                ]);
+
             }
 
             return redirect()->route('izinIndexOperator')

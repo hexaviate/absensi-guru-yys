@@ -25,7 +25,9 @@ class UsersController extends Controller
         if (!$user->hasAnyPermission(['view all users', 'manage users'])) {
             return redirect()->back()->with('error', 'anda tidak punya permission');
         }
-        $semuaUser = User::all();
+        // $semuaUser = User::all();
+        $semuaUser = User::with(['roles', 'instansi'])->get();
+
         $semuaRole = Role::all();
         $semuaInstansi = Instansi::all();
 
@@ -74,7 +76,7 @@ class UsersController extends Controller
         $user = auth()->user();
 
         $validate = Validator::make($request->all(), [
-            "name" => "required|min:5",
+            "name" => "required|min:3",
             "telp" => "required|numeric",
             "username" => "required",
             "password" => "required",
@@ -175,9 +177,9 @@ class UsersController extends Controller
 
         // Setup validation rules
         $rules = [
-            "name" => "required|min:5",
+            "name" => "required|min:3",
             "telp" => "required|numeric",
-            "password" => "nullable|min:6",
+            "password" => "nullable|min:3",
             "foto_presensi" => "nullable|image|mimes:jpeg,png,jpg|max:2048",
             "jarak_tempuh" => "nullable|numeric|min:0",
             "role_id" => "required|min:1",
