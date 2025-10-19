@@ -131,7 +131,8 @@
                         <div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Total Guru & Karyawan </h6>
-                                <h3 class="mb-0 text-primary">{{ $totalSemuaGuru }}</h3>
+                                {{-- <h3 class="mb-0 text-primary">{{ $totalSemuaGuru }}</h3> --}}
+                                <h3 class="mb-0 text-primary">464</h3>
                             </div>
                         </div>
                     </div>
