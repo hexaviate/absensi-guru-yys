@@ -61,7 +61,6 @@ class UsersController extends Controller
         $operatorRole = Role::whereIn('name', ['tenaga_pendidik', 'tenaga_kependidikan'])->get();
         $operatorInstansi = $user->instansi()->first();
 
-
         return view('user.tambah', compact('role', 'semuaUser', 'instansi', 'operatorRole', 'operatorInstansi'));
     }
 
