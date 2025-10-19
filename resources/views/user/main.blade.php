@@ -120,7 +120,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th>NOmor Induk</th>
+                                                    <th>Nomor Induk</th>
                                                     <th>Name</th>
                                                     <th>Peran</th>
                                                     <th>No Telephone</th>
