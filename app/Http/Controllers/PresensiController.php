@@ -6,6 +6,7 @@ use App\Http\Resources\JadwalResource;
 use App\Models\Jadwal;
 use App\Models\Presensi;
 use App\Models\Tapel;
+use App\Models\TidakHadir;
 use App\Models\User;
 use Carbon\Carbon;
 use Http;
@@ -46,7 +47,10 @@ class PresensiController extends Controller
             ->whereDate('created_at', $now->toDateString())
             ->first();
 
-        $token = '74SPnec8JM2KKXmKDNSz';
+        $tidakHadir = TidakHadir::where('tapel_id', $tapelAktif->id)->where('user_id', $user->id)->where('instansi_id', $request->instansi_id)->first();
+        if ($tidakHadir) {
+            return redirect()->back()->with('error', 'Anda tidak hadir hari ini, anda tidak bisa absen');
+        }
 
         // Tidak ada jadwal
         if (!$jadwal) {

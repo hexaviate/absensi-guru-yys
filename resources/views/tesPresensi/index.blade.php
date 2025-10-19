@@ -684,61 +684,9 @@
                                 status.style.display = 'block';
                                 return;
                             }
-
-                            // Validasi lokasi radius
-                            // const radius = 100;
-                            // const pusatLat = -6.592996353118405;
-                            // const pusatLon = 111.06748580403307;
-                            // const R = 6371e3;
-                            // const dLat = (latitude - pusatLat) * Math.PI / 180;
-                            // const dLon = (longitude - pusatLon) * Math.PI / 180;
-                            // const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                            //     Math.cos(pusatLat * Math.PI / 180) * Math.cos(latitude * Math.PI / 180) *
-                            //     Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                            // const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                            // const jarak = R * c;
-                            // if (jarak > radius) {
-                            //     status.innerText = "❌ Lokasi di luar radius presensi.";
-                            //     return;
-                            // }
-
-                            // status.innerText = "✅ Presensi sukses: wajah cocok dan lokasi valid.";
-                            // status.style.display = 'block';
-
-                            ///////////////////////////////////////////////////////////////////////////////////////
-                            //! ini AI
                             const lokasis = @json($lokasi);
 
-                            // function hitungJarak(lat1, lon1, lat2, lon2) {
-                            //     const R = 6371e3; // jari-jari bumi
-                            //     const dLat = (lat2 - lat1) * Math.PI / 180;
-                            //     const dLon = (lon2 - lon1) * Math.PI / 180;
 
-                            //     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                            //         Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                            //         Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-                            //     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                            //     return R * c; // meter
-                            // }
-
-                            // function cekLokasi(latitude, longitude) {
-                            //     for (let lokasi of lokasis) {
-                            //         const jarak = hitungJarak(lokasi.latitude, lokasi.longitude, latitude,
-                            //             longitude);
-                            //         if (jarak <= instansi.radius) {
-                            //             return true; // valid, berada dalam salah satu instansi
-                            //         }
-                            //     }
-                            //     return false; // tidak ada yang cocok
-                            // }
-
-                            // if (cekLokasi(latitude, longitude)) {
-                            //     status.innerText = "✅ Presensi sukses: lokasi valid.";
-                            // } else {
-                            //     status.innerText = "❌ Lokasi di luar radius semua instansi.";
-                            // }
-                            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                             function hitungJarak(lat1, lon1) {
                                 const radius = 100;
@@ -749,7 +697,7 @@
                                     Math.cos(lat1 * Math.PI / 180) * Math.cos(latitude * Math.PI / 180) *
                                     Math.sin(dLon / 2) * Math.sin(dLon / 2);
                                 const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                                console.log(R * c);
+                                // console.log(R * c);
 
                                 return R * c;
                             }
@@ -757,7 +705,7 @@
                             function cekLokasi(latitude, longitude) {
                                 for (let lokasi of lokasis) {
                                     const jarak = hitungJarak(lokasi.latitude, lokasi.longitude);
-                                    if (jarak <= 100) {
+                                    if (jarak <= 50) {
                                         const namaInstansi = lokasi.nama_instansi
                                         // status.innerText = "❌ Lokasi di luar radius presensi.";
                                         console.log('didalam');
@@ -872,6 +820,155 @@
                 }
 
 
+            }
+
+            async function collectLocationSamples() {
+                const samples = [];
+                const SAMPLE_COUNT = 3;
+                const SAMPLE_INTERVAL = 2000;
+
+                return new Promise((resolve, reject) => {
+                    let count = 0;
+
+                    const collectSample = () => {
+                        navigator.geolocation.getCurrentPosition(
+                            position => {
+                                const {
+                                    latitude,
+                                    longitude,
+                                    accuracy,
+                                    altitude,
+                                    altitudeAccuracy,
+                                    heading,
+                                    speed
+                                } = position.coords;
+
+                                // LAYER 1 CHECKS: GPS Metadata Analysis
+
+                                // 🔍 Flag 1: Accuracy too perfect
+                                if (accuracy < 5) {
+                                    console.warn("⚠️ Suspicious: Accuracy too perfect");
+                                    resolve({
+                                        success: false,
+                                        reason: "Sistem mendeteksi kemungkinan Fake GPS (akurasi terlalu sempurna)"
+                                    });
+                                    return;
+                                }
+
+                                // 🔍 Flag 2: Impossible coordinates
+                                if (latitude === 0 && longitude === 0) {
+                                    console.warn("⚠️ Suspicious: Null Island coordinates");
+                                    resolve({
+                                        success: false,
+                                        reason: "Koordinat GPS tidak valid"
+                                    });
+                                    return;
+                                }
+
+                                // 🔍 Flag 3: Missing altitude data
+                                if (altitude === null && altitudeAccuracy === null) {
+                                    console.warn("⚠️ Suspicious: No altitude data");
+                                    resolve({
+                                        success: false,
+                                        reason: "Data GPS tidak lengkap (kemungkinan Fake GPS)"
+                                    });
+                                    return;
+                                }
+
+                                // 🔍 Flag 4: Speed/heading inconsistency
+                                if (speed === 0 && heading !== null) {
+                                    console.warn("⚠️ Suspicious: Has heading while stationary");
+                                    resolve({
+                                        success: false,
+                                        reason: "Data GPS tidak konsisten"
+                                    });
+                                    return;
+                                }
+
+                                // Store sample
+                                samples.push({
+                                    lat: latitude,
+                                    lon: longitude,
+                                    accuracy: accuracy,
+                                    timestamp: position.timestamp
+                                });
+
+                                count++;
+
+                                if (count < SAMPLE_COUNT) {
+                                    // Collect more samples
+                                    setTimeout(collectSample, SAMPLE_INTERVAL);
+                                } else {
+                                    // LAYER 2: Analyze collected samples
+                                    const analysis = analyzeSamples(samples);
+
+                                    if (analysis.suspicious) {
+                                        resolve({
+                                            success: false,
+                                            reason: `Kemungkinan Fake GPS: ${analysis.reason}`
+                                        });
+                                    } else {
+                                        resolve({
+                                            success: true,
+                                            samples: samples
+                                        });
+                                    }
+                                }
+                            },
+                            error => {
+                                console.error("Location error:", error);
+                                resolve({
+                                    success: false,
+                                    reason: "Gagal mendapatkan lokasi GPS"
+                                });
+                            }, {
+                                enableHighAccuracy: true,
+                                maximumAge: 0,
+                                timeout: 10000
+                            }
+                        );
+                    };
+
+                    collectSample();
+                });
+            }
+
+            // Analyze location samples for suspicious patterns
+            function analyzeSamples(samples) {
+                // 🔍 Flag 5: All coordinates identical
+                const allSame = samples.every(sample =>
+                    sample.lat === samples[0].lat &&
+                    sample.lon === samples[0].lon
+                );
+
+                if (allSame) {
+                    console.warn("⚠️ Suspicious: All samples identical");
+                    return {
+                        suspicious: true,
+                        reason: "GPS tidak bergerak sama sekali (tidak natural)"
+                    };
+                }
+
+                // 🔍 Flag 6: Impossible movement speed (teleporting)
+                for (let i = 1; i < samples.length; i++) {
+                    const distance = calculateDistance(
+                        samples[i - 1].lat, samples[i - 1].lon,
+                        samples[i].lat, samples[i].lon
+                    );
+
+                    // More than 50 meters in 2 seconds = 90 km/h
+                    if (distance > 50) {
+                        console.warn("⚠️ Suspicious: Impossible movement speed");
+                        return {
+                            suspicious: true,
+                            reason: "Pergerakan terlalu cepat (tidak wajar)"
+                        };
+                    }
+                }
+
+                return {
+                    suspicious: false
+                };
             }
         </script>
 
