@@ -168,6 +168,7 @@ class LaporanAbsensiController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
+        $jenis = $request->query('jenis', 'harian'); // Default: harian
 
         try {
             // Base query dengan eager loading dan validasi relasi
@@ -190,7 +191,8 @@ class LaporanAbsensiController extends Controller
                         'instansi' => collect([]),
                         'tapels' => collect([]),
                         'user' => $user,
-                        'isOperatorInstansi' => true
+                        'isOperatorInstansi' => true,
+                        'jenis' => $jenis
                     ])->with('error', 'Akun Anda belum terhubung dengan instansi. Silakan hubungi administrator.');
                 }
 
@@ -220,31 +222,37 @@ class LaporanAbsensiController extends Controller
                 $query->where('status', $request->status);
             }
 
-            // Filter HARIAN (tanggal spesifik)
-            if ($request->filled('tanggal')) {
-                $query->whereDate('tanggal', $request->tanggal);
-            }
+            // Filter berdasarkan JENIS (Harian, Bulanan, Tahunan)
+            if ($jenis === 'harian') {
+                if ($request->filled('tanggal')) {
+                    $query->whereDate('tanggal', $request->tanggal);
+                } else {
+                    $query->whereDate('tanggal', Carbon::today());
+                }
+            } elseif ($jenis === 'bulanan') {
+                if ($request->filled('dari_tanggal') && $request->filled('sampai_tanggal')) {
+                    $query->whereBetween('tanggal', [$request->dari_tanggal, $request->sampai_tanggal]);
+                } else {
+                    $query->whereBetween('tanggal', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
+                }
+            } elseif ($jenis === 'tahunan') {
+                if ($request->filled('tahun_ajaran')) {
+                    $tapel = Tapel::find($request->tahun_ajaran);
 
-            // Filter BULANAN (range tanggal)
-            if ($request->filled('dari_tanggal') && $request->filled('sampai_tanggal')) {
-                $query->whereBetween('tanggal', [$request->dari_tanggal, $request->sampai_tanggal]);
-            }
+                    if ($tapel) {
+                        $dateRange = $tapel->getDateRange();
 
-            // Filter TAHUNAN (berdasarkan tahun ajaran)
-            if ($request->filled('tahun_ajaran')) {
-                $tapel = Tapel::find($request->tahun_ajaran);
+                        if ($dateRange && isset($dateRange['start']) && isset($dateRange['end'])) {
+                            $query->whereBetween('tanggal', [$dateRange['start'], $dateRange['end']]);
 
-                if ($tapel) {
-                    $dateRange = $tapel->getDateRange();
-
-                    if ($dateRange && isset($dateRange['start']) && isset($dateRange['end'])) {
-                        $query->whereBetween('tanggal', [$dateRange['start'], $dateRange['end']]);
-
-                        Log::info('Tahun Ajaran Filter Applied:', [
-                            'tapel_kode' => $tapel->kode,
-                            'date_range' => $dateRange
-                        ]);
+                            Log::info('Tahun Ajaran Filter Applied:', [
+                                'tapel_kode' => $tapel->kode,
+                                'date_range' => $dateRange
+                            ]);
+                        }
                     }
+                } else {
+                    $query->whereBetween('tanggal', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()]);
                 }
             }
 
@@ -265,7 +273,7 @@ class LaporanAbsensiController extends Controller
             // Get list tahun ajaran aktif
             $tapels = Tapel::active()->orderBy('kode', 'desc')->get();
 
-            return view('laporan.rekap_absensi', compact('presensi', 'instansi', 'tapels', 'user', 'isOperatorInstansi'));
+            return view('laporan.rekap_absensi', compact('presensi', 'instansi', 'tapels', 'user', 'isOperatorInstansi', 'jenis'));
         } catch (\Exception $e) {
             Log::error('ERROR in LaporanAbsensiController@index:', [
                 'message' => $e->getMessage(),
@@ -280,11 +288,11 @@ class LaporanAbsensiController extends Controller
                 'instansi' => collect([]),
                 'tapels' => collect([]),
                 'user' => $user,
-                'isOperatorInstansi' => $user->hasRole('operator_instansi')
+                'isOperatorInstansi' => $user->hasRole('operator_instansi'),
+                'jenis' => $jenis
             ])->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-
     public function exportExcel(Request $request)
     {
         try {

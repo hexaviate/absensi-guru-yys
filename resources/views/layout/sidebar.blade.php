@@ -132,7 +132,8 @@
 
             @php
                 $isOnlySMK =
-                    $user->instansi()->count() == 1 && $user->instansi()->where('nama_Instansi', 'SMK Salafiyah')->exists();
+                    $user->instansi()->count() == 1 &&
+                    $user->instansi()->where('nama_Instansi', 'SMK Salafiyah')->exists();
             @endphp
 
             @if ($isOnlySMK)
@@ -169,11 +170,35 @@
 
 
     @hasanyrole('admin_yayasan|operator_instansi')
-        <li class="menu-header">RECAP</li>
+        {{-- <li class="menu-header">RECAP</li>
 
         <li class="">
             <a href="{{ route('rekap_absensi.index') }}" class="nav-link"><i class="fa fa-file"></i><span>Laporan
                     Absensi</span></a>
+        </li> --}}
+
+        <li class="menu-header">Recap</li>
+        <li class="dropdown {{ Route::is('rekap_absensi.*') ? 'active' : '' }}">
+            <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+                <i class="fa fa-file"></i> <span>Recap</span>
+            </a>
+            <ul class="dropdown-menu">
+                <li class="{{ Route::is('rekap_absensi.index') && request('jenis') === 'harian' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('rekap_absensi.index', ['jenis' => 'harian']) }}">
+                        Recap Harian
+                    </a>
+                </li>
+                <li class="{{ Route::is('rekap_absensi.index') && request('jenis') === 'bulanan' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('rekap_absensi.index', ['jenis' => 'bulanan']) }}">
+                        Recap Bulanan
+                    </a>
+                </li>
+                <li class="{{ Route::is('rekap_absensi.index') && request('jenis') === 'tahunan' ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ route('rekap_absensi.index', ['jenis' => 'tahunan']) }}">
+                        Recap Tahunan
+                    </a>
+                </li>
+            </ul>
         </li>
 
     @endhasrole
