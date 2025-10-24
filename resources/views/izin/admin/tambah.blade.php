@@ -20,22 +20,35 @@
                         <div class="row">
                             <!-- Instansi (Auto-selected & Disabled untuk Operator) -->
                             <div class="col-md-6 mb-3">
+
+                                @php
+                                    $user = auth()->user();
+
+                                    // kalau role-nya admin_yayasan, ambil instansi bernama "PUSPELA"
+                                    if ($user->hasRole('admin_yayasan')) {
+                                        $instansi = \App\Models\Instansi::where('nama_instansi', 'PUSPELA')->first();
+                                    }
+                                @endphp
+
                                 <label for="instansi" class="form-label">Instansi <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('instansi_id') is-invalid @enderror"
-                                    value="{{ $instansi->nama_instansi ?? 'Tidak ada instansi' }}"
-                                    readonly disabled>
+                                    value="{{ $instansi->nama_instansi ?? 'Tidak ada instansi' }}" readonly disabled>
+
                                 <input type="hidden" name="instansi_id" value="{{ $instansi->id ?? '' }}">
+
                                 @error('instansi_id')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
+
                             </div>
 
                             <!-- User Search -->
                             <div class="col-md-6 mb-3">
-                                <label for="userSearch" class="form-label">Cari User <span class="text-danger">*</span></label>
-                                <input type="text" id="userSearch" class="form-control @error('user_id') is-invalid @enderror"
-                                    placeholder="Ketik nama user (min. 2 karakter)..."
-                                    autocomplete="off"
+                                <label for="userSearch" class="form-label">Cari User <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" id="userSearch"
+                                    class="form-control @error('user_id') is-invalid @enderror"
+                                    placeholder="Ketik nama user (min. 2 karakter)..." autocomplete="off"
                                     value="{{ old('user_name') }}">
                                 <input type="hidden" id="user_id" name="user_id" value="{{ old('user_id') }}">
 
@@ -78,10 +91,10 @@
 
                             <!-- Bukti Izin (Optional) -->
                             <div class="col-md-6 mb-3">
-                                <label for="bukti_izin" class="form-label">Bukti Izin <small class="text-muted">(Opsional)</small></label>
+                                <label for="bukti_izin" class="form-label">Bukti Izin <small
+                                        class="text-muted">(Opsional)</small></label>
                                 <input type="file" id="bukti_izin" name="bukti_izin"
-                                    class="form-control @error('bukti_izin') is-invalid @enderror"
-                                    accept="image/*,.pdf">
+                                    class="form-control @error('bukti_izin') is-invalid @enderror" accept="image/*,.pdf">
                                 <small class="form-text text-muted">
                                     Format: JPG, PNG, PDF. Maksimal 2MB
                                 </small>
@@ -91,7 +104,8 @@
 
                                 <!-- Preview untuk gambar -->
                                 <div id="previewContainer" class="mt-2" style="display:none;">
-                                    <img id="imagePreview" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px;">
+                                    <img id="imagePreview" src="" alt="Preview" class="img-thumbnail"
+                                        style="max-width: 200px;">
                                     <button type="button" class="btn btn-sm btn-danger mt-2" id="removePreview">
                                         <i class="fas fa-times"></i> Hapus
                                     </button>
@@ -103,8 +117,7 @@
                         <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan <span class="text-danger">*</span></label>
                             <textarea id="keterangan" name="keterangan" rows="4"
-                                class="form-control @error('keterangan') is-invalid @enderror"
-                                placeholder="Masukkan keterangan izin..." required>{{ old('keterangan') }}</textarea>
+                                class="form-control @error('keterangan') is-invalid @enderror" placeholder="Masukkan keterangan izin..." required>{{ old('keterangan') }}</textarea>
                             @error('keterangan')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -198,32 +211,32 @@
                 const url = `/izin/search-users?instansi=${instansiId}&search=${encodeURIComponent(searchTerm)}`;
 
                 fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    hideLoading();
-                    if (data.success) {
-                        displayResults(data.users || []);
-                    } else {
-                        showError(data.message || 'Terjadi kesalahan');
-                    }
-                })
-                .catch(error => {
-                    hideLoading();
-                    console.error('Error:', error);
-                    showError('Terjadi kesalahan saat mencari user: ' + error.message);
-                });
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        hideLoading();
+                        if (data.success) {
+                            displayResults(data.users || []);
+                        } else {
+                            showError(data.message || 'Terjadi kesalahan');
+                        }
+                    })
+                    .catch(error => {
+                        hideLoading();
+                        console.error('Error:', error);
+                        showError('Terjadi kesalahan saat mencari user: ' + error.message);
+                    });
             }
 
             // Function untuk menampilkan hasil pencarian
@@ -283,7 +296,9 @@
                 if (currentIndex >= items.length) currentIndex = 0;
 
                 items[currentIndex].classList.add('active');
-                items[currentIndex].scrollIntoView({ block: 'nearest' });
+                items[currentIndex].scrollIntoView({
+                    block: 'nearest'
+                });
             }
 
             function removeAllHighlights() {
@@ -369,7 +384,8 @@
                         previewContainer.style.display = 'block';
 
                         // Re-attach event listener untuk tombol hapus
-                        document.getElementById('removePdfPreview').addEventListener('click', removeBuktiIzin);
+                        document.getElementById('removePdfPreview').addEventListener('click',
+                            removeBuktiIzin);
                     }
                 }
             });

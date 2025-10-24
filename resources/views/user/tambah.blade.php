@@ -69,14 +69,23 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Peran <span class="text-danger">*</span></label>
                                 <div class="selectgroup selectgroup-pills">
+                                    @php
+                                        $user = auth()->user();
+                                        $adalahOperator = $user->hasRole('operator_instansi');
+                                        $RoleYangAda = ['tenaga_pendidik', 'tenaga_kependidikan'];
+                                    @endphp
+
                                     @forelse ($role as $item)
-                                        <label class="selectgroup-item">
-                                            <input type="radio" name="role_id[]" value="{{ $item->id }}"
-                                                data-role-name="{{ $item->name }}" class="selectgroup-input role-radio"
-                                                {{ old('role_id') == $item->id ? 'checked' : '' }}>
-                                            <span
-                                                class="selectgroup-button">{{ Str::of($item->name)->replace('_', ' ')->title() }}</span>
-                                        </label>
+                                        @if (!$adalahOperator || in_array($item->name, $RoleYangAda))
+                                            <label class="selectgroup-item">
+                                                <input type="radio" name="role_id[]" value="{{ $item->id }}"
+                                                    data-role-name="{{ $item->name }}"
+                                                    class="selectgroup-input role-radio"
+                                                    {{ old('role_id') == $item->id ? 'checked' : '' }}>
+                                                <span
+                                                    class="selectgroup-button">{{ Str::of($item->name)->replace('_', ' ')->title() }}</span>
+                                            </label>
+                                        @endif
                                     @empty
                                         <p class="text-muted mb-0">Tidak ada role</p>
                                     @endforelse
@@ -85,28 +94,53 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="nomor_induk_yayasan" class="form-label">Nomor Induk</label>
-                                <input type="text" class="form-control" id="nomor_induk_yayasan" name="nomor_induk_yayasan"
-                                    placeholder="Masukkan Nomor Induk Yayasan" value="{{ old('nomor_induk_yayasan') }}" step="0.01">
+                                <input type="text" class="form-control" id="nomor_induk_yayasan"
+                                    name="nomor_induk_yayasan" placeholder="Masukkan Nomor Induk Yayasan"
+                                    value="{{ old('nomor_induk_yayasan') }}" step="0.01">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="instansi">Instansi</label>
                                 <div class="form-group">
+                                    @php
+                                        $user = auth()->user();
+                                        $isOperator = $user->hasRole('operator_instansi');
+                                    @endphp
+
                                     @forelse ($instansi as $item)
-                                        <div class="form-check form-check-inline instansi-item"
-                                            data-instansi-name="{{ strtolower($item->nama_instansi) }}"
-                                            data-instansi-id="{{ $item->id }}">
-                                            <input class="form-check-input instansi-checkbox" type="checkbox"
-                                                id="instansi_{{ $item->id }}" name="instansi_id[]"
-                                                value="{{ $item->id }}"
-                                                {{ collect(old('instansi_id'))->contains($item->id) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="instansi_{{ $item->id }}">
-                                                {{ $item->nama_instansi }}
-                                            </label>
-                                        </div>
+                                        @if ($isOperator)
+                                            {{-- hanya tampilkan instansi milik operator --}}
+                                            @if ($user->instansi->contains('id', $item->id))
+                                                <div class="form-check form-check-inline instansi-item"
+                                                    data-instansi-name="{{ strtolower($item->nama_instansi) }}"
+                                                    data-instansi-id="{{ $item->id }}">
+                                                    <input class="form-check-input instansi-checkbox" type="checkbox"
+                                                        id="instansi_{{ $item->id }}" name="instansi_id[]"
+                                                        value="{{ $item->id }}" checked disabled>
+                                                    <label class="form-check-label text-muted"
+                                                        for="instansi_{{ $item->id }}">
+                                                        {{ $item->nama_instansi }} (Instansi Anda)
+                                                    </label>
+                                                </div>
+                                            @endif
+                                        @else
+                                            {{-- tampilkan semua instansi untuk non-operator --}}
+                                            <div class="form-check form-check-inline instansi-item"
+                                                data-instansi-name="{{ strtolower($item->nama_instansi) }}"
+                                                data-instansi-id="{{ $item->id }}">
+                                                <input class="form-check-input instansi-checkbox" type="checkbox"
+                                                    id="instansi_{{ $item->id }}" name="instansi_id[]"
+                                                    value="{{ $item->id }}"
+                                                    {{ collect(old('instansi_id'))->contains($item->id) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="instansi_{{ $item->id }}">
+                                                    {{ $item->nama_instansi }}
+                                                </label>
+                                            </div>
+                                        @endif
                                     @empty
                                         <p class="text-muted mb-0">Tidak ada instansi</p>
                                     @endforelse
+
                                 </div>
                             </div>
 

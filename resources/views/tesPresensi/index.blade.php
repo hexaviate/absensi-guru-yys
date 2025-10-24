@@ -270,18 +270,13 @@
             </div> --}}
 
             <!-- Tombol Kontrol -->
-            <div class="row g-3 mb-4">
-                <div class="col-12 col-md-4">
-                    <button class="btn btn-custom btn-primary-custom w-100" id="switchCamera">
-                        <i class="fas fa-sync-alt me-2"></i>Ganti Kamera
-                    </button>
-                </div>
-                <div class="col-12 col-md-4">
+            <div class="row g-3 mb-3 mt-4">
+                <div class="col-12 col-md-6">
                     <button class="btn btn-custom btn-success-custom w-100" id="takePhoto" onclick="ambilPresensi()">
                         <i class="fas fa-camera me-2"></i>Ambil Presensi
                     </button>
                 </div>
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-md-6">
                     @hasrole('admin_yayasan')
                         <a href="{{ route('adminYysDashboard') }}" class="btn btn-custom btn-danger-custom w-100">
                             <i class="fas fa-arrow-left me-2"></i>Kembali Dashboard
@@ -974,65 +969,14 @@
 
         {{-- sccript untuk ganti kaemrera --}}
 
+
+
+
+
+        // {{-- modal  --}}
+
         <script>
-            let currentStream;
-            let currentCameraIndex = 0;
-            let videoDevices = [];
-
-            // ambil semua kamera yang ada
-            async function getCameras() {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                videoDevices = devices.filter(device => device.kind === 'videoinput');
-                console.log("kamera terdeteksi:", videoDevices);
-            }
-
-            // start kamera sesuai index
-            async function startCamera(cameraIndex = 0) {
-                // stop kamera lama biar nggak bentrok
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                }
-
-                const constraints = {
-                    video: {
-                        deviceId: {
-                            exact: videoDevices[cameraIndex].deviceId
-                        }
-                    }
-                };
-
-                try {
-                    currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-                    video.srcObject = currentStream; // langsung pake const video kamu di global
-                } catch (err) {
-                    console.error("gagal nyalain kamera:", err);
-                }
-            }
-
-            // event tombol ganti kamera
-            document.getElementById("switchCamera").addEventListener("click", async () => {
-                if (videoDevices.length > 1) {
-                    currentCameraIndex = (currentCameraIndex + 1) % videoDevices.length;
-                    await startCamera(currentCameraIndex);
-                } else {
-                    alert("tidak ada kamera lain yang tersedia!");
-                }
-            });
-
-            // inisialisasi saat halaman load
-            getCameras().then(() => {
-                if (videoDevices.length > 0) {
-                    startCamera(currentCameraIndex);
-                }
-            });
-
-
-
-            // {{-- modal  --}}
-
-            <
-            script >
-                const tutorialModal = document.getElementById('tutorialModal');
+            const tutorialModal = document.getElementById('tutorialModal');
             tutorialModal.addEventListener('click', function(e) {
                 if (e.target === tutorialModal) {
                     const modalInstance = bootstrap.Modal.getInstance(tutorialModal);

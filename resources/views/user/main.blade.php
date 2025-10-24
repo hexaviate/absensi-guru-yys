@@ -64,11 +64,15 @@
                                                         <td>{{ $item->telp }}</td>
                                                         <td>{{ $item->username }}</td>
                                                         <td>
-                                                            @forelse ($item->instansi as $ins)
-                                                                {{ $ins->nama_instansi }}{{ !$loop->last ? ', ' : '' }}
-                                                            @empty
-                                                                Belum Ada Instansi
-                                                            @endforelse
+                                                            @if ($item->roles->contains('name', 'admin_yayasan'))
+                                                                Terdaftar di semua instansi
+                                                            @else
+                                                                @forelse ($item->instansi as $ins)
+                                                                    {{ $ins->nama_instansi }}{{ !$loop->last ? ', ' : '' }}
+                                                                @empty
+                                                                    Belum Ada Instansi
+                                                                @endforelse
+                                                            @endif
                                                         </td>
                                                         <td class="d-flex">
                                                             <a class="btn btn-warning mx-1"
@@ -120,7 +124,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th>NOmor Induk</th>
+                                                    <th>Nomor Induk</th>
                                                     <th>Name</th>
                                                     <th>Peran</th>
                                                     <th>No Telephone</th>

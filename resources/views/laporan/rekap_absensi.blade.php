@@ -12,212 +12,226 @@
         <div class="section-body">
             <div class="shadow pb-1">
                 <!-- REKAP HARIAN -->
-                <h4 class="p-2 m-2">Rekap Harian</h4>
-                <div class="border p-2 m-2">
-                    <form id="laporan-harian-form" method="GET" class="p-3">
-                        <div class="row mb-3">
-                            <div class="col-md-4 col-lg-3 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="status" class="form-control">
-                                    <option value="">-- Semua Status --</option>
-                                    <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir
-                                    </option>
-                                    <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin</option>
-                                </select>
+                @if (request('jenis') === 'harian')
+                    <h4 class="p-2 m-2">Rekap Harian</h4>
+                    <div class="border p-2 m-2">
+                        <form id="laporan-harian-form" method="GET" class="p-3">
+                            <div class="row mb-3">
+                                <div class="col-md-4 col-lg-3 mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-control">
+                                        <option value="">-- Semua Status --</option>
+                                        <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir
+                                        </option>
+                                        <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin
+                                        </option>
+                                    </select>
+                                </div>
+
+                                @hasrole('admin_yayasan')
+                                    <div class="col-md-4 col-lg-3 mb-3">
+                                        <label class="form-label">Instansi</label>
+                                        <select name="instansi" class="form-control">
+                                            <option value="">-- Semua Instansi --</option>
+                                            @foreach ($instansi as $i)
+                                                <option value="{{ $i->id }}"
+                                                    {{ request('instansi') == $i->id ? 'selected' : '' }}>
+                                                    {{ $i->nama_instansi }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endhasrole
+
+                                @hasrole('operator_instansi')
+                                    <input type="hidden" name="instansi" value="{{ $user->instansi()->first()->id ?? '' }}">
+                                @endhasrole
+
+
+                                <div class="col-md-4 col-lg-3 mb-3">
+                                    <label class="form-label">Tanggal hari ini</label>
+                                    <input type="date" name="tanggal" class="form-control"
+                                        value="{{ request('tanggal', now()->toDateString()) }}">
+                                </div>
                             </div>
 
-                            @hasrole('admin_yayasan')
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="btn-group-responsive d-flex flex-wrap gap-2">
+                                        <button type="submit" class="btn btn-primary mb-2 mb-sm-0">
+                                            <i class="fas fa-filter"></i> Filter
+                                        </button>
+                                        <a href="{{ route('rekap_absensi.index') }}" class="btn btn-secondary mb-2 mb-sm-0">
+                                            <i class="fas fa-redo"></i> Reset
+                                        </a>
+                                        <button type="button" class="btn btn-danger mb-2 mb-sm-0"
+                                            onclick="submitForm('{{ route('rekap_absensi.exportPDF') }}')">
+                                            <i class="fas fa-file-pdf"></i> Export PDF
+                                        </button>
+                                        <button type="button" class="btn btn-success mb-2 mb-sm-0"
+                                            onclick="submitForm('{{ route('rekap_absensi.exportExcel') }}')">
+                                            <i class="fas fa-file-excel"></i> Export Excel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                @elseif (request('jenis') === 'bulanan')
+                    <h4 class="p-2 m-2">Rekap Bulanan</h4>
+                    <div class="border p-2 m-2">
+                        <form id="laporan-bulanan-form" method="GET" class="p-3">
+                            <div class="row mb-3">
+                                <div class="col-md-6 col-lg-3 mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-control">
+                                        <option value="">-- Semua Status --</option>
+                                        <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir
+                                        </option>
+                                        <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin
+                                        </option>
+                                    </select>
+                                </div>
+
+                                @hasrole('admin_yayasan')
+                                    <div class="col-md-4 col-lg-3 mb-3">
+                                        <label class="form-label">Instansi</label>
+                                        <select name="instansi" class="form-control">
+                                            <option value="">-- Semua Instansi --</option>
+                                            @foreach ($instansi as $i)
+                                                <option value="{{ $i->id }}"
+                                                    {{ request('instansi') == $i->id ? 'selected' : '' }}>
+                                                    {{ $i->nama_instansi }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endhasrole
+
+                                @hasrole('operator_instansi')
+                                    <input type="hidden" name="instansi" value="{{ $user->instansi()->first()->id ?? '' }}">
+                                @endhasrole
+
+                                <div class="col-md-6 col-lg-3 mb-3">
+                                    <label class="form-label">Dari Tanggal</label>
+                                    <input type="date" name="dari_tanggal" class="form-control"
+                                        value="{{ request('dari_tanggal') }}">
+                                </div>
+
+                                <div class="col-md-6 col-lg-3 mb-3">
+                                    <label class="form-label">Sampai Tanggal</label>
+                                    <input type="date" name="sampai_tanggal" class="form-control"
+                                        value="{{ request('sampai_tanggal') }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="btn-group-responsive d-flex flex-wrap gap-2">
+                                        <button type="submit" class="btn btn-primary mb-2 mb-sm-0">
+                                            <i class="fas fa-filter"></i> Filter
+                                        </button>
+                                        <a href="{{ route('rekap_absensi.index') }}"
+                                            class="btn btn-secondary mb-2 mb-sm-0">
+                                            <i class="fas fa-redo"></i> Reset
+                                        </a>
+                                        <button type="button" class="btn btn-danger mb-2 mb-sm-0"
+                                            onclick="submitFormBulanan('{{ route('rekap_absensi.exportPDFBulanan') }}')">
+                                            <i class="fas fa-file-pdf"></i> Export PDF
+                                        </button>
+                                        <button type="button" class="btn btn-success mb-2 mb-sm-0"
+                                            onclick="submitFormBulanan('{{ route('rekap_absensi.exportExcelBulanan') }}')">
+                                            <i class="fas fa-file-excel"></i> Export Excel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                @elseif (request('jenis') === 'tahunan')
+                    <h4 class="p-2 m-2">Rekap Tahunan</h4>
+                    <div class="border p-2 m-2">
+                        <form id="laporan-tahunan-form" method="GET" class="p-3">
+                            <div class="row mb-3">
                                 <div class="col-md-4 col-lg-3 mb-3">
-                                    <label class="form-label">Instansi</label>
-                                    <select name="instansi" class="form-control">
-                                        <option value="">-- Semua Instansi --</option>
-                                        @foreach ($instansi as $i)
-                                            <option value="{{ $i->id }}"
-                                                {{ request('instansi') == $i->id ? 'selected' : '' }}>
-                                                {{ $i->nama_instansi }}
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-control">
+                                        <option value="">-- Semua Status --</option>
+                                        <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir
+                                        </option>
+                                        <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin
+                                        </option>
+                                    </select>
+                                </div>
+
+                                @hasrole('admin_yayasan')
+                                    <div class="col-md-4 col-lg-3 mb-3">
+                                        <label class="form-label">Instansi</label>
+                                        <select name="instansi" class="form-control">
+                                            <option value="">-- Semua Instansi --</option>
+                                            @foreach ($instansi as $i)
+                                                <option value="{{ $i->id }}"
+                                                    {{ request('instansi') == $i->id ? 'selected' : '' }}>
+                                                    {{ $i->nama_instansi }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endhasrole
+
+                                @hasrole('operator_instansi')
+                                    <input type="hidden" name="instansi"
+                                        value="{{ $user->instansi()->first()->id ?? '' }}">
+                                @endhasrole
+
+                                <div class="col-md-4 col-lg-3 mb-3">
+                                    <label class="form-label">Tahun Ajaran</label>
+                                    <select name="tahun_ajaran" class="form-control">
+                                        <option value="">-- Semua Tahun Ajaran --</option>
+                                        @foreach ($tapels as $tapel)
+                                            <option value="{{ $tapel->id }}"
+                                                {{ request('tahun_ajaran') == $tapel->id ? 'selected' : '' }}>
+                                                {{ $tapel->kode }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-                            @endhasrole
-
-                            @hasrole('operator_instansi')
-                                <input type="hidden" name="instansi" value="{{ $user->instansi()->first()->id ?? '' }}">
-                            @endhasrole
-
-
-                            <div class="col-md-4 col-lg-3 mb-3">
-                                <label class="form-label">Tanggal hari ini</label>
-                                <input type="date" name="tanggal" class="form-control"
-                                    value="{{ request('tanggal', now()->toDateString()) }}">
                             </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="btn-group-responsive d-flex flex-wrap gap-2">
-                                    <button type="submit" class="btn btn-primary mb-2 mb-sm-0">
-                                        <i class="fas fa-filter"></i> Filter
-                                    </button>
-                                    <a href="{{ route('rekap_absensi.index') }}" class="btn btn-secondary mb-2 mb-sm-0">
-                                        <i class="fas fa-redo"></i> Reset
-                                    </a>
-                                    <button type="button" class="btn btn-danger mb-2 mb-sm-0"
-                                        onclick="submitForm('{{ route('rekap_absensi.exportPDF') }}')">
-                                        <i class="fas fa-file-pdf"></i> Export PDF
-                                    </button>
-                                    <button type="button" class="btn btn-success mb-2 mb-sm-0"
-                                        onclick="submitForm('{{ route('rekap_absensi.exportExcel') }}')">
-                                        <i class="fas fa-file-excel"></i> Export Excel
-                                    </button>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="btn-group-responsive d-flex flex-wrap gap-2">
+                                        <button type="submit" class="btn btn-primary mb-2 mb-sm-0">
+                                            <i class="fas fa-filter"></i> Filter
+                                        </button>
+                                        <a href="{{ route('rekap_absensi.index') }}"
+                                            class="btn btn-secondary mb-2 mb-sm-0">
+                                            <i class="fas fa-redo"></i> Reset
+                                        </a>
+                                        <button type="button" class="btn btn-danger mb-2 mb-sm-0"
+                                            onclick="submitFormTahunan('{{ route('rekap_absensi.exportPDFTahunan') }}')">
+                                            <i class="fas fa-file-pdf"></i> Export PDF
+                                        </button>
+                                        <button type="button" class="btn btn-success mb-2 mb-sm-0"
+                                            onclick="submitFormTahunan('{{ route('rekap_absensi.exportExcelTahunan') }}')">
+                                            <i class="fas fa-file-excel"></i> Export Excel
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
+                        </form>
+                    </div>
+                @else
+                    {{-- <span>Kosong karena anada tidak menggunakan Request</span> --}}
+                @endif
+
+
 
                 <!-- REKAP BULANAN -->
-                <h4 class="p-2 m-2">Rekap Bulanan</h4>
-                <div class="border p-2 m-2">
-                    <form id="laporan-bulanan-form" method="GET" class="p-3">
-                        <div class="row mb-3">
-                            <div class="col-md-6 col-lg-3 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="status" class="form-control">
-                                    <option value="">-- Semua Status --</option>
-                                    <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir
-                                    </option>
-                                    <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin
-                                    </option>
-                                </select>
-                            </div>
 
-                            @hasrole('admin_yayasan')
-                                <div class="col-md-4 col-lg-3 mb-3">
-                                    <label class="form-label">Instansi</label>
-                                    <select name="instansi" class="form-control">
-                                        <option value="">-- Semua Instansi --</option>
-                                        @foreach ($instansi as $i)
-                                            <option value="{{ $i->id }}"
-                                                {{ request('instansi') == $i->id ? 'selected' : '' }}>
-                                                {{ $i->nama_instansi }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            @endhasrole
-
-                            @hasrole('operator_instansi')
-                                <input type="hidden" name="instansi" value="{{ $user->instansi()->first()->id ?? '' }}">
-                            @endhasrole
-
-                            <div class="col-md-6 col-lg-3 mb-3">
-                                <label class="form-label">Dari Tanggal</label>
-                                <input type="date" name="dari_tanggal" class="form-control"
-                                    value="{{ request('dari_tanggal') }}">
-                            </div>
-
-                            <div class="col-md-6 col-lg-3 mb-3">
-                                <label class="form-label">Sampai Tanggal</label>
-                                <input type="date" name="sampai_tanggal" class="form-control"
-                                    value="{{ request('sampai_tanggal') }}">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="btn-group-responsive d-flex flex-wrap gap-2">
-                                    <button type="submit" class="btn btn-primary mb-2 mb-sm-0">
-                                        <i class="fas fa-filter"></i> Filter
-                                    </button>
-                                    <a href="{{ route('rekap_absensi.index') }}" class="btn btn-secondary mb-2 mb-sm-0">
-                                        <i class="fas fa-redo"></i> Reset
-                                    </a>
-                                    <button type="button" class="btn btn-danger mb-2 mb-sm-0"
-                                        onclick="submitFormBulanan('{{ route('rekap_absensi.exportPDFBulanan') }}')">
-                                        <i class="fas fa-file-pdf"></i> Export PDF
-                                    </button>
-                                    <button type="button" class="btn btn-success mb-2 mb-sm-0"
-                                        onclick="submitFormBulanan('{{ route('rekap_absensi.exportExcelBulanan') }}')">
-                                        <i class="fas fa-file-excel"></i> Export Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
 
                 <!-- REKAP TAHUNAN -->
-                <h4 class="p-2 m-2">Rekap Tahunan</h4>
-                <div class="border p-2 m-2">
-                    <form id="laporan-tahunan-form" method="GET" class="p-3">
-                        <div class="row mb-3">
-                            <div class="col-md-4 col-lg-3 mb-3">
-                                <label class="form-label">Status</label>
-                                <select name="status" class="form-control">
-                                    <option value="">-- Semua Status --</option>
-                                    <option value="hadir" {{ request('status') == 'hadir' ? 'selected' : '' }}>Hadir
-                                    </option>
-                                    <option value="izin" {{ request('status') == 'izin' ? 'selected' : '' }}>Izin
-                                    </option>
-                                </select>
-                            </div>
 
-                            @hasrole('admin_yayasan')
-                                <div class="col-md-4 col-lg-3 mb-3">
-                                    <label class="form-label">Instansi</label>
-                                    <select name="instansi" class="form-control">
-                                        <option value="">-- Semua Instansi --</option>
-                                        @foreach ($instansi as $i)
-                                            <option value="{{ $i->id }}"
-                                                {{ request('instansi') == $i->id ? 'selected' : '' }}>
-                                                {{ $i->nama_instansi }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            @endhasrole
-
-                            @hasrole('operator_instansi')
-                                <input type="hidden" name="instansi" value="{{ $user->instansi()->first()->id ?? '' }}">
-                            @endhasrole
-
-                            <div class="col-md-4 col-lg-3 mb-3">
-                                <label class="form-label">Tahun Ajaran</label>
-                                <select name="tahun_ajaran" class="form-control">
-                                    <option value="">-- Semua Tahun Ajaran --</option>
-                                    @foreach ($tapels as $tapel)
-                                        <option value="{{ $tapel->id }}"
-                                            {{ request('tahun_ajaran') == $tapel->id ? 'selected' : '' }}>
-                                            {{ $tapel->kode }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="btn-group-responsive d-flex flex-wrap gap-2">
-                                    <button type="submit" class="btn btn-primary mb-2 mb-sm-0">
-                                        <i class="fas fa-filter"></i> Filter
-                                    </button>
-                                    <a href="{{ route('rekap_absensi.index') }}" class="btn btn-secondary mb-2 mb-sm-0">
-                                        <i class="fas fa-redo"></i> Reset
-                                    </a>
-                                    <button type="button" class="btn btn-danger mb-2 mb-sm-0"
-                                        onclick="submitFormTahunan('{{ route('rekap_absensi.exportPDFTahunan') }}')">
-                                        <i class="fas fa-file-pdf"></i> Export PDF
-                                    </button>
-                                    <button type="button" class="btn btn-success mb-2 mb-sm-0"
-                                        onclick="submitFormTahunan('{{ route('rekap_absensi.exportExcelTahunan') }}')">
-                                        <i class="fas fa-file-excel"></i> Export Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
             </div>
 
             <!-- TABEL DATA -->

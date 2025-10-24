@@ -42,7 +42,7 @@
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">{{ $statsData['PAUD'] }}</h2>
+                                <h2 class="stats-number">50</h2>
                                 <p class="stats-label">Guru & Karyawan PAUD</p>
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                     <div class="col-lg-4 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">{{ $statsData['MI'] }}</h2>
+                                <h2 class="stats-number">84</h2>
                                 <p class="stats-label">Guru & Karyawan <br>MI</p>
                             </div>
                         </div>
@@ -67,16 +67,16 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 col-12 mb-3">
+                    <div class="col-lg-3 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">{{ $statsData['MA'] }}</h2>
+                                <h2 class="stats-number">134</h2>
                                 <p class="stats-label">Guru & Karyawan <br>MA</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 col-12 mb-3">
+                    <div class="col-lg-3 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
                                 <h2 class="stats-number">{{ $statsData['SMK'] }}</h2>
@@ -85,11 +85,19 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 col-12 mb-3">
+                    <div class="col-lg-3 col-md-6 col-12 mb-3">
                         <div class="stats-card">
                             <div class="card-body">
-                                <h2 class="stats-number">{{ $statsData['PATTA'] }}</h2>
+                                <h2 class="stats-number">24</h2>
                                 <p class="stats-label">Guru & Karyawan PATTA</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-12 mb-3">
+                        <div class="stats-card">
+                            <div class="card-body">
+                                <h2 class="stats-number">4</h2>
+                                <p class="stats-label">KARYAWAN YAYASAN (PUSPELA)</p>
                             </div>
                         </div>
                     </div>
@@ -123,7 +131,8 @@
                         <div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Total Guru & Karyawan </h6>
-                                <h3 class="mb-0 text-success">{{ $totalSemuaGuru }}</h3>
+                                {{-- <h3 class="mb-0 text-primary">{{ $totalSemuaGuru }}</h3> --}}
+                                <h3 class="mb-0 text-primary">464</h3>
                             </div>
                         </div>
                     </div>

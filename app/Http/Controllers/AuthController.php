@@ -45,7 +45,7 @@ class AuthController extends Controller
             }
 
         } else {
-            return back();
+            return redirect()->back()->with('error', 'Username atau Password anda salah');
         }
     }
 

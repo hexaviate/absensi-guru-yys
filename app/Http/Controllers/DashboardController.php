@@ -96,7 +96,7 @@ class DashboardController extends Controller
                 ->count('id');
 
             // Hitung guru izin
-            $izin = Izin::whereDate('created_at', $tanggal)
+            $izin = Izin::whereDate('tanggal', $tanggal)
                 ->where('status', 'diterima')
                 ->distinct('id')
                 ->count('id');
