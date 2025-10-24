@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('telp');
             $table->string('username');
             $table->string('password');
+            $table->integer('wajib_hadir')->default(0);
             $table->string('jarak_tempuh')->nullable();
             $table->string('foto_presensi');
             $table->string('foto')->nullable();

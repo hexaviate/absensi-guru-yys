@@ -6,6 +6,7 @@ use App\Models\Jadwal;
 use App\Models\Tapel;
 use App\Models\User;
 use App\Imports\JadwalImport;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Validate;
@@ -115,6 +116,8 @@ class JadwalController extends Controller
      */
     public function store(Request $request)
     {
+        // $user = auth()->user();
+
         $validate = Validator::make($request->all(), [
             'tapel_id' => 'required|exists:tapels,id',
             'instansi_id' => 'required|exists:instansis,id',
@@ -134,6 +137,48 @@ class JadwalController extends Controller
         $adaJadwal = Jadwal::where('user_id', $request->user_id)->where('instansi_id', $request->instansi_id)->where('hari', $request->hari)->where('tapel_id', $tapelAktif->id)->first();
         $terdaftar = User::find($request->user_id)->instansi()->where('instansi_id', $request->instansi_id)->first(); //melihat apakah user terdaftar pada instansi
 
+        //*Penghitungan Wajib Hadir
+        // Get number of Fridays in current month
+        // if ($request->hari == "Senin") {
+        //     $wajibHadir = Carbon::now()->startOfMonth()
+        //         ->daysUntil(Carbon::now()->endOfMonth())
+        //         ->filter(fn($date) => $date->isMonday())
+        //         ->count();
+        // } elseif ($request->hari == "Selasa") {
+        //     $wajibHadir = Carbon::now()->startOfMonth()
+        //         ->daysUntil(Carbon::now()->endOfMonth())
+        //         ->filter(fn($date) => $date->isTuesday())
+        //         ->count();
+        // }
+
+        $dayMap = [
+            'Senin' => 'isMonday',
+            'Selasa' => 'isTuesday',
+            'Rabu' => 'isWednesday',
+            'Kamis' => 'isThursday',
+            'Jumat' => 'isFriday',
+            'Sabtu' => 'isSaturday',
+            'Minggu' => 'isSunday',
+        ];
+
+        $carbonMethod = $dayMap[$request->hari] ?? null;
+
+        if (!$carbonMethod) {
+            return back()->withErrors(['hari' => 'Hari tidak valid']);
+        }
+
+        $wajibHadir = Carbon::now()->startOfMonth()
+            ->daysUntil(Carbon::now()->endOfMonth())
+            ->filter(fn($date) => $date->$carbonMethod())
+            ->count();
+
+
+
+        // dd($carbonMethod);
+
+
+
+
         if ($terdaftar) {
             if (!$adaJadwal) {
                 Jadwal::create([
@@ -145,7 +190,17 @@ class JadwalController extends Controller
                     'pulang' => $request->pulang
                 ]);
 
-                return redirect()->route('jadwal.index')->with('success', 'Berhasil Menginputkan Jadwal');
+                $guru = User::find($request->user_id);
+
+                if ($guru->hasRole('tenaga_pendidik')) {
+                    $guru->update([
+                        'wajib_hadir' => $guru->wajib_hadir + $wajibHadir
+                    ]);
+
+                    return redirect()->route('jadwal.index')->with('success', 'Berhasil Menginputkan Jadwal');
+                }
+
+                // return redirect()->route('jadwal.index')->with('success', 'Berhasil Menginputkan Jadwal');
             } else {
                 return redirect()->back()->with('error', 'User ini telah terjadwal di instansi ini pada hari ini');
             }
@@ -211,12 +266,41 @@ class JadwalController extends Controller
         }
 
         $adaJadwal = Jadwal::where('user_id', $request->user_id)->where('instansi_id', $request->instansi_id)
-            ->where('hari', 'senin')
+            ->where('hari', $request->hari)
             ->where('id', '!=', $id)
             ->first();
 
         if ($adaJadwal) {
             return redirect()->back()->with('error', 'User ini sudah punya jadwal di instansi ini pada hari yang sama');
+        }
+
+        $guru = User::find($request->user_id);
+
+        $dayMap = [
+            'Senin' => 'isMonday',
+            'Selasa' => 'isTuesday',
+            'Rabu' => 'isWednesday',
+            'Kamis' => 'isThursday',
+            'Jumat' => 'isFriday',
+            'Sabtu' => 'isSaturday',
+            'Minggu' => 'isSunday',
+        ];
+
+        $jadwalCarbonMethod = $dayMap[$jadwal->hari] ?? null;
+
+        if (!$jadwalCarbonMethod) {
+            return back()->withErrors(['hari' => 'Hari tidak valid']);
+        }
+
+        $wajibHadirSebelumnya = Carbon::now()->startOfMonth()
+            ->daysUntil(Carbon::now()->endOfMonth())
+            ->filter(fn($date) => $date->$jadwalCarbonMethod())
+            ->count();
+
+        if ($guru->hasRole('tenaga_pendidik')) {
+            $guru->update([
+                'wajib_hadir' => $guru->wajib_hadir - $wajibHadirSebelumnya
+            ]);
         }
 
         $jadwal->update([
@@ -227,6 +311,22 @@ class JadwalController extends Controller
             'datang' => $request->datang,
             'pulang' => $request->pulang
         ]);
+
+        $carbonMethod = $dayMap[$request->hari] ?? null;
+        if (!$carbonMethod) {
+            return back()->withErrors(['hari' => 'Hari tidak valid']);
+        }
+        $wajibHadir = Carbon::now()->startOfMonth()
+            ->daysUntil(Carbon::now()->endOfMonth())
+            ->filter(fn($date) => $date->$carbonMethod())
+            ->count();
+
+
+        if ($guru->hasRole('tenaga_pendidik')) {
+            $guru->update([
+                'wajib_hadir' => $guru->wajib_hadir + $wajibHadir
+            ]);
+        }
 
         return redirect()->route('jadwal.index')->with('success', 'Berhasil mengedit Jadwal');
     }
@@ -242,6 +342,35 @@ class JadwalController extends Controller
         }
 
         $target = Jadwal::find($id);
+        $userJadwal = User::find($target->user_id);
+
+        $dayMap = [
+            'Senin' => 'isMonday',
+            'Selasa' => 'isTuesday',
+            'Rabu' => 'isWednesday',
+            'Kamis' => 'isThursday',
+            'Jumat' => 'isFriday',
+            'Sabtu' => 'isSaturday',
+            'Minggu' => 'isSunday',
+        ];
+
+        $carbonMethod = $dayMap[$target->hari] ?? null;
+
+        if (!$carbonMethod) {
+            return back()->withErrors(['hari' => 'Hari tidak valid']);
+        }
+
+        $wajibHadir = Carbon::now()->startOfMonth()
+            ->daysUntil(Carbon::now()->endOfMonth())
+            ->filter(fn($date) => $date->$carbonMethod())
+            ->count();
+
+        if ($userJadwal->hasRole('tenaga_pendidik')) {
+            $userJadwal->update([
+                'wajib_hadir' => $userJadwal->wajib_hadir - $wajibHadir
+            ]);
+        }
+
         $target->delete();
         return redirect()->route('jadwal.index')->with('success', 'Berhasil Hapus Jadwal');
     }
