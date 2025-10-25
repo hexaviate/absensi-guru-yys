@@ -89,13 +89,13 @@
                             <div class="col-md-6 mb-3">
                                 <label for="hari" class="form-label">Hari</label>
                                 <select class="form-control" id="hari" name="hari">
-                                    <option value="Senin" {{ $jadwal->hari == 'senin' ? 'selected' : '' }}>Senin</option>
-                                    <option value="Selasa" {{ $jadwal->hari == 'selasa' ? 'selected' : '' }}>Selasa
+                                    <option value="Senin" {{ $jadwal->hari == 'Senin' ? 'selected' : '' }}>Senin</option>
+                                    <option value="Selasa" {{ $jadwal->hari == 'Selasa' ? 'selected' : '' }}>Selasa
                                     </option>
-                                    <option value="Rabu" {{ $jadwal->hari == 'rabu' ? 'selected' : '' }}>Rabu</option>
-                                    <option value="Kamis" {{ $jadwal->hari == 'kamis' ? 'selected' : '' }}>Kamis</option>
-                                    <option value="Sabtu" {{ $jadwal->hari == 'sabtu' ? 'selected' : '' }}>Sabtu</option>
-                                    <option value="Ahad" {{ $jadwal->hari == 'ahad' ? 'selected' : '' }}>Ahad</option>
+                                    <option value="Rabu" {{ $jadwal->hari == 'Rabu' ? 'selected' : '' }}>Rabu</option>
+                                    <option value="Kamis" {{ $jadwal->hari == 'Kamis' ? 'selected' : '' }}>Kamis</option>
+                                    <option value="Sabtu" {{ $jadwal->hari == 'Sabtu' ? 'selected' : '' }}>Sabtu</option>
+                                    <option value="Ahad" {{ $jadwal->hari == 'Ahad' ? 'selected' : '' }}>Ahad</option>
                                 </select>
                             </div>
                         </div>

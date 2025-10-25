@@ -102,6 +102,18 @@ Route::middleware(['auth'])->group(function () {
             ->name('users.import');
         Route::get('/users/template/download', [UsersController::class, 'downloadTemplate'])
             ->name('users.template');
+
+        // INI UNTUK OPERATOR INSTANSI
+
+        Route::post('/users/template/download/operator', [App\Http\Controllers\UsersController::class, 'importOperator'])->name('operator.instansi.users.import');
+        Route::get('/users/import/opearator', [App\Http\Controllers\UsersController::class, 'downloadTemplateOperator'])->name('operator.instansi.users.download-template');
+
+        //untuk view nya
+        Route::get('/users/import/viewOperator', [UsersController::class, 'viewImportOperator'])
+            ->name('userImportViewOperator');
+
+        Route::get('/users/import/viewAdmin', [UsersController::class, 'viewImportAdmin'])
+            ->name('userImportViewAdmin');
     });
 });
 

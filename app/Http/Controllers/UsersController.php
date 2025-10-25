@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TemplateAdminExport;
+use App\Exports\TemplateOperatorInstansiExport;
 use App\Imports\UsersImport;
+use App\Imports\UsersImportOperator;
 use App\Models\Instansi;
 use App\Models\User;
 use Carbon\Carbon;
@@ -350,6 +353,81 @@ class UsersController extends Controller
 
     public function downloadTemplate()
     {
-        // ini saya isi nanti ketika sudah ada
+        // ini saya isi nanti ketika sudah ada ini untuk admin yayasan
+          return Excel::download(new TemplateAdminExport(), 'TemplateUserExport.xlsx');
+    }
+
+
+    // IMORT UNTUK OPERATORR YA INII
+
+    public function importOperator(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048'
+        ], [
+            'file.required' => 'File wajib diunggah.',
+            'file.mimes' => 'File harus berformat Excel atau CSV.',
+            'file.max' => 'Ukuran file maksimal 2MB.'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $import = new UsersImportOperator();
+            Excel::import($import, $request->file('file'));
+
+            // Cek apakah ada error
+            if ($import->getFailureCount() > 0) {
+                DB::rollBack();
+                return redirect()->back()->with([
+                    'error' => 'Import gagal! Terdapat ' . $import->getFailureCount() . ' baris yang error.',
+                    'errors' => $import->getErrors()
+                ]);
+            }
+
+            // Jika tidak ada error, commit transaction
+            DB::commit();
+            return redirect()->back()->with([
+                'success' => 'Import berhasil! ' . $import->getSuccessCount() . ' user berhasil diimport ke instansi Anda.'
+            ]);
+
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            DB::rollBack();
+            $failures = $e->failures();
+            $errors = [];
+
+            foreach ($failures as $failure) {
+                $errors[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+
+            return redirect()->back()->with([
+                'error' => 'Import gagal! Terdapat error pada file Excel.',
+                'errors' => $errors
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with([
+                'error' => 'Import gagal! ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Download template Excel untuk import
+     * Template hanya berisi kolom: name, telp, username, password, jarak_tempuh, nomor_induk_yayasan, peran
+     */
+    public function downloadTemplateOperator()
+    {
+        return Excel::download(new TemplateOperatorInstansiExport(), 'Template_Import_Operator_Instansi.xlsx');
+    }
+
+    public function viewImportOperator()
+    {
+        return view('user.importOperator');
+    }
+    public function viewImportAdmin()
+    {
+        return view('user.importAdmin');
     }
 }
