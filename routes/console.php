@@ -28,9 +28,10 @@ Schedule::call(function () {
     foreach ($users as $user) {
         foreach ($user->instansi as $instansi) {
             $presensi = Presensi::where('user_id', $user->id)->where('instansi_id', $instansi->id)->whereDate('tanggal', $today)->exists();
-
             if (!$presensi) {
 
+                if ($user->hasRole('admin_yayasan')) {
+                }
 
                 // $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->where('instansi_id', $instansi->id)->exists();
                 // if (!$jadwalHariIni) {
@@ -85,23 +86,52 @@ Schedule::call(function () {
 //!perlu disusaikan cron nya jika sudah di server
 //*jika running lokal maka pakai "php artisan schedule:work"
 
+//Reset Wajib Hadir setiap awal bulan
+Schedule::call(function () {
+    $users = User::with('instansi', 'jadwal')->get();
 
-// $instansi = Instansi::all();
+    foreach ($users as $user) {
+        $user->update([
+            "wajib_hadir" => 0
+        ]);
 
-// foreach ($instansi as $item) {
-//     $user = User::all();
+        if (!$user->hasRole('tenaga_pendidik')) {
+            $hariJumat = Carbon::now()->startOfMonth()
+                ->daysUntil(Carbon::now()->endOfMonth())
+                ->filter(fn($date) => $date->isFriday())
+                ->count();
 
-//     foreach ($user as $key) {
-//         $presensi =
-//     }
-// }
-// foreach ($user as $key) {
-//     $presensi = $key->presensi()->tanggal = Carbon::now()->toDateString();
+            $user->update([
+                "wajib_hadir" => now()->daysInMonth() - $hariJumat
+            ]);
+        } else {
+            foreach ($user->jadwal as $jadwal) {
+                $dayMap = [
+                    'Senin' => 'isMonday',
+                    'Selasa' => 'isTuesday',
+                    'Rabu' => 'isWednesday',
+                    'Kamis' => 'isThursday',
+                    'Jumat' => 'isFriday',
+                    'Sabtu' => 'isSaturday',
+                    'Minggu' => 'isSunday',
+                ];
 
-//     if (!$presensi) {
-//         TidakHadir::create([
-//             ""
-//         ]);
-//     }
-// }
+                $carbonMethod = $dayMap[$jadwal->hari] ?? null;
 
+                if (!$carbonMethod) {
+                    return back()->withErrors(['hari' => 'Hari tidak valid']);
+                }
+
+                $wajibHadir = Carbon::now()->startOfMonth()
+                    ->daysUntil(Carbon::now()->endOfMonth())
+                    ->filter(fn($date) => $date->$carbonMethod())
+                    ->count();
+
+                $user->update([
+                    "wajib_hadir" => $user->wajib_hadir + $wajibHadir
+                ]);
+            }
+        }
+    }
+})->dailyAt('15:23');
+//diganti menjadi setiap awal bulan

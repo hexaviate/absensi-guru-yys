@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\UsersImport;
 use App\Models\Instansi;
 use App\Models\User;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Validator;
@@ -85,8 +86,10 @@ class UsersController extends Controller
             "username" => "required",
             "password" => "required",
             'jarak_tempuh' => 'required',
-            "nomor_induk_yayasan" => "required",
+            "nomor_induk_yayasan" => "required|unique:users",
         ]);
+
+
 
         // dd($validate);
 
@@ -98,6 +101,11 @@ class UsersController extends Controller
             return redirect()->back()->with('error', 'anda tidak punya permission');
         }
 
+        // dd($request->instansi_id[0]);
+
+        if ($request->instansi_id[0] != $user->instansi()->first()->id) {
+            return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
+        }
         // if ($user->hasRole('operator_instansi') && $request->instansi_id != $user->instansi()->first()->id) {
         //     return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
         // }
@@ -113,7 +121,7 @@ class UsersController extends Controller
         $imagePresensi = $manager->read($request->file('foto_presensi'));
         $imagePresensi->encode(new AutoEncoder(50))->save(public_path('foto_presensi/' . $imageNamePresensi));
 
-        $user = User::create([
+        $userBaru = User::create([
             "nomor_induk_yayasan" => $request->nomor_induk_yayasan,
             "name" => $request->name,
             "telp" => $request->telp,
@@ -124,8 +132,20 @@ class UsersController extends Controller
             // "foto" => $imageName,
         ]);
 
-        $user->instansi()->attach($request->instansi_id);
-        $user->roles()->attach($request->role_id);
+        $userBaru->instansi()->attach($request->instansi_id);
+        $userBaru->roles()->attach($request->role_id);
+
+
+        $hariJumat = Carbon::now()->startOfMonth()
+            ->daysUntil(Carbon::now()->endOfMonth())
+            ->filter(fn($date) => $date->isFriday())
+            ->count();
+
+        if (!$userBaru->hasRole("tenaga_pendidik")) {
+            $userBaru->update([
+                "wajib_hadir" => now()->daysInMonth() - $hariJumat
+            ]);
+        }
 
         return redirect()->route('user.index')->with('success', 'Berhasil Tambah User');
 
@@ -190,7 +210,7 @@ class UsersController extends Controller
             "jarak_tempuh" => "nullable|numeric|min:0",
             "role_id" => "required|min:1",
             "instansi_id" => "required|array|min:1",
-            "nomor_induk_yayasan" => "required"
+            "nomor_induk_yayasan" => "required|unique:users,id",
 
         ];
 
