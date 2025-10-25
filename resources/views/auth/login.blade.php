@@ -32,12 +32,12 @@
                     <div
                         class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
                         <div class="login-brand text-center">
-                            {{-- <img src="{{ asset('asset/image/logoYayasan.svg') }}" alt="logo" width="100"
-                                class=""> --}}
+                            <img src="{{ asset('asset/image/logoYayasan.svg') }}" alt="logo" width="100"
+                                class="">
 
-                            <h2 class="fw-bold text-primary mb-1 mt-4" style="letter-spacing: 2px;">SIAP</h2>
+                            {{-- <h2 class="fw-bold text-primary mb-1 mt-4" style="letter-spacing: 2px;">SIAP</h2>
                             <p class="text-primary mb-0" style="font-size: 14px;">Sistem Informasi Administrasi Presensi
-                            </p>
+                            </p> --}}
                         </div>
 
 

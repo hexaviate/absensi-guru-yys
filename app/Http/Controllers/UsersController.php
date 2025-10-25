@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\UsersImport;
 use App\Models\Instansi;
 use App\Models\User;
 use DB;
@@ -11,7 +12,11 @@ use Spatie\Permission\Models\Role;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\AutoEncoder;
+// use Vtiful\Kernel\Excel;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
+
+
 
 class UsersController extends Controller
 {
@@ -69,7 +74,7 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        //TODO: jangan lupa tambahkan pengecekan apakah user punya role "admin_yayasan"
+        // TODO: jangan lupa tambahkan pengecekan apakah user punya role "admin_yayasan"
         //*sementara untuk keperluan testing
 
         $user = auth()->user();
@@ -83,6 +88,8 @@ class UsersController extends Controller
             "nomor_induk_yayasan" => "required",
         ]);
 
+        // dd($validate);
+
         if ($validate->fails()) {
             return redirect()->back()->withErrors($validate)->withInput();
         }
@@ -91,9 +98,9 @@ class UsersController extends Controller
             return redirect()->back()->with('error', 'anda tidak punya permission');
         }
 
-        if ($user->hasRole('operator_instansi') && $request->instansi_id != $user->instansi()->first()->id) {
-            return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
-        }
+        // if ($user->hasRole('operator_instansi') && $request->instansi_id != $user->instansi()->first()->id) {
+        //     return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
+        // }
 
         // * Upload untuk Foto Presensi
 
@@ -266,5 +273,63 @@ class UsersController extends Controller
         $target = User::find($id);
         $target->delete();
         return redirect()->route('user.index')->with('success', 'Berhasil Hapus User');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048'
+        ]);
+
+        DB::beginTransaction();
+        $import = new UsersImport();
+
+        try {
+            Excel::import($import, $request->file('file'));
+
+            // Cek apakah ada error
+            if ($import->getFailureCount() > 0) {
+                DB::rollBack();
+
+                return redirect()->back()->with([
+                    'error' => 'Import gagal! Terdapat ' . $import->getFailureCount() . ' baris yang error.',
+                    'errors' => $import->getErrors()
+                ]);
+            }
+
+            // Jika tidak ada error, commit transaction
+            DB::commit();
+
+            return redirect()->back()->with([
+                'success' => 'Import berhasil! ' . $import->getSuccessCount() . ' user berhasil diimport.'
+            ]);
+
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            DB::rollBack();
+
+            $failures = $e->failures();
+            $errors = [];
+
+            foreach ($failures as $failure) {
+                $errors[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+
+            return redirect()->back()->with([
+                'error' => 'Import gagal! Terdapat error pada file Excel.',
+                'errors' => $errors
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->with([
+                'error' => 'Import gagal! ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        // ini saya isi nanti ketika sudah ada
     }
 }

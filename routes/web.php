@@ -39,14 +39,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('prosesPresensi', 'prosesPresensi')->name('prosesPresensi');
     });
 
+    Route::get('/cekProfile', function () {
+        return view('user.cekProfile');
+    });
+
     Route::resource('user', UsersController::class);
     Route::resource('role', RoleController::class);
     Route::resource('instansi', InstansiController::class);
     Route::resource('tapel', TapelController::class);
     Route::resource('hariLibur', HariLiburController::class);
     Route::resource('jadwal', JadwalController::class);
-
-
 
 
     Route::controller(ProfileController::class)->group(function () {
@@ -90,7 +92,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/izin/search-users', [IzinController::class, 'searchUsers'])
             ->name('izin.searchUsers');
 
-        Route::post('jadwal/import', [JadwalController::class,'import'])->name('jadwal.import');
+        // kelompok jadwal import dan export exel
+        Route::post('jadwal/import', [JadwalController::class, 'import'])->name('jadwal.import');
+        Route::get('/jadwal/template/download', [JadwalController::class, 'downloadTemplate'])
+            ->name('jadwal.template');
+
+        // kelompok user import dan export exel
+        Route::post('/users/import', [UsersController::class, 'import'])
+            ->name('users.import');
+        Route::get('/users/template/download', [UsersController::class, 'downloadTemplate'])
+            ->name('users.template');
     });
 });
 

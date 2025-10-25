@@ -18,6 +18,7 @@
             <div class="section-body">
                 <div class="shadow pb-2">
                     <a href="{{ route('user.create') }}" class="btn btn-primary m-2 shadow">Tambah Data User</a>
+                    <a href="{{ route('user.create') }}" class="btn btn-primary m-2 shadow">Import Data User</a>
                 </div>
 
                 <div class="row">
@@ -108,6 +109,7 @@
                     <div class="col-12">
                         <div class="shadow pb-2">
                             <a href="{{ route('user.create') }}" class="btn btn-primary m-2 shadow">Tambah Data User</a>
+                            <a href="{{ route('user.create') }}" class="btn btn-primary m-2 shadow">Import Data User</a>
                         </div>
                         <div class="card shadow">
                             <div class="card-header">

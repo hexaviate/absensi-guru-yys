@@ -52,6 +52,7 @@
                         <div class="row">
                             <!-- user_id pencarian -->
                             <!-- Ganti bagian ini di blade template -->
+
                             <div class="col-md-6 mb-3">
                                 <label for="userSearch" class="form-label">Cari User</label>
                                 <input type="text" id="userSearch" class="form-control"
@@ -119,20 +120,19 @@
                     <h5 class="mb-0">Import Jadwal</h5>
                 </div>
 
-
                 <div class="card-body">
                     <form action="{{ route('jadwal.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="tapel" class="form-label">Imput File Exel</label>
-                                <input type="file" class="form-control" name="file" accept=".xlsx, .xls, .csv" required>
+                                <input type="file" class="form-control" name="file" accept=".xlsx, .xls, .csv"
+                                    required>
                             </div>
                         </div>
-
-
-
                         <div class="d-flex justify-content-end" style="gap: 10px;">
+                            <button type="submit" class="btn btn-primary px-4"><i
+                                    class="fa-solid fa-arrow-down mr-2"></i>Download Template</button>
                             <button type="submit" class="btn btn-primary px-4">Simpan</button>
                             <a href="{{ route('jadwal.index') }}" class="btn btn-secondary">Batal</a>
                         </div>

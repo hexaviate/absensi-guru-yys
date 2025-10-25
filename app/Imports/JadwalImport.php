@@ -12,6 +12,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Validators\Failure;
 
 class JadwalImport implements ToModel, WithValidation, SkipsOnFailure, WithHeadingRow
 {
@@ -24,8 +25,8 @@ class JadwalImport implements ToModel, WithValidation, SkipsOnFailure, WithHeadi
     public function rules(): array
     {
         return [
-            '*.instansi_id' => 'required',
-            '*.user_id' => 'required',
+            '*.nama_instansi' => 'required',
+            '*.kode' => 'required',
             '*.hari' => 'required',
             '*.datang' => 'required',
             '*.pulang' => 'required'
@@ -51,23 +52,56 @@ class JadwalImport implements ToModel, WithValidation, SkipsOnFailure, WithHeadi
         $tapelAktif = Tapel::where('status', 'aktif')->first();
 
         // Cari instansi berdasarkan nama
-        $instansi = Instansi::where('nama_instansi', 'like', "%{$row['instansi_id']}%")->first();
-        $instansi_id = $instansi ? $instansi->id : null;
+        $instansi = Instansi::where('nama_instansi', 'like', "%{$row['nama_instansi']}%")->first();
+        $user = User::where('nomor_induk_yayasan', strval($row['kode']))->first();
 
-        // Cari user berdasarkan nomor induk
-        $user = User::where('nomor_induk_yayasan', strval($row['user_id']))->first();
+        // dd([
+        //     'row' => $row,
+        //     'tapel' => $tapelAktif,
+        //     'instansi' => $instansi,
+        //     'user' => $user
+        // ]);
 
-        if (!$tapelAktif || !$instansi || !$user) {
-            return back()->with('error','instansi / user ada kesalahan data');
+
+
+        // kalau instansi / user nggak ditemukan, skip aja biar gak crash
+        if (!$instansi) {
+            $this->failures[] = new Failure(
+                $this->getRowNumber(),
+                'nama_instansi',
+                ['Instansi tidak ditemukan di database'],
+                $row
+            );
+            return null;
+        }
+
+        if (!$user) {
+            $this->failures[] = new Failure(
+                $this->getRowNumber(),
+                'kode',
+                ["User dengan kode {$row['kode']} tidak ditemukan di database"],
+                $row
+            );
+            return null;
         }
 
         return new Jadwal([
             'tapel_id' => $tapelAktif->id,
-            'instansi_id' => $instansi_id,
+            'instansi_id' => $instansi->id,
             'user_id' => $user->id,
             'hari' => $row['hari'],
             'datang' => $this->excelTimeToString($row['datang']),
             'pulang' => $this->excelTimeToString($row['pulang'])
         ]);
+    }
+
+    private $currentRow = 1;
+    public function onRow($row)
+    {
+        $this->currentRow++;
+    }
+    private function getRowNumber()
+    {
+        return $this->currentRow;
     }
 }

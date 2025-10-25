@@ -30,16 +30,30 @@ class JadwalController extends Controller
             Excel::import($import, $request->file('file'));
 
             if ($import->failures()->isNotEmpty()) {
-                $rows = $import->failures()
-                    ->map(fn($failure) => $failure->row())
-                    ->unique()
-                    ->implode(',');
+                $failures = $import->failures();
 
-                // rollback sebelum keluar
+                $userErrors = $failures
+                    ->filter(fn($f) => str_contains(implode(', ', $f->errors()), 'User dengan kode'))
+                    ->map(fn($f) => $f->values()['kode'] ?? '')
+                    ->filter()
+                    ->implode(', ');
+
+
+                $otherErrors = $failures
+                    ->reject(fn($f) => str_contains(implode(', ', $f->errors()), 'User dengan kode'))
+                    ->map(fn($f) => "Baris {$f->row()}: " . implode(', ', $f->errors()))
+                    ->implode('. ');
+
+                $message = $userErrors
+                    ? "User dengan kode $userErrors tidak ditemukan di database. " . $otherErrors
+                    : $otherErrors;
+
+                // rollback transaksi
                 DB::rollBack();
 
-                return back()->with('error', "Terdapat Kesalahan Pada Baris $rows");
+                return back()->with('error', $message);
             }
+
 
             DB::commit();
             return back()->with('success', 'Semua Data Jadwal Berhasil Di Import');
