@@ -15,7 +15,9 @@
                 @if (request('jenis') === 'harian')
                     <h4 class="p-2 m-2">Rekap Harian</h4>
                     <div class="border p-2 m-2">
-                        <form id="laporan-harian-form" method="GET" class="p-3">
+                        <form id="laporan-harian-form" method="GET" action="{{ route('rekap_absensi.index') }}"
+                            class="p-3">
+                            <input type="hidden" name="jenis" value="harian">
                             <div class="row mb-3">
                                 <div class="col-md-4 col-lg-3 mb-3">
                                     <label class="form-label">Status</label>
@@ -47,7 +49,6 @@
                                     <input type="hidden" name="instansi" value="{{ $user->instansi()->first()->id ?? '' }}">
                                 @endhasrole
 
-
                                 <div class="col-md-4 col-lg-3 mb-3">
                                     <label class="form-label">Tanggal hari ini</label>
                                     <input type="date" name="tanggal" class="form-control"
@@ -61,7 +62,8 @@
                                         <button type="submit" class="btn btn-primary mb-2 mb-sm-0">
                                             <i class="fas fa-filter"></i> Filter
                                         </button>
-                                        <a href="{{ route('rekap_absensi.index') }}" class="btn btn-secondary mb-2 mb-sm-0">
+                                        <a href="{{ route('rekap_absensi.index', ['jenis' => 'harian']) }}"
+                                            class="btn btn-secondary mb-2 mb-sm-0">
                                             <i class="fas fa-redo"></i> Reset
                                         </a>
                                         <button type="button" class="btn btn-danger mb-2 mb-sm-0"
@@ -80,7 +82,9 @@
                 @elseif (request('jenis') === 'bulanan')
                     <h4 class="p-2 m-2">Rekap Bulanan</h4>
                     <div class="border p-2 m-2">
-                        <form id="laporan-bulanan-form" method="GET" class="p-3">
+                        <form id="laporan-bulanan-form" method="GET" action="{{ route('rekap_absensi.index') }}"
+                            class="p-3">
+                            <input type="hidden" name="jenis" value="bulanan">
                             <div class="row mb-3">
                                 <div class="col-md-6 col-lg-3 mb-3">
                                     <label class="form-label">Status</label>
@@ -131,7 +135,7 @@
                                         <button type="submit" class="btn btn-primary mb-2 mb-sm-0">
                                             <i class="fas fa-filter"></i> Filter
                                         </button>
-                                        <a href="{{ route('rekap_absensi.index') }}"
+                                        <a href="{{ route('rekap_absensi.index', ['jenis' => 'bulanan']) }}"
                                             class="btn btn-secondary mb-2 mb-sm-0">
                                             <i class="fas fa-redo"></i> Reset
                                         </a>
@@ -151,7 +155,9 @@
                 @elseif (request('jenis') === 'tahunan')
                     <h4 class="p-2 m-2">Rekap Tahunan</h4>
                     <div class="border p-2 m-2">
-                        <form id="laporan-tahunan-form" method="GET" class="p-3">
+                        <form id="laporan-tahunan-form" method="GET" action="{{ route('rekap_absensi.index') }}"
+                            class="p-3">
+                            <input type="hidden" name="jenis" value="tahunan">
                             <div class="row mb-3">
                                 <div class="col-md-4 col-lg-3 mb-3">
                                     <label class="form-label">Status</label>
@@ -204,7 +210,7 @@
                                         <button type="submit" class="btn btn-primary mb-2 mb-sm-0">
                                             <i class="fas fa-filter"></i> Filter
                                         </button>
-                                        <a href="{{ route('rekap_absensi.index') }}"
+                                        <a href="{{ route('rekap_absensi.index', ['jenis' => 'tahunan']) }}"
                                             class="btn btn-secondary mb-2 mb-sm-0">
                                             <i class="fas fa-redo"></i> Reset
                                         </a>
@@ -222,16 +228,11 @@
                         </form>
                     </div>
                 @else
-                    {{-- <span>Kosong karena anada tidak menggunakan Request</span> --}}
+                    <div class="alert alert-info m-3">
+                        <i class="fas fa-info-circle"></i> Silakan pilih jenis rekap dari menu sidebar (Recap Harian,
+                        Bulanan, atau Tahunan)
+                    </div>
                 @endif
-
-
-
-                <!-- REKAP BULANAN -->
-
-
-                <!-- REKAP TAHUNAN -->
-
             </div>
 
             <!-- TABEL DATA -->
@@ -259,7 +260,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if ($presensi->count() > 0)
+                                        @if (isset($presensi) && $presensi->count() > 0)
                                             @foreach ($presensi as $item)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
@@ -421,6 +422,11 @@
 
             // Initialize DataTable dengan error handling
             try {
+                // Cek apakah ada data
+                const tableBody = document.querySelector('#example tbody');
+                const hasData = tableBody && tableBody.querySelectorAll('tr').length > 0 &&
+                    !tableBody.querySelector('td[colspan="10"]');
+
                 // Cek apakah tabel sudah diinisialisasi
                 if ($.fn.DataTable.isDataTable('#example')) {
                     $('#example').DataTable().destroy();
@@ -428,37 +434,44 @@
 
                 // Hitung jumlah kolom yang sebenarnya ada di thead
                 const columnCount = $('#example thead tr th').length;
-                console.log('Column count:', columnCount);
 
-                // Inisialisasi DataTable
-                $('#example').DataTable({
-                    "pagingType": "full_numbers",
-                    "language": {
-                        "paginate": {
-                            "first": "<i class='fas fa-angle-double-left'></i>",
-                            "last": "<i class='fas fa-angle-double-right'></i>",
-                            "next": "<i class='fas fa-chevron-right'></i>",
-                            "previous": "<i class='fas fa-chevron-left'></i>"
+                // Inisialisasi DataTable hanya jika ada data
+                if (hasData) {
+                    $('#example').DataTable({
+                        "pagingType": "full_numbers",
+                        "language": {
+                            "paginate": {
+                                "first": "<i class='fas fa-angle-double-left'></i>",
+                                "last": "<i class='fas fa-angle-double-right'></i>",
+                                "next": "<i class='fas fa-chevron-right'></i>",
+                                "previous": "<i class='fas fa-chevron-left'></i>"
+                            },
+                            "emptyTable": "Data Kosong",
+                            "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                            "infoEmpty": "Menampilkan 0 sampai 0 dari 0 data",
+                            "infoFiltered": "(disaring dari _MAX_ total data)",
+                            "lengthMenu": "Tampilkan _MENU_ data",
+                            "search": "Cari:",
+                            "zeroRecords": "Data tidak ditemukan"
                         },
-                        "emptyTable": "Data Kosong",
-                        "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                        "infoEmpty": "Menampilkan 0 sampai 0 dari 0 data",
-                        "infoFiltered": "(disaring dari _MAX_ total data)",
-                        "lengthMenu": "Tampilkan _MENU_ data",
-                        "search": "Cari:",
-                        "zeroRecords": "Data tidak ditemukan"
-                    },
-                    "order": [
-                        [1, "desc"]
-                    ], // Sort by tanggal (kolom ke-2)
-                    "columnDefs": [{
-                            "orderable": false,
-                            "targets": [7]
-                        } // Bukti Izin tidak bisa disort
-                    ]
-                });
-
-                console.log('DataTable initialized successfully');
+                        "order": [
+                            [1, "desc"]
+                        ], // Sort by tanggal (kolom ke-2)
+                        "columnDefs": [{
+                                "orderable": false,
+                                "targets": [7]
+                            } // Bukti Izin tidak bisa disort
+                        ],
+                        "pageLength": 10,
+                        "lengthMenu": [
+                            [10, 25, 50, 100, -1],
+                            [10, 25, 50, 100, "Semua"]
+                        ]
+                    });
+                } else {
+                    // Jika tidak ada data, tampilkan tabel biasa tanpa DataTable
+                    console.log('Tidak ada data untuk ditampilkan');
+                }
             } catch (error) {
                 console.error('Error initializing DataTable:', error);
             }
