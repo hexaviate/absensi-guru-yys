@@ -67,4 +67,9 @@ class Instansi extends Model
     {
         return $this->hasMany(TidakHadir::class);
     }
+
+    public function event()
+    {
+        return $this->hasMany(Event::class);
+    }
 }

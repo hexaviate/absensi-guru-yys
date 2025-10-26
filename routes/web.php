@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\HariLiburController;
 use App\Http\Controllers\InstansiController;
 use App\Http\Controllers\LaporanAbsensiController;
@@ -58,6 +59,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('jadwalUser', 'viewJadwalMingguIni')->name('jadwalUser');
         Route::get('viewRiwayatAbsensi', 'viewRiwayatAbsensi');
         Route::get('viewJadwalHariIni', 'viewJadwalHariIni');
+    });
+
+    Route::controller(EventController::class)->group(function () {
+        Route::get('indexEventOperator', 'indexEventOperator')->name('indexEventOperator');
+        Route::get('createEventOperator', 'createEventOperator')->name('createEventOperator');
+        Route::post('storeEventOperator', 'storeEventOperator')->name('storeEventOperator');
+        Route::get('editEventOperator', 'editEventOperator')->name('editEventOperator');
+        Route::put('updateEventOperator', 'updateEventOperator')->name('updateEventOperator');
+        Route::delete('deleteEventOperator', 'deleteEventOperator')->name('deleteEventOperator');
+
+        //* bawah ini untuk user
+        Route::delete('viewEventUser', 'viewEventUser')->name('viewEventUser');
     });
 
     Route::controller(IzinController::class)->group(function () {
