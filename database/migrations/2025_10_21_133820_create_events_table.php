@@ -15,7 +15,9 @@ return new class extends Migration {
             $table->foreignId('tapel_id')->constrained()->onDelete('cascade');
             $table->foreignId('instansi_id')->constrained()->onDelete('cascade');
             $table->string('nama_event');
-            $table->string('');
+            $table->text('keterangan');
+            $table->date('tanggal_mulai');
+            $table->date('tanggal_selesai');
             $table->timestamps();
         });
     }

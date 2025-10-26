@@ -33,12 +33,6 @@ Schedule::call(function () {
                 if ($user->hasRole('admin_yayasan')) {
                 }
 
-                // $jadwalHariIni = $user->jadwal()->where('hari', now()->isoFormat('dddd'))->where('instansi_id', $instansi->id)->exists();
-                // if (!$jadwalHariIni) {
-                //     if ($user->hasRole('tenaga_pendidik')) {
-                //         continue;
-                //     }
-                // }
                 $hariLibur = HariLibur::where('instansi_id', $instansi->id)->where('tanggal', now()->toDateString())->first();
 
                 if ($user->hasRole('tenaga_pendidik')) {
