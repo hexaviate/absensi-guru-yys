@@ -173,11 +173,75 @@
                     </div>
                 </div>
             </div>
+            <div class="card custom-card">
+                <div class="card-header">
+                    <div class="card-header">
+                        <h2>Kalender Yayasan</h2>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="calendar"></div>
+                </div>
+            </div>
         </div>
     </section>
 @endsection
 
+@section('modal')
+    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="eventModalLabel">Detail Event</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Judul:</strong> <span id="modalTitle"></span></p>
+                    <p><strong>Tanggal:</strong> <span id="modalDate"></span></p>
+                    <p><strong>Deskripsi:</strong></p>
+                    <p id="modalDescription"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
 @push('style')
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #calendar {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* responsif untuk mobile */
+        @media (max-width: 768px) {
+            #calendar {
+                width: 100%;
+                font-size: 13px;
+            }
+
+            .fc-toolbar {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .fc-toolbar-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+
     <style>
         .avatar-presensi {
             width: 50px;
@@ -265,7 +329,40 @@
 
 @push('script')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 'auto',
+                events: [{
+                        title: 'Rapat Tim',
+                        start: '2025-10-29',
+                        description: 'Diskusi proyek laravel dan testing API'
+                    },
+                    {
+                        title: 'Ujian Tengah Semester',
+                        start: '2025-10-30',
+                        description: 'UTS Pemrograman Lanjut'
+                    }
+                ],
+                eventClick: function(info) {
+                    // isi data ke modal
+                    document.getElementById('modalTitle').innerText = info.event.title;
+                    document.getElementById('modalDate').innerText = info.event.start
+                        .toLocaleDateString();
+                    document.getElementById('modalDescription').innerText = info.event.extendedProps
+                        .description || '-';
+
+                    // tampilkan modal (pakai jQuery)
+                    $('#eventModal').modal('show');
+                }
+            });
+            calendar.render();
+        });
+    </script>
 
     </script>
     <script>

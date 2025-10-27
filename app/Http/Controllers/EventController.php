@@ -24,8 +24,10 @@ class EventController extends Controller
         $event = Event::with('tapel', 'instansi')->where('tapel_id', $tapelAktif->id)->where('instansi_id', $instansiOperator->id)->get();
         $semuaEvent = Event::with('tapel', 'instansi')->where('tapel_id', $tapelAktif->id)->get();
 
+
+        // dd($event);
         // route view jangan lupa untuk diganti
-        return view('', compact('event', 'semuaEvent'));
+        return view('event.main', compact('event', 'semuaEvent'));
     }
 
     public function createEventOperator()
@@ -38,7 +40,7 @@ class EventController extends Controller
         $instansiOperator = $user->instansi()->first();
         $tapelAktif = Tapel::where('status', 'aktif');
 
-        return view('', compact('instansiOperator', 'tapelAktif'));
+        return view('event.tambah', compact('instansiOperator', 'tapelAktif'));
     }
 
     public function storeEventOperator(Request $request)
@@ -77,7 +79,7 @@ class EventController extends Controller
             "tanggal_selesai" => $request->tanggal_selesai
         ]);
 
-        return redirect()->route()->with('success', 'Anda berhasil menginputkan data');
+        return redirect()->route('')->with('success', 'Anda berhasil menginputkan data');
     }
 
     public function editEventOperator(string $id)
@@ -91,7 +93,7 @@ class EventController extends Controller
         $tapelAktif = Tapel::where('status', 'aktif');
         $event = Event::findOrFail($id);
 
-        return view('', compact('instansiOperator', 'tapelAktif', 'event'));
+        return view('event.edit', compact('instansiOperator', 'tapelAktif', 'event'));
     }
 
     public function updateEventOperator(Request $request, string $id)
@@ -131,7 +133,7 @@ class EventController extends Controller
             "tanggal_selesai" => $request->tanggal_selesai
         ]);
 
-        return redirect()->route()->with('success', 'Anda berhasil mengedit data');
+        return redirect()->route('')->with('success', 'Anda berhasil mengedit data');
     }
 
     public function deleteEventOperator(string $id)
@@ -147,7 +149,7 @@ class EventController extends Controller
         }
 
         $event->delete();
-        return redirect()->route()->with('success', 'Anda berhasil menghapus data');
+        return redirect()->route('')->with('success', 'Anda berhasil menghapus data');
     }
 
     //------------------------------------------------{Untuk User}-----------------------------------------------

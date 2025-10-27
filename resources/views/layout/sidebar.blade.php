@@ -73,6 +73,10 @@
                     <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
                     </li>
+                    {{-- INI UNTUK EVENT --}}
+                    <li class="{{ Route::is('indexEventOperator') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('indexEventOperator') }}">Management Acara</a>
+                    </li>
                 @endif
 
                 {{-- menu untuk operator instansi --}}
@@ -85,6 +89,10 @@
                     </li>
                     <li class="{{ Route::is('hariLibur.*') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('hariLibur.index') }}">Management Hari Libur</a>
+                    </li>
+                    {{-- INI UNTUK EVENT --}}
+                    <li class="{{ Route::is('indexEventOperator') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('indexEventOperator') }}">Management Acara</a>
                     </li>
                 @endif
 
