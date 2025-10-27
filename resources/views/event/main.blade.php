@@ -43,7 +43,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($semuaEvent as $item)
+                                                @forelse ($eventAdmin as $item)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $item->tapel->kode }}</td>

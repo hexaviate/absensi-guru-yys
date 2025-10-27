@@ -27,8 +27,7 @@ class EventController extends Controller
         if ($user->hasRole('admin_yayasan')) {
             $semuaEvent = Event::with('tapel', 'instansi')->where('tapel_id', $tapelAktif->id)->get();
             $eventAdmin = Event::with('tapel', 'instansi')->where('tapel_id', $tapelAktif->id)->where('instansi_id', 7)->get();
-            return view('', compact('eventAdmin', 'semuaEvent'));
-
+            return view('event.main', compact('eventAdmin', 'semuaEvent'));
         }
 
         // route view jangan lupa untuk diganti
@@ -42,8 +41,13 @@ class EventController extends Controller
             return redirect()->back()->with('error', 'Anda tidak punya permission');
         }
 
-        $instansiOperator = $user->instansi()->first();
-        $tapelAktif = Tapel::where('status', 'aktif');
+        if ($user->hasRole('admin_yayasan')) {
+            $instansiOperator = \App\Models\Instansi::find(7);
+        } else {
+            $instansiOperator = $user->instansi()->first();
+        }
+
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
 
         return view('event.tambah', compact('instansiOperator', 'tapelAktif'));
     }
@@ -72,9 +76,18 @@ class EventController extends Controller
             return redirect()->back()->with('error', $validator->errors());
         }
 
+        $instansiOperator = $user->hasRole('admin_yayasan')
+            ? \App\Models\Instansi::find(7)
+            : $user->instansi()->first();
+
+        if (!$instansiOperator) {
+            return redirect()->back()->with('error', 'Data instansi operator tidak ditemukan');
+        }
+
         if ($request->instansi_id != $instansiOperator->id) {
             return redirect()->back()->with('error', 'Anda tidak terdaftar di instansi ini');
         }
+
 
         if ($user->hasRole('admin_yayasan')) {
             Event::create([
@@ -87,7 +100,7 @@ class EventController extends Controller
                 "tanggal_selesai" => $request->tanggal_selesai
             ]);
 
-            return redirect()->route()->with('success', 'Anda berhasil menginputkan data');
+            return redirect()->route('indexEventOperator')->with('success', 'Anda berhasil menginputkan data');
         }
 
         Event::create([
@@ -100,7 +113,7 @@ class EventController extends Controller
             "tanggal_selesai" => $request->tanggal_selesai
         ]);
 
-        return redirect()->route('')->with('success', 'Anda berhasil menginputkan data');
+        return redirect()->route('indexEventOperator')->with('success', 'Anda berhasil menginputkan data');
     }
 
     public function editEventOperator(string $id)
@@ -110,7 +123,11 @@ class EventController extends Controller
             return redirect()->back()->with('error', 'Anda tidak punya permission');
         }
 
-        $instansiOperator = $user->instansi()->first();
+        if ($user->hasRole('admin_yayasan')) {
+            $instansiOperator = \App\Models\Instansi::find(7);
+        } else {
+            $instansiOperator = $user->instansi()->first();
+        }
         $tapelAktif = Tapel::where('status', 'aktif');
         $event = Event::findOrFail($id);
 
@@ -125,7 +142,11 @@ class EventController extends Controller
         }
 
         $tapelAktif = Tapel::where('status', 'aktif')->first();
-        $instansiOperator = $user->instansi()->first();
+        if ($user->hasRole('admin_yayasan')) {
+            $instansiOperator = \App\Models\Instansi::find(7);
+        } else {
+            $instansiOperator = $user->instansi()->first();
+        }
         $event = Event::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
@@ -154,7 +175,7 @@ class EventController extends Controller
             "tanggal_selesai" => $request->tanggal_selesai
         ]);
 
-        return redirect()->route('')->with('success', 'Anda berhasil mengedit data');
+        return redirect()->route('indexEventOperator')->with('success', 'Anda berhasil mengedit data');
     }
 
     public function deleteEventOperator(string $id)

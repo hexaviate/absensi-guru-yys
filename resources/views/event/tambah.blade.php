@@ -1,198 +1,158 @@
 @extends('layout.main')
-
 @section('main')
     <section class="section">
         <div class="section-header">
-            <h1>Halaman Management Hari Libur</h1>
+            <h1>Tambah Event</h1>
             <div class="section-header-breadcrumb">
-                <div class="breadcrumb-item active"><a href="#">Hari Libur</a></div>
+                <div class="breadcrumb-item active"><a href="#">Event</a></div>
                 <div class="breadcrumb-item">Dashboard</div>
             </div>
         </div>
 
-        <div class="section-body">
-            <div class="shadow pb-2">
-                <a href="{{ route('hariLibur.create') }}" class="btn btn-primary m-2 shadow">Tambah Data Hari Libur</a>
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible show fade">
+                <div class="alert-title">Error!</div>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+        @endif
 
-            @hasanyrole('admin_yayasan')
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card shadow">
-                            <div class="card-header">
-                                <h4>Data Hari Libur</h4>
+        <div class="section-body">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Form Tambah Event</h5>
+                </div>
+
+                <div class="card-body">
+                    <form action="{{ route('storeEventOperator') }}" method="POST">
+                        @csrf
+                        <div class="row">
+                            {{-- Tahun Pelajaran --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="tapel" class="form-label">Tahun Pelajaran <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control"
+                                    value="{{ $tapelAktif ? $tapelAktif->kode : 'Tidak ada tahun pelajaran aktif' }}"
+                                    readonly>
+                                <input type="hidden" name="tapel_id" value="{{ $tapelAktif ? $tapelAktif->id : '' }}">
                             </div>
-                            <div class="card-body">
-                                @if ($semuaHariLibur->isEmpty())
-                                    <div class="d-flex justify-content-center align-items-center" style="height: 50px;">
-                                        <span class="font-weight-bold">Data Jadwal Kosong</span>
-                                    </div>
-                                @else
-                                    <div class="table-responsive">
-                                        <table id="example" class="table table-striped table-bordered table-md">
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Tahun Pelajaran</th>
-                                                    <th>Nama Instansi</th>
-                                                    <th>keterangan Libur</th>
-                                                    <th>Tanggal Libur</th>
-                                                    <th>Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse ($semuaHariLibur as $item)
-                                                    <tr>
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td>{{ $item->tapel->kode }}</td>
-                                                        <td>{{ $item->instansi->nama_instansi }}</td>
-                                                        <td>{{ $item->keterangan }}</td>
-                                                        <td>{{ $item->tanggal }}</td>
-                                                        <td class="d-flex">
-                                                            <a href="{{ route('hariLibur.edit', $item->id) }}"
-                                                                class="btn btn-warning mx-2">Edit</a>
-                                                            <form action="{{ route('hariLibur.destroy', $item->id) }}"
-                                                                method="POST">
-                                                                @csrf
-                                                                @method('delete')
-                                                                <button type="submit"
-                                                                    class="btn btn-danger delete-btn">Hapus</button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="7" class="text-center">Data Hari Libur Kosong</td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @endif
+
+                            {{-- Instansi --}}
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Instansi <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control"
+                                    value="{{ $instansiOperator ? $instansiOperator->nama_instansi : 'Tidak ada instansi' }}"
+                                    readonly>
+                                <input type="hidden" name="instansi_id"
+                                    value="{{ $instansiOperator ? $instansiOperator->id : '' }}">
                             </div>
                         </div>
-                    </div>
-                </div>
-            @endhasanyrole
 
-            @hasanyrole('operator_instansi')
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card shadow">
-                            <div class="card-header">
-                                <h4>Data Hari Libur</h4>
+                        <div class="row">
+                            {{-- Nama Event --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="nama_event" class="form-label">Nama Event <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control @error('nama_event') is-invalid @enderror"
+                                    id="nama_event" name="nama_event" placeholder="Contoh: Peringatan Hari Kartini"
+                                    value="{{ old('nama_event') }}" required>
+                                @error('nama_event')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-                            <div class="card-body">
-                                @if ($operatorHariLibur->isEmpty())
-                                    <div class="d-flex justify-content-center align-items-center" style="height: 50px;">
-                                        <span class="font-weight-bold">Data Jadwal Kosong</span>
-                                    </div>
-                                @else
-                                    <div class="table-responsive">
-                                        <table id="example" class="table table-striped table-bordered table-md">
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Tahun Pelajaran</th>
-                                                    <th>Nama Instansi</th>
-                                                    <th>keterangan Libur</th>
-                                                    <th>Tanggal Libur</th>
-                                                    <th>Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse ($operatorHariLibur as $item)
-                                                    <tr>
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td>{{ $item->tapel->kode }}</td>
-                                                        <td>{{ $item->instansi->nama_instansi }}</td>
-                                                        <td>{{ $item->keterangan }}</td>
-                                                        <td>{{ $item->tanggal }}</td>
-                                                        <td class="d-flex">
-                                                            <a href="{{ route('hariLibur.edit', $item->id) }}"
-                                                                class="btn btn-warning mx-2">Edit</a>
-                                                            <form action="{{ route('hariLibur.destroy', $item->id) }}"
-                                                                method="POST">
-                                                                @csrf
-                                                                @method('delete')
-                                                                <button type="submit"
-                                                                    class="btn btn-danger delete-btn">Hapus</button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="7" class="text-center">Data Hari Libur Kosong</td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @endif
+
+                            {{-- Tipe Event (Jika Admin Yayasan) --}}
+                            @if (auth()->user()->hasRole('admin_yayasan'))
+                                <div class="col-md-6 mb-3">
+                                    <label for="tipe" class="form-label">Tipe Event</label>
+                                    <select class="form-control @error('tipe') is-invalid @enderror" id="tipe"
+                                        name="tipe">
+                                        <option value="internal" {{ old('tipe') == 'internal' ? 'selected' : '' }}>Internal
+                                        </option>
+                                        <option value="eksternal" {{ old('tipe') == 'eksternal' ? 'selected' : '' }}>
+                                            Eksternal</option>
+                                    </select>
+                                    @error('tipe')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="row">
+                            {{-- Keterangan --}}
+                            <div class="col-md-12 mb-3">
+                                <label for="keterangan" class="form-label">Keterangan <span
+                                        class="text-danger">*</span></label>
+                                <textarea class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" name="keterangan"
+                                    rows="3" placeholder="Masukkan keterangan event..." required>{{ old('keterangan') }}</textarea>
+                                @error('keterangan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
-                    </div>
+
+                        <div class="row">
+                            {{-- Tanggal Mulai --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="tanggal_mulai" class="form-label">Tanggal Mulai <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" class="form-control @error('tanggal_mulai') is-invalid @enderror"
+                                    id="tanggal_mulai" name="tanggal_mulai" value="{{ old('tanggal_mulai') }}" required>
+                                @error('tanggal_mulai')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- Tanggal Selesai --}}
+                            <div class="col-md-6 mb-3">
+                                <label for="tanggal_selesai" class="form-label">Tanggal Selesai <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" class="form-control @error('tanggal_selesai') is-invalid @enderror"
+                                    id="tanggal_selesai" name="tanggal_selesai" value="{{ old('tanggal_selesai') }}"
+                                    required>
+                                @error('tanggal_selesai')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-0">
+                            <div class="d-flex justify-content-end" style="gap: 10px;">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fas fa-save"></i> Simpan
+                                </button>
+                                <a href="{{ route('indexEventOperator') }}" class="btn btn-secondary px-4">
+                                    <i class="fas fa-times"></i> Batal
+                                </a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            @endhasanyrole
+            </div>
         </div>
     </section>
 @endsection
 
-@push('script')
-    {{-- <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> --}}
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+@push('scripts')
     <script>
-        $(document).ready(function() {
-            $('#example').DataTable({
-                "pagingType": "full_numbers", // biar ada prev, next, first, last
-                "language": {
-                    "paginate": {
-                        "first": "<i class='fas fa-angle-double-left'></i>",
-                        "last": "<i class='fas fa-angle-double-right'></i>",
-                        "next": "<i class='fas fa-chevron-right'></i>",
-                        "previous": "<i class='fas fa-chevron-left'></i>"
-                    }
-                }
-            });
+        // Validasi tanggal selesai tidak boleh kurang dari tanggal mulai
+        document.getElementById('tanggal_mulai').addEventListener('change', function() {
+            document.getElementById('tanggal_selesai').min = this.value;
         });
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            $('.delete-btn').on('click', function(e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-
-                swal({
-                    title: 'Yakin ingin menghapus?',
-                    text: 'Data yang dihapus tidak bisa dikembalikan!',
-                    icon: 'warning',
-                    buttons: {
-                        cancel: {
-                            text: 'Batal',
-                            visible: true,
-                            className: 'btn btn-danger',
-                            closeModal: true,
-                        },
-                        confirm: {
-                            text: 'Ya, hapus!',
-                            visible: true,
-                            className: 'btn btn-primary',
-                            closeModal: true,
-                        }
-                    },
-                    dangerMode: true,
-                }).then((willDelete) => {
-                    if (willDelete) {
-                        form.submit();
-                    }
-                });
-            });
+        document.getElementById('tanggal_selesai').addEventListener('change', function() {
+            const tanggalMulai = document.getElementById('tanggal_mulai').value;
+            if (tanggalMulai && this.value < tanggalMulai) {
+                alert('Tanggal selesai tidak boleh kurang dari tanggal mulai!');
+                this.value = tanggalMulai;
+            }
         });
     </script>
 @endpush
-
-@push('style')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-@endpush
-
