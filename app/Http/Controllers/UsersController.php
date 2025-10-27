@@ -106,9 +106,9 @@ class UsersController extends Controller
 
         // dd($request->instansi_id[0]);
 
-        if ($request->instansi_id[0] != $user->instansi()->first()->id) {
-            return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
-        }
+        // if ($request->instansi_id[0] != $user->instansi()->first()->id) {
+        //     return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
+        // }
         // if ($user->hasRole('operator_instansi') && $request->instansi_id != $user->instansi()->first()->id) {
         //     return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
         // }
@@ -236,9 +236,9 @@ class UsersController extends Controller
             return redirect()->back()->with('error', 'anda tidak punya permission');
         }
 
-        if ($user->hasRole('operator_instansi') && $request->instansi_id != $user->instansi()->first()->id) {
-            return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
-        }
+        // if ($user->hasRole('operator_instansi') && $request->instansi_id != $user->instansi()->first()->id) {
+        //     return redirect()->back()->with('error', 'anda tidak terdaftar di instansi ini');
+        // }
 
         // Prepare data untuk update
         $dataUpdate = [

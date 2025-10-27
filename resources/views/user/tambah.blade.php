@@ -72,11 +72,23 @@
                                     @php
                                         $user = auth()->user();
                                         $adalahOperator = $user->hasRole('operator_instansi');
+                                        $adalahAdminYayasan = $user->hasRole('admin_yayasan');
                                         $RoleYangAda = ['tenaga_pendidik', 'tenaga_kependidikan'];
                                     @endphp
 
                                     @forelse ($role as $item)
-                                        @if (!$adalahOperator || in_array($item->name, $RoleYangAda))
+                                        @if ($adalahAdminYayasan)
+                                            {{-- Admin Yayasan bisa lihat semua role --}}
+                                            <label class="selectgroup-item">
+                                                <input type="radio" name="role_id[]" value="{{ $item->id }}"
+                                                    data-role-name="{{ $item->name }}"
+                                                    class="selectgroup-input role-radio"
+                                                    {{ old('role_id') == $item->id ? 'checked' : '' }}>
+                                                <span
+                                                    class="selectgroup-button">{{ Str::of($item->name)->replace('_', ' ')->title() }}</span>
+                                            </label>
+                                        @elseif ($adalahOperator && in_array($item->name, $RoleYangAda))
+                                            {{-- Operator hanya lihat 2 role: tenaga_pendidik dan tenaga_kependidikan --}}
                                             <label class="selectgroup-item">
                                                 <input type="radio" name="role_id[]" value="{{ $item->id }}"
                                                     data-role-name="{{ $item->name }}"
@@ -96,15 +108,16 @@
                                 <label for="nomor_induk_yayasan" class="form-label">Nomor Induk</label>
                                 <input type="text" class="form-control" id="nomor_induk_yayasan"
                                     name="nomor_induk_yayasan" placeholder="Masukkan Nomor Induk Yayasan"
-                                    value="{{ old('nomor_induk_yayasan') }}" step="0.01">
+                                    value="{{ old('nomor_induk_yayasan') }}">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="instansi">Instansi</label>
-                                <div class="form-group">
+                                <div class="form-group" id="instansi-container">
                                     @php
                                         $user = auth()->user();
                                         $isOperator = $user->hasRole('operator_instansi');
+                                        $isAdminYayasan = $user->hasRole('admin_yayasan');
                                     @endphp
 
                                     @forelse ($instansi as $item)
@@ -124,7 +137,7 @@
                                                 </div>
                                             @endif
                                         @else
-                                            {{-- tampilkan semua instansi untuk non-operator --}}
+                                            {{-- tampilkan semua instansi untuk admin yayasan --}}
                                             <div class="form-check form-check-inline instansi-item"
                                                 data-instansi-name="{{ strtolower($item->nama_instansi) }}"
                                                 data-instansi-id="{{ $item->id }}">
@@ -142,6 +155,7 @@
                                     @endforelse
 
                                 </div>
+                                <small id="instansi-helper" class="d-block mt-2"></small>
                             </div>
 
                             <div class="col-md-12 mb-3">
@@ -150,102 +164,8 @@
                                     <a href="{{ route('user.index') }}" class="btn btn-secondary">Batal</a>
                                 </div>
                             </div>
+                        </div>
                     </form>
-                </div>
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"> Import Data Users</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- INFO BOX -->
-                        <div class="alert alert-info mb-3">
-                            <div class="d-flex">
-                                <div class="flex-shrink-0">
-                                    <i class="fas fa-info-circle fa-2x mr-2"></i>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="alert-heading"><strong>Panduan Import:</strong></h6>
-                                    <ol class="mb-0">
-                                        <li>Klik tombol <strong>"Download Template"</strong> untuk mendapatkan format Excel
-                                            yang benar</li>
-                                        <li>Isi data user sesuai format yang ada di template</li>
-                                        <li>Upload file yang sudah diisi dan klik tombol <strong>"Import"</strong></li>
-                                    </ol>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- WARNING BOX -->
-                        <div class="alert alert-warning mb-4">
-                            <div class="d-flex">
-                                <div class="flex-shrink-0 mr-2">
-                                    <i class="fas fa-exclamation-triangle fa-2x"></i>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="alert-heading"><strong>Perhatian Penting:</strong></h6>
-                                    <ul class="mb-0">
-                                        <li><strong>Jika ada 1 baris saja yang error, maka SEMUA data tidak akan
-                                                diimport</strong></li>
-                                        <li>Username tidak boleh duplikat dengan user yang sudah ada</li>
-                                        <li>Semua kolom wajib diisi sesuai ketentuan</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FORM IMPORT -->
-                        <form action="{{ route('users.import') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="file" class="form-label">
-                                        <i class="fas fa-file-excel"></i> Pilih File Excel
-                                    </label>
-                                    <input type="file" class="form-control @error('file') is-invalid @enderror"
-                                        id="file" name="file" accept=".xlsx,.xls,.csv" required>
-                                    @error('file')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="text-muted">
-                                        <i class="fas fa-paperclip"></i> Format yang didukung: .xlsx, .xls, .csv (Maksimal
-                                        2MB)
-                                    </small>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Format Kolom Excel</label>
-                                    <div class="border rounded p-2" style="background: #f8f9fa; font-size: 12px;">
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <i class="fas fa-check text-success"></i> nomor_induk_yayasan<br>
-                                                <i class="fas fa-check text-success"></i> name<br>
-                                                <i class="fas fa-check text-success"></i> telp<br>
-                                                <i class="fas fa-check text-success"></i> username
-                                            </div>
-                                            <div class="col-6">
-                                                <i class="fas fa-check text-success"></i> password<br>
-                                                <i class="fas fa-check text-success"></i> jarak_tempuh<br>
-                                                <i class="fas fa-check text-success"></i> nama_instansi<br>
-                                                <i class="fas fa-check text-success"></i> peran
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-end" style="gap: 10px;">
-                                <a href="{{ route('users.template') }}" class="btn btn-success px-4">
-                                    <i class="fa-solid fa-download mr-2"></i>Download Template
-                                </a>
-                                <button type="submit" class="btn btn-primary px-4">
-                                    <i class="fas fa-upload mr-2"></i>Import Sekarang
-                                </button>
-                                <a href="{{ route('user.index') }}" class="btn btn-secondary">
-                                    <i class="fas fa-times mr-2"></i>Batal
-                                </a>
-                            </div>
-                        </form>
-                    </div>
                 </div>
             </div>
     </section>
@@ -255,33 +175,60 @@
 @push('script')
     <script>
         $(document).ready(function() {
+            // Data semua instansi untuk digunakan saat role admin_yayasan dipilih
+            var allInstansiIds = [];
+            $('.instansi-checkbox').each(function() {
+                allInstansiIds.push($(this).val());
+            });
+
+            // Cek user yang login dari data attribute (tambahkan di blade)
+            var loginUserRole = $('body').data('login-user-role') || 'admin_yayasan';
+
+            // Fungsi untuk cek apakah user adalah admin_yayasan (check dari radio yang ada)
+            function isAdminYayasanRole() {
+                var selectedRole = $('.role-radio:checked').data('role-name');
+                return selectedRole && selectedRole.toLowerCase() === 'admin_yayasan';
+            }
+
+            // Fungsi untuk cek apakah user adalah operator_instansi (check dari radio yang ada)
+            function isOperatorInstansiRole() {
+                var selectedRole = $('.role-radio:checked').data('role-name');
+                return selectedRole && selectedRole.toLowerCase() === 'operator_instansi';
+            }
 
             // Fungsi untuk filter dan validasi instansi berdasarkan role
             function filterInstansiByRole() {
                 var selectedRole = $('.role-radio:checked').data('role-name');
                 var roleName = selectedRole ? selectedRole.toLowerCase() : '';
 
-                // Reset semua instansi
+                // Reset tampilan
                 $('.instansi-item').show();
-                $('.instansi-checkbox').prop('disabled', false).off('change'); // Hapus event listener lama
+                $('.instansi-checkbox').prop('disabled', false).off('change');
                 $('#instansi-helper').text('');
 
                 if (!roleName) {
-                    // Jika belum pilih role, disable semua instansi
                     $('.instansi-checkbox').prop('disabled', true);
                     $('#instansi-helper').text('Silakan pilih role terlebih dahulu').addClass('text-warning');
                     return;
                 }
 
-                // ROLE: Admin Yayasan - Tampil semua instansi
-                if (roleName === 'admin_yayasan' || roleName === 'admin yayasan') {
-                    $('#instansi-helper').text('Pilih semua instansi yang diperlukan').removeClass('text-warning')
-                        .addClass('text-info');
+                // ROLE: Admin Yayasan - AUTO SELECT SEMUA INSTANSI
+                if (roleName === 'admin_yayasan') {
+                    // Uncheck semua dulu
+                    $('.instansi-checkbox').prop('checked', false);
+
+                    // Check semua yang visible
+                    $('.instansi-checkbox:visible').prop('checked', true);
+
+                    // Disable semua (tidak bisa diubah)
+                    $('.instansi-checkbox').prop('disabled', true);
+
+                    $('#instansi-helper').text('Semua instansi dipilih otomatis untuk Admin Yayasan')
+                        .removeClass('text-warning').addClass('text-info');
                 }
 
-                // ROLE: Operator Instansi - Maksimal 1 instansi, kecuali Puspela
-                else if (roleName === 'operator_instansi' || roleName === 'operator instansi') {
-                    // Sembunyikan Puspela
+                // ROLE: Operator Instansi - MAKSIMAL 1 INSTANSI
+                else if (roleName === 'operator_instansi') {
                     $('.instansi-item').each(function() {
                         var instansiName = $(this).data('instansi-name');
                         if (instansiName.includes('puspela')) {
@@ -290,16 +237,14 @@
                         }
                     });
 
-                    $('#instansi-helper').text('Maksimal memilih 1 instansi (kecuali Puspela)').addClass(
-                        'text-warning');
+                    $('#instansi-helper').text('Maksimal memilih 1 instansi (kecuali Puspela)')
+                        .addClass('text-warning');
 
-                    // Validasi maksimal 1 checkbox
                     validateMaxInstansi(1);
                 }
 
-                // ROLE: Tenaga Pendidik - Semua kecuali Puspela (BISA BANYAK)
-                else if (roleName === 'tenaga_pendidik' || roleName === 'tenaga pendidik') {
-                    // Sembunyikan Puspela
+                // ROLE: Tenaga Pendidik - BISA BANYAK INSTANSI
+                else if (roleName === 'tenaga_pendidik') {
                     $('.instansi-item').each(function() {
                         var instansiName = $(this).data('instansi-name');
                         if (instansiName.includes('puspela')) {
@@ -308,15 +253,21 @@
                         }
                     });
 
-                    $('#instansi-helper').text('Pilih instansi yang diperlukan (kecuali Puspela)').removeClass(
-                            'text-warning')
-                        .addClass('text-info');
-                    // TIDAK ada batasan jumlah
+                    @if ($user->hasRole('admin_yayasan'))
+                        $('#instansi-helper').text(
+                                'Pilih instansi yang diperlukan - Bisa lebih dari 1')
+                            .removeClass('text-warning').addClass('text-info');
+                    @else
+                        $('#instansi-helper').text(
+                                'Pilih instansi')
+                            .removeClass('text-warning').addClass('text-info');
+                    @endif
+
+                    // TIDAK ada event listener untuk batasan jumlah
                 }
 
-                // ROLE: Tenaga Kependidikan - Maksimal 1, kecuali Puspela
-                else if (roleName === 'tenaga_kependidikan' || roleName === 'tenaga kependidikan') {
-                    // Sembunyikan Puspela
+                // ROLE: Tenaga Kependidikan - MAKSIMAL 1 INSTANSI
+                else if (roleName === 'tenaga_kependidikan') {
                     $('.instansi-item').each(function() {
                         var instansiName = $(this).data('instansi-name');
                         if (instansiName.includes('puspela')) {
@@ -325,27 +276,25 @@
                         }
                     });
 
-                    $('#instansi-helper').text('Maksimal memilih 1 instansi (kecuali Puspela)').addClass(
-                        'text-warning');
+                    $('#instansi-helper').text('Maksimal memilih 1 instansi (kecuali Puspela)')
+                        .addClass('text-warning');
 
-                    // Validasi maksimal 1 checkbox
                     validateMaxInstansi(1);
-                } else {
-                    $('#instansi-helper').text('Pilih instansi yang sesuai').removeClass('text-warning').addClass(
-                        'text-info');
                 }
             }
 
-            // Fungsi validasi maksimal instansi
+            // Fungsi validasi maksimal instansi dengan auto-uncheck
             function validateMaxInstansi(maxCount) {
                 $('.instansi-checkbox:visible').on('change', function() {
                     var checkedCount = $('.instansi-checkbox:checked:visible').length;
 
-                    if (checkedCount >= maxCount) {
-                        // Disable checkbox yang belum dicentang
+                    if (checkedCount > maxCount) {
+                        // Uncheck checkbox yang baru saja diklik jika sudah melampaui maksimal
+                        $(this).prop('checked', false);
+                        alert('Maksimal memilih ' + maxCount + ' instansi!');
+                    } else if (checkedCount >= maxCount) {
                         $('.instansi-checkbox:not(:checked):visible').prop('disabled', true);
                     } else {
-                        // Enable semua checkbox yang visible
                         $('.instansi-checkbox:visible').prop('disabled', false);
                     }
                 });
@@ -353,18 +302,19 @@
 
             // Event ketika role dipilih
             $('.role-radio').on('change', function() {
-                // Uncheck semua instansi
-                $('.instansi-checkbox').prop('checked', false);
+                // Uncheck semua instansi (KECUALI untuk admin_yayasan yang akan di-handle di filterInstansiByRole)
+                if (!isAdminYayasanRole()) {
+                    $('.instansi-checkbox').prop('checked', false);
+                }
 
                 // Filter instansi berdasarkan role
                 filterInstansiByRole();
             });
 
-            // Jalankan filter saat pertama kali load (jika ada old input)
+            // Jalankan filter saat pertama kali load
             if ($('.role-radio:checked').length > 0) {
                 filterInstansiByRole();
             } else {
-                // Disable instansi jika belum pilih role
                 $('.instansi-checkbox').prop('disabled', true);
             }
 
@@ -374,26 +324,20 @@
                 var roleName = selectedRole ? selectedRole.toLowerCase() : '';
                 var checkedInstansi = $('.instansi-checkbox:checked').length;
 
-                // Validasi role harus dipilih
                 if (!roleName) {
                     e.preventDefault();
                     alert('Silakan pilih role terlebih dahulu!');
                     return false;
                 }
 
-                // Validasi instansi harus dipilih
+                // Admin Yayasan otomatis select semua, jadi tidak perlu validasi
+                if (roleName === 'admin_yayasan') {
+                    return true;
+                }
+
                 if (checkedInstansi === 0) {
                     e.preventDefault();
                     alert('Silakan pilih minimal 1 instansi!');
-                    return false;
-                }
-
-                // Validasi maksimal 1 instansi untuk Operator Instansi dan Tenaga Kependidikan
-                if ((roleName === 'operator_instansi' || roleName === 'operator instansi' ||
-                        roleName === 'tenaga_kependidikan' || roleName === 'tenaga kependidikan') &&
-                    checkedInstansi > 1) {
-                    e.preventDefault();
-                    alert('Maksimal memilih 1 instansi untuk role ' + selectedRole + '!');
                     return false;
                 }
 
