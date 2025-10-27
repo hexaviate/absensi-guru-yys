@@ -24,6 +24,13 @@ class EventController extends Controller
         $event = Event::with('tapel', 'instansi')->where('tapel_id', $tapelAktif->id)->where('instansi_id', $instansiOperator->id)->get();
         $semuaEvent = Event::with('tapel', 'instansi')->where('tapel_id', $tapelAktif->id)->get();
 
+        if ($user->hasRole('admin_yayasan')) {
+            $semuaEvent = Event::with('tapel', 'instansi')->where('tapel_id', $tapelAktif->id)->get();
+            $eventAdmin = Event::with('tapel', 'instansi')->where('tapel_id', $tapelAktif->id)->where('instansi_id', 7)->get();
+            return view('', compact('eventAdmin', 'semuaEvent'));
+
+        }
+
         // route view jangan lupa untuk diganti
         return view('', compact('event', 'semuaEvent'));
     }
@@ -51,6 +58,7 @@ class EventController extends Controller
         $tapelAktif = Tapel::where('status', 'aktif')->first();
         $instansiOperator = $user->instansi()->first();
 
+
         $validator = Validator::make($request->all(), [
             'tapel_id' => 'required',
             'instansi_id' => 'required',
@@ -68,11 +76,26 @@ class EventController extends Controller
             return redirect()->back()->with('error', 'Anda tidak terdaftar di instansi ini');
         }
 
+        if ($user->hasRole('admin_yayasan')) {
+            Event::create([
+                "tapel_id" => $request->tapel_id,
+                "instansi_id" => $request->instansi_id,
+                "nama_event" => $request->nama_event,
+                "keterangan" => $request->keterangan,
+                "tipe" => $request->tipe,
+                "tanggal_mulai" => $request->tanggal_mulai,
+                "tanggal_selesai" => $request->tanggal_selesai
+            ]);
+
+            return redirect()->route()->with('success', 'Anda berhasil menginputkan data');
+        }
+
         Event::create([
             "tapel_id" => $request->tapel_id,
             "instansi_id" => $request->instansi_id,
             "nama_event" => $request->nama_event,
             "keterangan" => $request->keterangan,
+            "tipe" => 'internal',
             "tanggal_mulai" => $request->tanggal_mulai,
             "tanggal_selesai" => $request->tanggal_selesai
         ]);
@@ -159,8 +182,17 @@ class EventController extends Controller
             return redirect()->back()->with('error', 'Anda tidak punya permission');
         }
 
-        $user = User::with('instansi.event')->find(auth()->id());
-        return view('', compact('user'));
+        $tapelAktif = Tapel::where('status', 'aktif');
+        $user = User::with([
+            'instansi.event' => function ($query) {
+                $query->whereHas('tapel', function ($q) {
+                    $q->where('status', 'aktif');
+                });
+            }
+        ])->find(auth()->id());
+
+        $eventYayasan = Event::where('tipe', 'yayasan')->where('tapel_id', $tapelAktif->id);
+        return view('', compact('user', 'eventYayasan'));
 
         //* cara untuk mengakses data event pada instansi yang dimili user adalah sebagai berikut
         // foreach ($user->instansi() as $instansi) {
