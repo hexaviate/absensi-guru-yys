@@ -151,12 +151,4 @@ class ProfileController extends Controller
 
         return view('', compact('user', 'tapelAktif', 'wajibHadir', 'hadir', 'izin', 'tidakHadir'));// view nanti diganti
     }
-
-    public function viewUserDetail(string $id)
-    {
-        $user = auth()->user();
-        if (!$user->can('view self jadwal')) {
-            return redirect()->back();
-        }
-    }
 }

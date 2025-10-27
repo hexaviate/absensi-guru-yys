@@ -59,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('jadwalUser', 'viewJadwalMingguIni')->name('jadwalUser');
         Route::get('viewRiwayatAbsensi', 'viewRiwayatAbsensi');
         Route::get('viewJadwalHariIni', 'viewJadwalHariIni');
+        Route::get('viewSelfProfile', 'viewSelfProfile');
     });
 
     Route::controller(EventController::class)->group(function () {
