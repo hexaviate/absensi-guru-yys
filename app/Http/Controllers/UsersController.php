@@ -7,6 +7,7 @@ use App\Exports\TemplateOperatorInstansiExport;
 use App\Imports\UsersImport;
 use App\Imports\UsersImportOperator;
 use App\Models\Instansi;
+use App\Models\Tapel;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;
@@ -160,7 +161,19 @@ class UsersController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $userLogin = auth()->user();
+        if (!$userLogin->can('manage users')) {
+            return redirect()->back()->with('error', 'Anda tidak mempunya permission');
+        }
+
+        $user = User::find($id);
+        $tapelAktif = Tapel::where('status', 'aktif')->first();
+        $wajibHadir = $user->wajib_hadir;
+        $hadir = $user->presensi()->where('tapel_id', $tapelAktif->id)->where('status', 'hadir')->count();
+        $izin = $user->presensi()->where('tapel_id', $tapelAktif->id)->where('status', 'izin')->count();
+        $tidakHadir = $user->tidak_hadir()->where('tapel_id', $tapelAktif->id)->count();
+
+        return view('', compact('user', 'wajibHadir', 'hadir', 'izin', 'tidakHadir'));
     }
 
     /**
@@ -354,7 +367,7 @@ class UsersController extends Controller
     public function downloadTemplate()
     {
         // ini saya isi nanti ketika sudah ada ini untuk admin yayasan
-          return Excel::download(new TemplateAdminExport(), 'TemplateUserExport.xlsx');
+        return Excel::download(new TemplateAdminExport(), 'TemplateUserExport.xlsx');
     }
 
 
