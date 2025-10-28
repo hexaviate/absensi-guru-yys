@@ -145,11 +145,28 @@ class EventController extends Controller
             return redirect()->back()->with('error', 'Anda tidak terdaftar di instansi ini');
         }
 
+        if ($user->hasRole('admin_yayasan')) {
+            $event->update([
+                "tapel_id" => $request->tapel_id,
+                "instansi_id" => $request->instansi_id,
+                "nama_event" => $request->nama_event,
+                "keterangan" => $request->keterangan,
+                "tipe" => $request->tipe,
+                "tanggal_mulai" => $request->tanggal_mulai,
+                "tanggal_selesai" => $request->tanggal_selesai
+            ]);
+
+
+            return redirect()->route()->with('success', 'Anda berhasil menginputkan data');
+        }
+
+
         $event->update([
             "tapel_id" => $request->tapel_id,
             "instansi_id" => $request->instansi_id,
             "nama_event" => $request->nama_event,
             "keterangan" => $request->keterangan,
+            "tipe" => 'internal',
             "tanggal_mulai" => $request->tanggal_mulai,
             "tanggal_selesai" => $request->tanggal_selesai
         ]);
