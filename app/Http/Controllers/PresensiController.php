@@ -22,7 +22,11 @@ class PresensiController extends Controller
         // return view('tesPresensi.index', compact('instansi'));
         $user = auth()->user();
         $fotoPresensi = $user->foto_presensi;
-        $lokasi = $user->instansi()->get(['latitude', 'longitude', 'nama_instansi', 'instansi_id']);
+        if ($user->hasRole('admin_yayasan')) {
+            $lokasi = $user->instansi()->where('id', 7)->get(['latitude', 'longitude', 'nama_instansi', 'instansi_id']);
+        } else {
+            $lokasi = $user->instansi()->get(['latitude', 'longitude', 'nama_instansi', 'instansi_id']);
+        }
         // $hariIni = Carbon::now()->isoFormat('dddd');
         // dd($hariIni);
         return view('tesPresensi.index', compact('user', 'lokasi', 'fotoPresensi'));
