@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\Tapel;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Traits\HasRoles;
 use Validator;
 
 class EventController extends Controller
@@ -186,12 +187,15 @@ class EventController extends Controller
         }
 
         $event = Event::findOrFail($id);
-        if ($event->instansi_id != $user->instansi()->first()->id) {
-            return redirect()->back()->with('error', 'Anda tidak terdaftar di instansi ini');
+
+        if ($user->hasRole('operator_instansi')) {
+            if ($event->instansi_id != $user->instansi()->first()->id) {
+                return redirect()->back()->with('error', 'Anda tidak terdaftar di instansi ini');
+            }
         }
 
         $event->delete();
-        return redirect()->route('')->with('success', 'Anda berhasil menghapus data');
+        return redirect()->route('indexEventOperator')->with('success', 'Anda berhasil menghapus data');
     }
 
     //------------------------------------------------{Untuk User}-----------------------------------------------

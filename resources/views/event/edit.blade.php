@@ -77,7 +77,7 @@
                                         <option value="internal" {{ old('tipe', $event->tipe) == 'internal' ? 'selected' : '' }}>
                                             Internal
                                         </option>
-                                        <option value="eksternal" {{ old('tipe', $event->tipe) == 'eksternal' ? 'selected' : '' }}>
+                                        <option value="yayasan" {{ old('tipe', $event->tipe) == 'yayasan' ? 'selected' : '' }}>
                                             Eksternal
                                         </option>
                                     </select>

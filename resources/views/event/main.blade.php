@@ -37,6 +37,7 @@
                                                     <th>Nama Instansi</th>
                                                     <th>Acara</th>
                                                     <th>Keterangan</th>
+                                                    <th>Jenis</th>
                                                     <th>Mulai</th>
                                                     <th>Selesai</th>
                                                     <th>Aksi</th>
@@ -50,6 +51,7 @@
                                                         <td>{{ $item->instansi->nama_instansi }}</td>
                                                         <td>{{ $item->nama_event }}</td>
                                                         <td>{{ $item->keterangan }}</td>
+                                                        <td>{{ $item->tipe }}</td>
                                                         <td>{{ $item->tanggal_mulai }}</td>
                                                         <td>{{ $item->tanggal_selesai }}</td>
                                                         <td class="d-flex">

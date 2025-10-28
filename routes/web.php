@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('storeEventOperator', 'storeEventOperator')->name('storeEventOperator');
         Route::get('editEventOperator/{id}', 'editEventOperator')->name('editEventOperator');
         Route::put('updateEventOperator/{id}', 'updateEventOperator')->name('updateEventOperator');
-        Route::delete('deleteEventOperator', 'deleteEventOperator')->name('deleteEventOperator');
+        Route::delete('deleteEventOperator/{id}', 'deleteEventOperator')->name('deleteEventOperator');
 
         //* bawah ini untuk user
         Route::delete('viewEventUser', 'viewEventUser')->name('viewEventUser');

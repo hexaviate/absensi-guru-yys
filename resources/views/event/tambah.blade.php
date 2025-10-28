@@ -75,7 +75,7 @@
                                         name="tipe">
                                         <option value="internal" {{ old('tipe') == 'internal' ? 'selected' : '' }}>Internal
                                         </option>
-                                        <option value="eksternal" {{ old('tipe') == 'eksternal' ? 'selected' : '' }}>
+                                        <option value="yayasan" {{ old('tipe') == 'yayasan' ? 'selected' : '' }}>
                                             Eksternal</option>
                                     </select>
                                     @error('tipe')
@@ -149,7 +149,8 @@
 
         document.getElementById('tanggal_selesai').addEventListener('change', function() {
             const tanggalMulai = document.getElementById('tanggal_mulai').value;
-            if (tanggalMulai && this.value < tanggalMulai) {
+            const tanggals = document.getElementById('tanggal_selesai').value;
+            if (tanggalMulai && this.value < tanggals) {
                 alert('Tanggal selesai tidak boleh kurang dari tanggal mulai!');
                 this.value = tanggalMulai;
             }
