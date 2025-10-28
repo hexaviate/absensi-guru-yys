@@ -139,16 +139,6 @@ class ProfileController extends Controller
 
     public function viewSelfProfile()
     {
-        $user = auth()->user();
-        if (!$user->can('view self ')) {
-            return redirect()->back();
-        }
-        $tapelAktif = Tapel::where('status', 'aktif')->first();
-        $wajibHadir = $user->wajib_hadir;
-        $hadir = $user->presensi()->where('tapel_id', $tapelAktif->id)->where('status', 'hadir')->count();
-        $izin = $user->presensi()->where('tapel_id', $tapelAktif->id)->where('status', 'izin')->count();
-        $tidakHadir = $user->tidak_hadir()->where('tapel_id', $tapelAktif->id)->count();
-
-        return view('', compact('user', 'tapelAktif', 'wajibHadir', 'hadir', 'izin', 'tidakHadir'));// view nanti diganti
+       
     }
 }

@@ -173,7 +173,7 @@ class UsersController extends Controller
         $izin = $user->presensi()->where('tapel_id', $tapelAktif->id)->where('status', 'izin')->count();
         $tidakHadir = $user->tidak_hadir()->where('tapel_id', $tapelAktif->id)->count();
 
-        return view('', compact('user', 'wajibHadir', 'hadir', 'izin', 'tidakHadir'));
+        return view('user.cekProfile', compact('user', 'wajibHadir', 'hadir', 'izin', 'tidakHadir'));
     }
 
     /**

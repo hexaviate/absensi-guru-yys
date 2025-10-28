@@ -11,6 +11,15 @@
         </div>
 
         <div class="section-body">
+            <!-- Back Button -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <a href="{{ route('user.index') }}" class="btn btn-icon icon-left btn-primary">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Daftar User
+                    </a>
+                </div>
+            </div>
+
             <div class="row mt-sm-4">
                 <!-- Left Side - Profile Card -->
                 <div class="col-12 col-md-4">
@@ -18,38 +27,58 @@
                         <div class="card-body text-center">
                             <!-- Profile Picture -->
                             <div class="mb-3">
-                                <img alt="Foto Profil" src="{{ asset('asset/dist/assets/img/avatar/avatar-1.png') }}"
-                                    class="rounded-circle" width="120">
+                                @if($user->foto && file_exists(public_path('foto/' . $user->foto)))
+                                    <img alt="Foto Profil" src="{{ asset('foto/' . $user->foto) }}"
+                                        class="rounded-circle" width="120" height="120" style="object-fit: cover;">
+                                @elseif($user->foto_presensi && file_exists(public_path('foto_presensi/' . $user->foto_presensi)))
+                                    <img alt="Foto Profil" src="{{ asset('foto_presensi/' . $user->foto_presensi) }}"
+                                        class="rounded-circle" width="120" height="120" style="object-fit: cover;">
+                                @else
+                                    <img alt="Foto Profil" src="{{ asset('asset/dist/assets/img/avatar/avatar-1.png') }}"
+                                        class="rounded-circle" width="120">
+                                @endif
                             </div>
 
                             <!-- User Name -->
-                            <h5 class="mb-1">Ujang Maman</h5>
+                            <h5 class="mb-1">{{ $user->name }}</h5>
 
                             <!-- Position -->
                             <p class="text-muted mb-2">
-                                <small>Tenaga Pendidik</small>
+                                <small>{{ $user->role ?? 'Tenaga Pendidik' }}</small>
                             </p>
 
                             <!-- Institution/Company -->
                             <div class="mb-3 pb-3 border-bottom">
                                 <small class="text-muted d-block">
-                                    SMK Salafiyah
+                                    @if ($user->roles->contains('name', 'admin_yayasan'))
+                                        Terdaftar di semua instansi
+                                    @else
+                                        @forelse ($user->instansi as $ins)
+                                            {{ $ins->nama_instansi }}{{ !$loop->last ? ', ' : '' }}
+                                        @empty
+                                            Belum Ada Instansi
+                                        @endforelse
+                                    @endif
                                 </small>
                             </div>
 
                             <!-- Phone Number -->
+                            @if($user->telp)
                             <div class="mb-3">
                                 <small class="text-muted d-block">
-                                    <i class="fas fa-phone"></i> +62 812 3456 7890
+                                    <i class="fas fa-phone"></i> {{ $user->telp }}
                                 </small>
                             </div>
+                            @endif
 
                             <!-- Distance -->
+                            @if(isset($user->distance))
                             <div class="mb-3">
                                 <small class="text-muted d-block">
-                                    <i class="fas fa-map-marker-alt"></i> Jarak Tempuh: 2.5 km
+                                    <i class="fas fa-map-marker-alt"></i> Jarak Tempuh: {{ $user->distance }} km
                                 </small>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -62,7 +91,7 @@
                             <div class="attendance-stat-card attendance-stat-primary">
                                 <div class="stat-content">
                                     <div class="stat-label">Wajib Hadir</div>
-                                    <div class="stat-value">22</div>
+                                    <div class="stat-value">{{ $wajibHadir }}</div>
                                     <div class="stat-unit">hari</div>
                                 </div>
                             </div>
@@ -71,7 +100,7 @@
                             <div class="attendance-stat-card attendance-stat-success">
                                 <div class="stat-content">
                                     <div class="stat-label">Hadir</div>
-                                    <div class="stat-value">20</div>
+                                    <div class="stat-value">{{ $hadir }}</div>
                                     <div class="stat-unit">hari</div>
                                 </div>
                             </div>
@@ -80,7 +109,7 @@
                             <div class="attendance-stat-card attendance-stat-warning">
                                 <div class="stat-content">
                                     <div class="stat-label">Izin</div>
-                                    <div class="stat-value">1</div>
+                                    <div class="stat-value">{{ $izin }}</div>
                                     <div class="stat-unit">hari</div>
                                 </div>
                             </div>
@@ -89,7 +118,7 @@
                             <div class="attendance-stat-card attendance-stat-danger">
                                 <div class="stat-content">
                                     <div class="stat-label">Alpha</div>
-                                    <div class="stat-value">1</div>
+                                    <div class="stat-value">{{ $tidakHadir }}</div>
                                     <div class="stat-unit">hari</div>
                                 </div>
                             </div>
@@ -97,7 +126,25 @@
                     </div>
 
                     <!-- Attendance Percentage Card -->
-                    <div class="card ">
+                    @php
+                        $totalTidakHadir = $izin + $tidakHadir;
+                        $persentaseKehadiran = $wajibHadir > 0 ? ($hadir / $wajibHadir) * 100 : 0;
+                        $persentaseKehadiran = number_format($persentaseKehadiran, 2);
+
+                        // Determine progress bar color based on percentage
+                        if ($persentaseKehadiran >= 90) {
+                            $progressColor = 'linear-gradient(135deg, #28a745 0%, #1e7e34 100%)';
+                            $textColor = '#28a745';
+                        } elseif ($persentaseKehadiran >= 75) {
+                            $progressColor = 'linear-gradient(135deg, #ffc107 0%, #e0a800 100%)';
+                            $textColor = '#ffc107';
+                        } else {
+                            $progressColor = 'linear-gradient(135deg, #dc3545 0%, #bd2130 100%)';
+                            $textColor = '#dc3545';
+                        }
+                    @endphp
+
+                    <div class="card">
                         <div class="card-header">
                             <h4>Tingkat Kehadiran</h4>
                         </div>
@@ -105,13 +152,13 @@
                             <div class="attendance-meter">
                                 <div class="meter-header">
                                     <span>Persentase Kehadiran</span>
-                                    <strong class="meter-percentage">90.91%</strong>
+                                    <strong class="meter-percentage" style="color: {{ $textColor }}">{{ $persentaseKehadiran }}%</strong>
                                 </div>
                                 <div class="progress meter-bar" style="height: 30px; border-radius: 8px; overflow: hidden;">
                                     <div class="progress-bar" role="progressbar"
-                                        style="width: 90.91%; font-size: 14px; display: flex; align-items: center; justify-content: center; font-weight: 600;  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%)"
-                                        aria-valuenow="90.91" aria-valuemin="0" aria-valuemax="100">
-                                        90.91%
+                                        style="width: {{ $persentaseKehadiran }}%; font-size: 14px; display: flex; align-items: center; justify-content: center; font-weight: 600; background: {{ $progressColor }}"
+                                        aria-valuenow="{{ $persentaseKehadiran }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ $persentaseKehadiran }}%
                                     </div>
                                 </div>
                             </div>
@@ -119,13 +166,13 @@
                             <div class="row mt-4">
                                 <div class="col-6">
                                     <div class="meter-stat">
-                                        <div class="meter-stat-value">20</div>
+                                        <div class="meter-stat-value">{{ $hadir }}</div>
                                         <div class="meter-stat-label">Total Hadir</div>
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="meter-stat">
-                                        <div class="meter-stat-value">2</div>
+                                    <div class="meter-stat meter-stat-absent">
+                                        <div class="meter-stat-value">{{ $totalTidakHadir }}</div>
                                         <div class="meter-stat-label">Tidak Hadir</div>
                                     </div>
                                 </div>
@@ -225,7 +272,7 @@
 
         .meter-percentage {
             font-size: 18px;
-            color: #28a745;
+            font-weight: 600;
         }
 
         .meter-bar {
@@ -244,6 +291,18 @@
         .meter-stat:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .meter-stat-absent {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        }
+
+        .meter-stat-absent .meter-stat-value {
+            color: #dc3545;
+        }
+
+        .meter-stat-absent .meter-stat-label {
+            color: #c62828;
         }
 
         .meter-stat-value {

@@ -18,7 +18,8 @@
             <div class="section-body">
                 <div class="shadow pb-2">
                     <a href="{{ route('user.create') }}" class="btn btn-primary m-2 shadow">Tambah Data User</a>
-                    <a href="{{ Auth::user()->hasRole('admin_yayasan') ? route('userImportViewAdmin') : route('userImportViewOperator') }}" class="btn btn-primary m-2 shadow">Import Data User</a>
+                    <a href="{{ Auth::user()->hasRole('admin_yayasan') ? route('userImportViewAdmin') : route('userImportViewOperator') }}"
+                        class="btn btn-primary m-2 shadow">Import Data User</a>
                 </div>
 
                 <div class="row">
@@ -78,6 +79,9 @@
                                                         <td class="d-flex">
                                                             <a class="btn btn-warning mx-1"
                                                                 href="{{ route('user.edit', $item->id) }}">Edit</a>
+                                                            <a class="btn btn-warning mx-1"
+                                                                href="{{ route('user.show', $item->id) }}"><i
+                                                                    class="fa-solid fa-eye mr-1"></i>Cek</a>
                                                             <form action="{{ route('user.destroy', $item->id) }}"
                                                                 method="POST">
                                                                 @csrf
@@ -109,7 +113,8 @@
                     <div class="col-12">
                         <div class="shadow pb-2">
                             <a href="{{ route('user.create') }}" class="btn btn-primary m-2 shadow">Tambah Data User</a>
-                          <a href="{{ Auth::user()->hasRole('admin_yayasan') ? route('userImportViewAdmin') : route('userImportViewOperator') }}" class="btn btn-primary m-2 shadow">Import Data User</a>
+                            <a href="{{ Auth::user()->hasRole('admin_yayasan') ? route('userImportViewAdmin') : route('userImportViewOperator') }}"
+                                class="btn btn-primary m-2 shadow">Import Data User</a>
                         </div>
                         <div class="card shadow">
                             <div class="card-header">
@@ -153,6 +158,9 @@
                                                         <td class="d-flex">
                                                             <a class="btn btn-warning mx-1"
                                                                 href="{{ route('user.edit', $item->id) }}">Edit</a>
+                                                            <a class="btn btn-warning mx-1"
+                                                                href="{{ route('user.edit', $item->id) }}"><i
+                                                                    class="fa-solid fa-eye"></i>Cek</a>
                                                             <form action="{{ route('user.destroy', $item->id) }}"
                                                                 method="POST" class="delete-form d-inline">
                                                                 @csrf

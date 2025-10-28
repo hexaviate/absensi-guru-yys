@@ -179,7 +179,7 @@ class EventController extends Controller
             ]);
 
 
-            return redirect()->route()->with('success', 'Anda berhasil menginputkan data');
+            return redirect()->route('indexEventOperator')->with('success', 'Anda berhasil menginputkan data');
         }
 
 
