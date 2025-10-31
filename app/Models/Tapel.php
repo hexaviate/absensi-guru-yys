@@ -108,4 +108,9 @@ class Tapel extends Model
     {
         return $this->hasMany(Event::class);
     }
+
+    public function WajibHadir()
+    {
+        return $this->hasMany(WajibHadir::class);
+    }
 }

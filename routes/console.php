@@ -129,3 +129,29 @@ Schedule::call(function () {
     }
 })->dailyAt('15:23');
 //diganti menjadi setiap awal bulan
+
+
+//Ini baur tsesting
+Schedule::call(function () {
+    $users = User::with('jadwal', 'wajib_hadir')->all();
+    $tapelAktif = Tapel::where('status', 'aktif')->first();
+    foreach ($users as $user) {
+        if ($user->hasRole('tenaga_pendidik')) {
+            foreach ($user->wajib_hadir() as $wajibHadir) {
+
+            }
+        }
+
+
+
+        // foreach ($user->wajib_hadir() as $wajibHadir) {
+        //     if (!$wajibHadir->where('tapel_id', $tapelAktif->id)) {
+        //         if ($user->hasRole('tenaga_pendidik')) {
+        //             foreach ($user->jadwal() as $jadwal) {
+
+        //             }
+        //         }
+        //     }
+        // }
+    }
+});

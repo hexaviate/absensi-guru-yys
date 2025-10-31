@@ -93,4 +93,9 @@ class User extends Authenticatable
         return $this->hasMany(TidakHadir::class);
     }
 
+    public function wajib_hadir()
+    {
+        return $this->hasMany(WajibHadir::class);
+    }
+
 }
